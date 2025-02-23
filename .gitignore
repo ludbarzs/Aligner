@@ -1,0 +1,12 @@
+# Ignore vitrual env dir
+venv/
+
+# Ignore Python cache dir
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyc
+
+# Ignore environment variables
+.env
