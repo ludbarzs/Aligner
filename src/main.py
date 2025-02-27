@@ -1,4 +1,4 @@
-from image_processing.circularity import (
+from image_processing.coin_detection import (
     coin_top_left_corner,
     find_px_to_mm_ratio,
 )

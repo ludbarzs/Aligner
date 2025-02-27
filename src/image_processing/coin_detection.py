@@ -21,7 +21,7 @@ def calculate_circularity(contour: np.ndarray) -> float:
 
 
 def detect_circles(
-    countours: List[np.ndarray], min_circularity: float = 0.8
+    countours: List[np.ndarray], min_circularity: float = 0.85
 ) -> Optional[List[np.ndarray]]:
     circles = []
 
