@@ -30,7 +30,7 @@ def find_contours(image: np.ndarray, min_area: float = 1000) -> np.ndarray:
     return filtered_contours
 
 
-def view_image(image: np.ndarray, contours: np.ndarray = None):
+def view_image(image: np.ndarray, contours=None):
     if contours is not None:
         # If it's a single contour, wrap it in a list
         if isinstance(contours, np.ndarray):

@@ -1,4 +1,1 @@
-from .coin_detection import *
-from .utils import *
-
-__all__ = ["coin_detection", "utils"]
+__all__ = ["coin_detection", "utils", "drawer_detection"]

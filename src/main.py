@@ -1,21 +1,15 @@
-from image_processing.coin_detection import (
-    coin_top_left_corner,
-    find_px_to_mm_ratio,
-)
-from image_processing.utils import find_contours, load_image, prepare_image, view_image
+from image_processing import *
 
 
 def main():
-    image = load_image("../images/test_7.jpg")
-    prepared_image = prepare_image(image)
+    image = utils.load_image("../images/test_7.jpg")
+    prepared_image = utils.prepare_image(image)
 
-    contours = find_contours(prepared_image)
+    contours = utils.find_contours(prepared_image)
 
-    circle = coin_top_left_corner(contours)
-    view_image(image, circle)
+    circle = coin_detection.coin_top_left_corner(contours)
 
-    px_to_mm_ratio = find_px_to_mm_ratio(circle)
-    print(f"Ratio: {px_to_mm_ratio}")
+    px_to_mm_ratio = coin_detection.find_px_to_mm_ratio(circle)
 
 
 main()
