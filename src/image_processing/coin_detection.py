@@ -21,7 +21,7 @@ def calculate_circularity(contour: np.ndarray) -> float:
 
 
 def detect_circles(
-    countours: List[np.ndarray], min_circularity: float = 0.85
+    countours: List[np.ndarray], min_circularity: float = 0.80
 ) -> Optional[List[np.ndarray]]:
     circles = []
 
@@ -68,7 +68,9 @@ def coin_top_left_corner(contours: List[np.ndarray]) -> np.ndarray:
     return min_circle[1]
 
 
-def find_px_to_mm_ratio(contour: np.ndarray, coin_diameter: float = 24.25) -> float:
+def find_px_to_mm_ratio(
+    image, contour: np.ndarray, coin_diameter: float = 23.25
+) -> float:
     # Smalles circle that can fully enclose the contour
     (x, y), radius = cv.minEnclosingCircle(contour)
 
@@ -76,4 +78,22 @@ def find_px_to_mm_ratio(contour: np.ndarray, coin_diameter: float = 24.25) -> fl
 
     pixel_to_mm_ratio = diameter_px / coin_diameter
 
+    output(image, contour)
     return pixel_to_mm_ratio
+
+
+def output(image, contour):
+    (x, y), radius = cv.minEnclosingCircle(contour)
+    # Convert to integer values for drawing
+    center = (int(x), int(y))
+    radius = int(radius)
+
+    # Draw the center dot
+    cv.circle(image, center, 3, (0, 0, 255), -1)  # Red dot
+
+    # Draw the radius line
+    edge_point = (int(x + radius), int(y))  # Point on the circle's edge
+    cv.line(image, center, edge_point, (255, 0, 0), 6)  # Blue line
+    cv.line(image, center, (int(x - radius), int(y)), (255, 0, 0), 6)  # Blue line
+    cv.line(image, center, (int(x), int(y - radius)), (255, 0, 0), 6)  # Blue line
+    cv.line(image, center, (int(x), int(y + radius)), (255, 0, 0), 6)  # Blue line

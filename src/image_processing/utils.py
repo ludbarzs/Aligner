@@ -14,7 +14,7 @@ def prepare_image(image: np.ndarray) -> np.ndarray:
     blurred_image = cv.GaussianBlur(gray_image, (7, 7), 0)
     # high_contrast = cv.equalizeHist(blurred_image)
     # high_contrast = cv.convertScaleAbs(image, alpha=1, beta=0)  # beta=brightness
-    edges_image = cv.Canny(blurred_image, 50, 150)
+    edges_image = cv.Canny(blurred_image, 40, 120)
 
     # Apply morphological closing to merge nearby edges
     kernel = cv.getStructuringElement(cv.MORPH_RECT, (9, 9))
@@ -35,8 +35,9 @@ def view_image(image: np.ndarray, contours=None):
         # If it's a single contour, wrap it in a list
         if isinstance(contours, np.ndarray):
             contours = [contours]
-        cv.drawContours(image, contours, -1, (0, 255, 0), 2)
+        cv.drawContours(image, contours, -1, (0, 255, 0), 3)
 
+    cv.namedWindow("image", cv.WINDOW_NORMAL)
     cv.imshow("image", image)
     cv.moveWindow("image", 0, 0)
 
