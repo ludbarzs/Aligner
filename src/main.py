@@ -12,22 +12,16 @@ from image_processing.utils import find_contours, load_image, prepare_image, vie
 
 
 def main():
-    image = load_image("images/test_14.jpg")
+    image = load_image("images/test_15.jpg")
     prepared_image = prepare_image(image)
 
     contours = find_contours(prepared_image)
 
     corners = select_drawer_corners(image)
 
-    corrected_image, ratio = correct_perspective(image, corners, 537, 340)
-    measure_object_in_drawer(corrected_image, ratio)
-    measure_object_in_drawer(corrected_image, ratio)
-    measure_object_in_drawer(corrected_image, ratio)
-    measure_object_in_drawer(corrected_image, ratio)
-    measure_object_in_drawer(corrected_image, ratio)
-    measure_object_in_drawer(corrected_image, ratio)
-
-    view_drawer_boundaries(image, corners)
+    corrected_image, ratio = correct_perspective(image, corners, 540, 340)
+    measure_object_in_drawer(corrected_image, ratio[0], ratio[1])
+    measure_object_in_drawer(corrected_image, ratio[0], ratio[1])
 
 
 def view_outputs():

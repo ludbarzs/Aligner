@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple
 
 import cv2 as cv
 import numpy as np
@@ -100,33 +100,30 @@ def get_drawer_dimensions_px(
     # return np.array([top_mm, right_mm, bottom_mm, left_mm])
 
 
-def average_px_to_mm_distortion(
+def calculate_axis_ratios(
     corners: np.ndarray, real_width_mm: float, real_height_mm: float
-) -> float:
+) -> Tuple[float, float]:
     top_px = np.linalg.norm(corners[1] - corners[0])
     bottom_px = np.linalg.norm(corners[2] - corners[3])
+    avg_with_px = (top_px + bottom_px) / 2
+
     right_px = np.linalg.norm(corners[2] - corners[1])
     left_px = np.linalg.norm(corners[3] - corners[0])
+    avg_height_px = (right_px + left_px) / 2
 
-    top_ratio = top_px / real_width_mm
-    bottom_ratio = bottom_px / real_width_mm
-    right_ratio = right_px / real_height_mm
-    left_ratio = left_px / real_height_mm
+    x_ratio = avg_with_px / real_width_mm
+    y_ratio = avg_height_px / real_height_mm
 
-    avg_ratio = (top_ratio + bottom_ratio + right_ratio + left_ratio) / 4
-
-    return avg_ratio
+    return x_ratio, y_ratio
 
 
 def correct_perspective(
     image: np.ndarray, corners: np.ndarray, real_width_mm: float, real_height_mm: float
 ) -> tuple[np.ndarray, float]:
-    avg_px_to_mm_ratio = average_px_to_mm_distortion(
-        corners, real_width_mm, real_height_mm
-    )
+    x_ratio, y_ratio = calculate_axis_ratios(corners, real_width_mm, real_height_mm)
 
-    target_width_px = int(real_width_mm * avg_px_to_mm_ratio)
-    target_height_px = int(real_height_mm * avg_px_to_mm_ratio)
+    target_width_px = int(real_width_mm * x_ratio)
+    target_height_px = int(real_height_mm * y_ratio)
 
     # Destination points: Rectangle
     dst_points = np.array(
@@ -147,13 +144,14 @@ def correct_perspective(
         image, perspective_matrix, (target_width_px, target_height_px)
     )
 
-    px_to_mm_ratio = target_width_px / real_width_mm
+    final_x_ratio = target_width_px / real_width_mm
+    final_y_ratio = target_height_px / real_height_mm
 
-    return corrected_image, px_to_mm_ratio
+    return corrected_image, (final_x_ratio, final_y_ratio)
 
 
 def measure_object_in_drawer(
-    corrected_image: np.ndarray, px_to_mm_ratio: float
+    corrected_image: np.ndarray, x_ratio: float, y_ratio: float
 ) -> None:
     measuring_image = corrected_image.copy()
     points = []
@@ -166,12 +164,13 @@ def measure_object_in_drawer(
             cv.circle(measuring_image, (x, y), 3, (0, 0, 255), -1)
 
             if len(points) == 2:
+                dx = abs(points[1][0] - points[0][0])
+                dy = abs(points[1][1] - points[0][1])
+
+                x_distance_mm = dx / x_ratio
+                y_distance_mm = dy / y_ratio
                 # Calculate distance
-                distance_px = np.sqrt(
-                    (points[1][0] - points[0][0]) ** 2
-                    + (points[1][1] - points[0][1]) ** 2
-                )
-                distance_mm = distance_px / px_to_mm_ratio
+                distance_mm = np.sqrt((x_distance_mm) ** 2 + (y_distance_mm) ** 2)
 
                 # Draw line
                 cv.line(measuring_image, points[0], points[1], (0, 255, 0), 2)
