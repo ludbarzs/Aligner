@@ -81,6 +81,46 @@ def find_px_to_mm_ratio(
     return pixel_to_mm_ratio
 
 
+def display_coin(image, contour, x_ratio, y_ratio, coin_diameter: float = 23.25):
+    M = cv.moments(contour)
+    if M["m00"] == 0:
+        return 0
+    cx = int(M["m10"] / M["m00"])  # cx = (sum of x-coordinates) / area
+    cy = int(M["m01"] / M["m00"])  # cy = (sum of y-coordinates) / area
+    center = (cx, cy)
+
+    min_distance = float("inf")
+    for point in contour:
+        # Calculate distance between two points |AB| = sqrt((x2 - x1)^2 + (y2 - y1)^2)
+        x, y = point[0]
+        distance = np.sqrt((x - cx) ** 2 + (y - cy) ** 2)
+        if distance < min_distance:
+            min_distance = distance
+
+    radius = int(min_distance)
+
+    # Draw the new smaller circle
+    cv.circle(image, center, radius, (255, 0, 0), 2)  # Blue circle, thickness 2
+
+    # Calculate the diameter of the new circle in millimeters
+    pixel_diameter = 2 * radius
+    mm_diameter = (
+        pixel_diameter / coin_diameter
+    ) * coin_diameter  # Scale using the coin's diameter
+
+    # Display the diameter in millimeters on the image
+    text = f"Diameter: {mm_diameter:.2f} mm"
+    cv.putText(
+        image,
+        text,
+        (cx + radius + 10, cy),
+        cv.FONT_HERSHEY_SIMPLEX,
+        0.5,
+        (255, 255, 255),
+        1,
+    )
+
+
 def find_px_to_mm_ratio_2(
     image, contour: np.ndarray, coin_diameter: float = 23.25
 ) -> float:

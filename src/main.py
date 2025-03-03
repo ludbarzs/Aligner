@@ -4,6 +4,8 @@ from image_processing.coin_detection import (
 )
 from image_processing.drawer_detection import (
     correct_perspective,
+    draw_contour_line,
+    find_inscribed_circle_diameter,
     measure_object_in_drawer,
     select_drawer_corners,
     view_drawer_boundaries,
@@ -12,16 +14,21 @@ from image_processing.utils import find_contours, load_image, prepare_image, vie
 
 
 def main():
-    image = load_image("images/test_15.jpg")
-    prepared_image = prepare_image(image)
-
-    contours = find_contours(prepared_image)
+    image = load_image("images/test_17.jpg")
 
     corners = select_drawer_corners(image)
+    corrected_image, x_ratio, y_ratio = correct_perspective(image, corners, 540, 340)
 
-    corrected_image, ratio = correct_perspective(image, corners, 540, 340)
-    measure_object_in_drawer(corrected_image, ratio[0], ratio[1])
-    measure_object_in_drawer(corrected_image, ratio[0], ratio[1])
+    prepared_image = prepare_image(corrected_image)
+
+    contours = find_contours(prepared_image)
+    coin = coin_top_left_corner(contours)
+    view_image(find_inscribed_circle_diameter(corrected_image, coin, x_ratio, y_ratio))
+
+    for contour in contours:
+        draw_contour_line(corrected_image, contour, x_ratio, y_ratio)
+
+    measure_object_in_drawer(corrected_image, x_ratio, y_ratio)
 
 
 def view_outputs():

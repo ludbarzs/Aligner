@@ -74,9 +74,7 @@ def select_drawer_corners(image: np.ndarray) -> Optional[np.ndarray]:
     return ordered_corners if ordered_corners.shape[0] == 4 else None
 
 
-def get_drawer_dimensions_px(
-    corners: np.ndarray, px_to_mm_ratio: float
-) -> tuple[float, float, float, float]:
+def get_drawer_dimensions_px(corners: np.ndarray) -> tuple[float, float, float, float]:
     """Returns: Up, Right, Down, Left-down"""
 
     # Corner px cordinates
@@ -91,13 +89,7 @@ def get_drawer_dimensions_px(
     right_px = np.linalg.norm(corners[2] - corners[1])
     left_px = np.linalg.norm(corners[3] - corners[0])
 
-    # top_mm = top_px / px_to_mm_ratio
-    # right_mm = right_px / px_to_mm_ratio
-    # bottom_mm = bottom_px / px_to_mm_ratio
-    # left_mm = left_px / px_to_mm_ratio
-
     return np.array([top_px, right_px, bottom_px, left_px])
-    # return np.array([top_mm, right_mm, bottom_mm, left_mm])
 
 
 def calculate_axis_ratios(
@@ -147,12 +139,14 @@ def correct_perspective(
     final_x_ratio = target_width_px / real_width_mm
     final_y_ratio = target_height_px / real_height_mm
 
-    return corrected_image, (final_x_ratio, final_y_ratio)
+    return corrected_image, final_x_ratio, final_y_ratio
 
 
+# For testing
 def measure_object_in_drawer(
     corrected_image: np.ndarray, x_ratio: float, y_ratio: float
 ) -> None:
+    windows_name = "Measure Objects"
     measuring_image = corrected_image.copy()
     points = []
 
@@ -167,12 +161,12 @@ def measure_object_in_drawer(
                 dx = abs(points[1][0] - points[0][0])
                 dy = abs(points[1][1] - points[0][1])
 
-                x_distance_mm = dx / x_ratio
-                y_distance_mm = dy / y_ratio
-                # Calculate distance
+                # Add .5% correctoin factor
+                x_distance_mm = dx / x_ratio * 1.005
+                y_distance_mm = dy / y_ratio * 1.005
+
                 distance_mm = np.sqrt((x_distance_mm) ** 2 + (y_distance_mm) ** 2)
 
-                # Draw line
                 cv.line(measuring_image, points[0], points[1], (0, 255, 0), 2)
 
                 # Display distance
@@ -203,6 +197,135 @@ def measure_object_in_drawer(
     cv.destroyAllWindows()
 
 
+def find_inscribed_circle_diameter(
+    image, contour: np.ndarray, x_ratio: float, y_ratio: float
+) -> float:
+    """
+    Find the smallest inscribed circle within a coin contour and display its diameter in mm.
+
+    Parameters:
+    - image: The image to draw visualization on
+    - contour: The contour of the coin
+    - x_ratio: Pixel to mm ratio in the x direction
+    - y_ratio: Pixel to mm ratio in the y direction
+
+    Returns:
+    - The diameter of the inscribed circle in mm
+    """
+    # Find the center of the contour
+    M = cv.moments(contour)
+    if M["m00"] == 0:
+        return 0
+
+    cx = int(M["m10"] / M["m00"])  # cx = (sum of x-coordinates) / area
+    cy = int(M["m01"] / M["m00"])  # cy = (sum of y-coordinates) / area
+    center = (cx, cy)
+
+    # Calculate distance from center to each point on the contour
+    min_distance = float("inf")
+    for point in contour:
+        x, y = point[0]
+        # Calculate distance, accounting for potentially different x and y ratios
+        x_dist = (x - cx) / x_ratio
+        y_dist = (y - cy) / y_ratio
+        distance = np.sqrt(x_dist**2 + y_dist**2)
+
+        if distance < min_distance:
+            min_distance = distance
+            closest_point = (x, y)
+
+    # Convert the minimum distance to pixels for visualization
+    radius_px_x = min_distance * x_ratio
+    radius_px_y = min_distance * y_ratio
+
+    # For visualization purposes, use the average of x and y ratios
+    avg_radius_px = (radius_px_x + radius_px_y) / 2
+
+    # Calculate diameter in mm (already in mm since we divided by the ratios)
+    diameter_mm = 2 * min_distance
+
+    # For comparison, get the min enclosing circle
+    (enclosing_x, enclosing_y), min_enclosing_radius = cv.minEnclosingCircle(contour)
+
+    # Draw visualization
+    cv.circle(image, center, 3, (0, 0, 255), -1)  # Red dot for center
+    # cv.circle(
+    #     image, center, int(avg_radius_px), (0, 255, 0), 2
+    # )  # Green circle for inscribed circle
+    # cv.circle(
+    #     image,
+    #     (int(enclosing_x), int(enclosing_y)),
+    #     int(min_enclosing_radius),
+    #     (255, 0, 0),
+    #     2,
+    # )  # Blue circle for enclosing circle
+
+    # Draw line from center to closest point
+    cv.line(
+        image, center, closest_point, (255, 255, 0), 2
+    )  # Yellow line showing radius
+
+    # Add text with diameter information
+    cv.putText(
+        image,
+        f"Diameter: {diameter_mm:.2f} mm",
+        (center[0] - 120, center[1] + int(avg_radius_px) + 30),
+        cv.FONT_HERSHEY_SIMPLEX,
+        0.7,
+        (0, 255, 0),
+        2,
+    )
+
+    return image
+
+
+def draw_contour_line(
+    image: np.ndarray, contour: np.ndarray, x_ratio: float, y_ratio: float
+):
+    cv.drawContours(image, [contour], -1, (0, 255, 0), 1)
+
+    max_length = 0
+    longest_line = None
+
+    for i in range(len(contour)):
+        for j in range(i + 1, len(contour)):
+            point1 = tuple(contour[i][0])
+            point2 = tuple(contour[j][0])
+
+            dx = abs(point2[0] - point1[0])
+            dy = abs(point2[1] - point1[1])
+
+            # Add .5% correctoin factor
+            x_distance_mm = dx / x_ratio
+            y_distance_mm = dy / y_ratio
+
+            distance_mm = np.sqrt((x_distance_mm) ** 2 + (y_distance_mm) ** 2)
+
+            if distance_mm > max_length:
+                max_length = distance_mm
+                longest_line = (point1, point2)
+
+    if longest_line:
+        cv.line(image, longest_line[0], longest_line[1], (255, 0, 0), 1)
+
+        # Display distance
+        mid_point = (
+            (longest_line[0][0] + longest_line[1][0]) // 2,
+            (longest_line[0][1] + longest_line[1][1]) // 2,
+        )
+        cv.putText(
+            image,
+            f"{max_length:.1f} mm",
+            mid_point,
+            cv.FONT_HERSHEY_SIMPLEX,
+            0.7,
+            (255, 0, 0),
+            2,
+        )
+
+    return image
+
+
 def view_drawer_boundaries(image: np.ndarray, corners: np.ndarray) -> None:
     for x, y in corners:
         cv.circle(image, (x, y), 3, (0, 255, 0), -1)
@@ -221,53 +344,3 @@ def view_drawer_boundaries(image: np.ndarray, corners: np.ndarray) -> None:
     cv.imshow("Drawer boundaries", image)
     cv.waitKey(0)
     cv.destroyAllWindows()
-
-
-# DEPRECATED
-def detect_drawer_boundaries(
-    image: np.ndarray,
-    canny_low: int = 10,
-    canny_high: int = 10,
-    min_area_ratio: float = 0.5,
-):
-    gray_image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-    blurred_image = cv.GaussianBlur(gray_image, (7, 7), 0)
-    edges_image = cv.Canny(blurred_image, canny_low, canny_high)
-
-    kernel = cv.getStructuringElement(cv.MORPH_RECT, (11, 11))
-    closed_edges = cv.morphologyEx(edges_image, cv.MORPH_CLOSE, kernel)
-
-    contours, _ = cv.findContours(
-        closed_edges, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE
-    )
-
-    # Get image dimensions (px)
-    height, width = image.shape[:2]
-    image_area = height * width
-
-    for contour in contours:
-        contour_area = cv.contourArea(contour)
-        area_ratio = contour_area / image_area
-
-        # Skip contours the area of which is not sufficient (50% by default)
-        if area_ratio < min_area_ratio:
-            continue
-
-        # Approximates the contours as a poligon (Lines that can be straight are made straight)
-        # Removes collinear poitns
-        epsilon = 0.1 * cv.arcLength(
-            contour, True
-        )  # conour and boolean if contour is closed or not
-        approx = cv.approxPolyDP(
-            contour, epsilon, True
-        )  # Straightens lines to the accuracy of epsilon
-
-        view_image(image, approx)
-        rect = cv.minAreaRect(contour)
-        (w, h) = rect[1]  # Contains width and height
-        aspect_ratio = max(w, h) / min(w, h)  # Get aspect ratio that is positive
-
-        # Refine the contour with minAreaRect
-        box = cv.boxPoints(rect)
-        box = np.int0(box)
-        view_image(image, box)
