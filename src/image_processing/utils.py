@@ -11,10 +11,10 @@ def load_image(image_path: str) -> np.ndarray:
 
 def prepare_image(image: np.ndarray) -> np.ndarray:
     gray_image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-    blurred_image = cv.GaussianBlur(gray_image, (7, 7), 0)
+    blurred_image = cv.GaussianBlur(gray_image, (5, 5), 0)
     # high_contrast = cv.equalizeHist(blurred_image)
     # high_contrast = cv.convertScaleAbs(image, alpha=1, beta=0)  # beta=brightness
-    edges_image = cv.Canny(blurred_image, 40, 120)
+    edges_image = cv.Canny(blurred_image, 50, 150)
 
     # Apply morphological closing to merge nearby edges
     kernel = cv.getStructuringElement(cv.MORPH_RECT, (9, 9))

@@ -1,4 +1,8 @@
-from image_processing.coin_detection import coin_top_left_corner, find_px_to_mm_ratio
+from image_processing.coin_detection import (
+    coin_top_left_corner,
+    find_px_to_mm_ratio,
+    find_px_to_mm_ratio_2,
+)
 from image_processing.drawer_detection import (
     get_drawer_dimensions,
     select_drawer_corners,
@@ -8,14 +12,15 @@ from image_processing.utils import find_contours, load_image, prepare_image, vie
 
 
 def main():
-    image = load_image("images/test_11.jpg")
+    image = load_image("images/test_4.jpg")
     prepared_image = prepare_image(image)
 
     contours = find_contours(prepared_image)
 
     coin = coin_top_left_corner(contours)
+    view_image(image.copy(), contours)
 
-    px_to_mm_ratio = find_px_to_mm_ratio(image, coin, 23.25)
+    px_to_mm_ratio = find_px_to_mm_ratio_2(image, coin, 23.25)
 
     corners = select_drawer_corners(image)
     print(get_drawer_dimensions(corners, px_to_mm_ratio))
@@ -23,7 +28,7 @@ def main():
 
 
 def view_outputs():
-    image = load_image("images/test_9.jpg")
+    image = load_image("images/test_12.jpg")
     prepared_image = prepare_image(image)
 
     contours = find_contours(prepared_image)
@@ -41,4 +46,5 @@ def view_outputs():
     print(corners)
 
 
+# view_outputs()
 main()
