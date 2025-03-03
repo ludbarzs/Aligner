@@ -74,7 +74,7 @@ def select_drawer_corners(image: np.ndarray) -> Optional[np.ndarray]:
     return ordered_corners if ordered_corners.shape[0] == 4 else None
 
 
-def get_drawer_dimensions(
+def get_drawer_dimensions_px(
     corners: np.ndarray, px_to_mm_ratio: float
 ) -> tuple[float, float, float, float]:
     """Returns: Up, Right, Down, Left-down"""
@@ -86,17 +86,122 @@ def get_drawer_dimensions(
     bottom_left = corners[3]
 
     # Boundary px size
-    top_px = top_right[0] - top_left[0]
-    right_px = bottom_right[1] - top_right[1]
-    bottom_px = bottom_right[0] - bottom_left[0]
-    left_px = bottom_left[1] - top_left[1]
+    top_px = np.linalg.norm(corners[1] - corners[0])
+    bottom_px = np.linalg.norm(corners[2] - corners[3])
+    right_px = np.linalg.norm(corners[2] - corners[1])
+    left_px = np.linalg.norm(corners[3] - corners[0])
 
-    top_mm = top_px / px_to_mm_ratio
-    right_mm = right_px / px_to_mm_ratio
-    bottom_mm = bottom_px / px_to_mm_ratio
-    left_mm = left_px / px_to_mm_ratio
+    # top_mm = top_px / px_to_mm_ratio
+    # right_mm = right_px / px_to_mm_ratio
+    # bottom_mm = bottom_px / px_to_mm_ratio
+    # left_mm = left_px / px_to_mm_ratio
 
-    return np.array([top_mm, right_mm, bottom_mm, left_mm])
+    return np.array([top_px, right_px, bottom_px, left_px])
+    # return np.array([top_mm, right_mm, bottom_mm, left_mm])
+
+
+def average_px_to_mm_distortion(
+    corners: np.ndarray, real_width_mm: float, real_height_mm: float
+) -> float:
+    top_px = np.linalg.norm(corners[1] - corners[0])
+    bottom_px = np.linalg.norm(corners[2] - corners[3])
+    right_px = np.linalg.norm(corners[2] - corners[1])
+    left_px = np.linalg.norm(corners[3] - corners[0])
+
+    top_ratio = top_px / real_width_mm
+    bottom_ratio = bottom_px / real_width_mm
+    right_ratio = right_px / real_height_mm
+    left_ratio = left_px / real_height_mm
+
+    avg_ratio = (top_ratio + bottom_ratio + right_ratio + left_ratio) / 4
+
+    return avg_ratio
+
+
+def correct_perspective(
+    image: np.ndarray, corners: np.ndarray, real_width_mm: float, real_height_mm: float
+) -> tuple[np.ndarray, float]:
+    avg_px_to_mm_ratio = average_px_to_mm_distortion(
+        corners, real_width_mm, real_height_mm
+    )
+
+    target_width_px = int(real_width_mm * avg_px_to_mm_ratio)
+    target_height_px = int(real_height_mm * avg_px_to_mm_ratio)
+
+    # Destination points: Rectangle
+    dst_points = np.array(
+        [
+            [0, 0],
+            [target_width_px, 0],
+            [target_width_px, target_height_px],
+            [0, target_height_px],
+        ],
+        dtype=np.float32,
+    )
+
+    src_point = corners.astype(np.float32)
+
+    perspective_matrix = cv.getPerspectiveTransform(src_point, dst_points)
+
+    corrected_image = cv.warpPerspective(
+        image, perspective_matrix, (target_width_px, target_height_px)
+    )
+
+    px_to_mm_ratio = target_width_px / real_width_mm
+
+    return corrected_image, px_to_mm_ratio
+
+
+def measure_object_in_drawer(
+    corrected_image: np.ndarray, px_to_mm_ratio: float
+) -> None:
+    measuring_image = corrected_image.copy()
+    points = []
+
+    def click_event(event, x, y, flag, param):
+        nonlocal points, measuring_image
+
+        if event == cv.EVENT_LBUTTONDOWN:
+            points.append((x, y))
+            cv.circle(measuring_image, (x, y), 3, (0, 0, 255), -1)
+
+            if len(points) == 2:
+                # Calculate distance
+                distance_px = np.sqrt(
+                    (points[1][0] - points[0][0]) ** 2
+                    + (points[1][1] - points[0][1]) ** 2
+                )
+                distance_mm = distance_px / px_to_mm_ratio
+
+                # Draw line
+                cv.line(measuring_image, points[0], points[1], (0, 255, 0), 2)
+
+                # Display distance
+                mid_point = (
+                    (points[0][0] + points[1][0]) // 2,
+                    (points[0][1] + points[1][1]) // 2,
+                )
+                cv.putText(
+                    measuring_image,
+                    f"{distance_mm:.1f} mm",
+                    mid_point,
+                    cv.FONT_HERSHEY_SIMPLEX,
+                    0.7,
+                    (255, 0, 0),
+                    2,
+                )
+
+                # Reset for new measurement
+                points.clear()
+
+            cv.imshow("Measure Objects", measuring_image)
+
+    cv.namedWindow("Measure Objects", cv.WINDOW_NORMAL)
+    cv.imshow("Measure Objects", measuring_image)
+    cv.setMouseCallback("Measure Objects", click_event)
+
+    cv.waitKey(0)
+    cv.destroyAllWindows()
 
 
 def view_drawer_boundaries(image: np.ndarray, corners: np.ndarray) -> None:
