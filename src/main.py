@@ -1,16 +1,14 @@
+import numpy as np
+
 from file_conversion.dxf_exporter import contours_to_dxf
 from image_processing.coin_detection import (
-    coin_top_left_corner,
     detect_circles,
-    find_px_to_mm_ratio,
 )
 from image_processing.drawer_detection import (
     correct_perspective,
     draw_contour_line,
     find_inscribed_circle_diameter,
     measure_object_in_drawer,
-    select_drawer_corners,
-    view_drawer_boundaries,
 )
 from image_processing.utils import find_contours, load_image, prepare_image, view_image
 
@@ -20,9 +18,17 @@ def main():
     image = load_image("images/test_14.jpg")
 
     # User selects drawer corners
-    corners = select_drawer_corners(image)
+    # corners = select_drawer_corners(image)
+
+    # Auto select corners for test_14.jpg
+    corners = np.array([[149, 82], [1939, 75], [1995, 1213], [115, 1240]])
+
     # Image perspective gets corrected
-    corrected_image, x_ratio, y_ratio = correct_perspective(image, corners, 540, 340)
+    irl_width = 540
+    irl_length = 340
+    corrected_image, x_ratio, y_ratio = correct_perspective(
+        image, corners, irl_width, irl_length
+    )
 
     # Prepare corrected image for contour finding (Grayscale, canny, closeing edges)
     prepared_image = prepare_image(corrected_image)
@@ -30,7 +36,9 @@ def main():
     # Find contours
     contours = find_contours(prepared_image)
 
-    output_path = contours_to_dxf(contours, "output_file.dxf", x_ratio, y_ratio)
+    output_path = contours_to_dxf(
+        contours, "output_file.dxf", x_ratio, y_ratio, irl_width, irl_length
+    )
     print(f"DXF file saved to: {output_path}")
 
     # Get all circles in image
@@ -52,24 +60,4 @@ def main():
     measure_object_in_drawer(corrected_image, x_ratio, y_ratio)
 
 
-def view_outputs():
-    image = load_image("images/test_12.jpg")
-    prepared_image = prepare_image(image)
-
-    contours = find_contours(prepared_image)
-    contour_image = image.copy()
-    view_image(contour_image, contours)
-
-    coin = coin_top_left_corner(contours)
-    coin_image = image.copy()
-    view_image(coin_image, coin)
-
-    px_to_mm_ratio = find_px_to_mm_ratio(coin)
-
-    corners = select_drawer_corners(image)
-    view_drawer_boundaries(image, corners)
-    print(corners)
-
-
-# view_outputs()
 main()
