@@ -249,16 +249,16 @@ def find_inscribed_circle_diameter(
 
     # Draw visualization
     cv.circle(image, center, 3, (0, 0, 255), -1)  # Red dot for center
-    # cv.circle(
-    #     image, center, int(avg_radius_px), (0, 255, 0), 2
-    # )  # Green circle for inscribed circle
-    # cv.circle(
-    #     image,
-    #     (int(enclosing_x), int(enclosing_y)),
-    #     int(min_enclosing_radius),
-    #     (255, 0, 0),
-    #     2,
-    # )  # Blue circle for enclosing circle
+    cv.circle(
+        image, center, int(avg_radius_px), (0, 255, 0), 2
+    )  # Green circle for inscribed circle
+    cv.circle(
+        image,
+        (int(enclosing_x), int(enclosing_y)),
+        int(min_enclosing_radius),
+        (255, 0, 0),
+        2,
+    )  # Blue circle for enclosing circle
 
     # Draw line from center to closest point
     cv.line(

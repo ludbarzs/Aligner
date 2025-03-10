@@ -14,16 +14,28 @@ from image_processing.utils import find_contours, load_image, prepare_image, vie
 
 
 def main():
-    image = load_image("images/test_17.jpg")
+    # Load Image
+    image = load_image("images/test_14.jpg")
 
+    # User selects drawer corners
     corners = select_drawer_corners(image)
+    # Image perspective gets corrected
     corrected_image, x_ratio, y_ratio = correct_perspective(image, corners, 540, 340)
 
+    # Prepare corrected image for contour finding (Grayscale, canny, closeing edges)
     prepared_image = prepare_image(corrected_image)
 
+    # Find contours
     contours = find_contours(prepared_image)
+    # Get coin contour top left corner
     coin = coin_top_left_corner(contours)
-    view_image(find_inscribed_circle_diameter(corrected_image, coin, x_ratio, y_ratio))
+
+    # Returns diameter of circle given (smallest circle within the contour)
+    cirlce_diameter = find_inscribed_circle_diameter(
+        corrected_image, coin, x_ratio, y_ratio
+    )
+
+    view_image(cirlce_diameter)
 
     for contour in contours:
         draw_contour_line(corrected_image, contour, x_ratio, y_ratio)
