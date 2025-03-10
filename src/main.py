@@ -1,5 +1,6 @@
 from image_processing.coin_detection import (
     coin_top_left_corner,
+    detect_circles,
     find_px_to_mm_ratio,
 )
 from image_processing.drawer_detection import (
@@ -27,19 +28,23 @@ def main():
 
     # Find contours
     contours = find_contours(prepared_image)
-    # Get coin contour top left corner
-    coin = coin_top_left_corner(contours)
 
-    # Returns diameter of circle given (smallest circle within the contour)
-    cirlce_diameter = find_inscribed_circle_diameter(
-        corrected_image, coin, x_ratio, y_ratio
-    )
+    # Get all circles in image
+    circles = detect_circles(contours)
 
-    view_image(cirlce_diameter)
+    circles_image = corrected_image.copy()
 
+    # Drawes the inscribed diameter of all circles
+    for circle in circles:
+        find_inscribed_circle_diameter(circles_image, circle, x_ratio, y_ratio)
+
+    view_image(circles_image)
+
+    # Draw the largest line in contour for tests
     for contour in contours:
         draw_contour_line(corrected_image, contour, x_ratio, y_ratio)
 
+    # Allows user to measure
     measure_object_in_drawer(corrected_image, x_ratio, y_ratio)
 
 

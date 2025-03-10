@@ -268,7 +268,7 @@ def find_inscribed_circle_diameter(
     # Add text with diameter information
     cv.putText(
         image,
-        f"Diameter: {diameter_mm:.2f} mm",
+        f"D: {diameter_mm:.2f} mm",
         (center[0] - 120, center[1] + int(avg_radius_px) + 30),
         cv.FONT_HERSHEY_SIMPLEX,
         0.7,
