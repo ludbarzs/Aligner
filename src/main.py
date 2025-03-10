@@ -1,3 +1,4 @@
+from file_conversion.dxf_exporter import contours_to_dxf
 from image_processing.coin_detection import (
     coin_top_left_corner,
     detect_circles,
@@ -28,6 +29,9 @@ def main():
 
     # Find contours
     contours = find_contours(prepared_image)
+
+    output_path = contours_to_dxf(contours, "output_file.dxf", x_ratio, y_ratio)
+    print(f"DXF file saved to: {output_path}")
 
     # Get all circles in image
     circles = detect_circles(contours)
