@@ -2,3 +2,4 @@ opencv-python
 numpy
 pytest
 ezdxf
+PyQt6
