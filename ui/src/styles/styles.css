@@ -1,0 +1,248 @@
+/*
+TODO:
+- Change 
+- Change logo color (line 78)
+- Chang body color
+
+* */
+:root {
+  --bg-color: #1f2335;
+  --bg-color-accent: #2f354a;
+  --fg-color: #c0caf5;
+  --blue: #7aa2f7;
+  --green: #9ece6a;
+  --purple: #bb9af7;
+  --orange: #ff9e64;
+  --red: #f7768e;
+  --yellow: #e0af68;
+  --cyan: #7dcfff;
+  --comment: #565f89;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'JetBrainsMono Nerd Font', monospace;
+}
+
+body {
+  background-color: #1a1b26;
+  color: var(--fg-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.container {
+  min-width: 900px;
+  max-width: 900px;
+  margin: 0;
+  padding: 10px;
+  background-color: var(--bg-color);
+  border-radius: 10px;
+}
+
+/* Header Style */
+header{
+  background-color: var(--bg-color-accent);
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #2d3548;
+  border-radius: 10px;
+  padding-right: 15px;
+  padding-left: 10px;
+}
+
+.logo-container{
+  display: flex;
+}
+
+.logo {
+  width: 70px;
+  height: 70px;
+  color: var(--fg-color);
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 12px;
+}
+
+.logo-text h1 {
+  color: #6699ff;
+  font-size: 20px;
+  margin-bottom: 2px;
+}
+
+.logo-text p {
+  font-size: 12px;
+  color: var(--fg-color);
+}
+
+.header-icons {
+  display: flex;
+}
+
+.icon-button {
+  width: 30px;
+  height: 30px;
+  background-color: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--fg-color);
+  margin-left: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: .3s;
+}
+
+.icon-button:hover {
+  color: var(--cyan);
+}
+
+/* Step container */
+.steps-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 0;
+  margin-inline: 90px;
+  position: relative;
+}
+
+.steps-container::before {
+  content: '';
+  position: absolute;
+  top: 38%;
+  left: 5%;
+  height: 2px;
+  width: 90%;
+  background-color: var(--bg-color-accent);
+  z-index: 0;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.step-number {
+  width: 40px;
+  height: 40px;
+  background-color: #2d3548;
+  border-radius: 11%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.step-active .step-number {
+  background-color: var(--purple);
+  z-index: 1;
+}
+
+.step-label {
+  font-size: 14px;
+  color: var(--fg-color);
+}
+
+.active .step-label {
+    color: var(--blue);
+}
+
+/* Upload Container */
+.upload-container {
+  margin: 20px 0;
+}
+
+.upload-box {
+  border: 2px dashed var(--bg-color-accent);
+  border-radius: 8px;
+  padding: 40px;
+  text-align: center;
+  min-height: 350px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.upload-icon {
+  font-size: 40px;
+  color: var(--blue);
+  margin-bottom: 20px;
+}
+
+.upload-box h3 {
+  margin-bottom: 5px;
+  color: var(--fg-color);
+}
+
+.upload-box p{
+  color: var(--fg-color);
+  font-size: 14px;
+  margin-bottom: 20px;
+  max-width: 400px;
+}
+
+.select-file-btn {
+  background-color: transparent;
+  border: 1px solid var(--bg-color-accent);
+  color: var(--fg-color);
+  padding: 8px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: bold;
+}
+
+.select-file-btn:hover {
+  background-color: var(--purple);
+  color: var(--bg-color);
+}
+
+.action-buttons{
+  display: flex;
+  justify-content: space-between;
+}
+
+.reupload-btn, .continue-btn {
+  padding: 12px;
+  width: 50%;
+  margin: 5px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+.reupload-btn {
+  background-color: transparent;
+  color: var(--fg-color);
+  transition: .3s;
+  font-weight: bold;
+}
+
+.reupload-btn:hover {
+  background-color: var(--purple);
+  color: var(--bg-color);
+}
+
+
+
+.continue-btn {
+  background-color: var(--cyan);
+}
+
+

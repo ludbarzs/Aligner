@@ -1,6 +1,14 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('node:path');
 
+try {
+  require('electron-reloader')(module, {
+    // Optional: Set the directory where to watch for changes (default is current directory)
+    // electron: path.join(__dirname, 'node_modules', '.bin', 'electron') // Path to electron executable
+  });
+} catch (err) {
+  console.error('Error loading electron-reloader:', err);
+}
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit();
