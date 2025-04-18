@@ -1,12 +1,9 @@
 from file_conversion.dxf_exporter import contours_to_dxf
-from image_processing.coin_detection import (
-    detect_circles,
-)
+from image_processing.coin_detection import detect_circles
 from image_processing.drawer_detection import (
     correct_perspective,
     draw_contour_line,
     find_inscribed_circle_diameter,
-    measure_object_in_drawer,
     select_drawer_corners,
 )
 from image_processing.utils import find_contours, load_image, prepare_image, view_image
@@ -18,7 +15,6 @@ def main():
 
     # User selects drawer corners
     corners = select_drawer_corners(image)
-
     # Auto select corners for test_14.jpg
     # corners = np.array([[149, 82], [1939, 75], [1995, 1213], [115, 1240]])
 

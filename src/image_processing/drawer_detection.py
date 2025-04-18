@@ -6,7 +6,7 @@ import numpy as np
 from image_processing.utils import *
 
 
-def order_corners(corners: np.ndarray) -> tuple[float, float, float, float]:
+def order_corners(corners: np.ndarray) -> np.ndarray:
     """Orders corners in: Left-Up, Right-up, Right-down, Left-down"""
     if corners.shape[0] != 4:
         raise ValueError(f"Expected 4 values, got {corners.shape[0]}")
@@ -74,7 +74,7 @@ def select_drawer_corners(image: np.ndarray) -> Optional[np.ndarray]:
     return ordered_corners if ordered_corners.shape[0] == 4 else None
 
 
-def get_drawer_dimensions_px(corners: np.ndarray) -> tuple[float, float, float, float]:
+def get_drawer_dimensions_px(corners: np.ndarray) -> np.ndarray:
     """Returns: Up, Right, Down, Left-down"""
 
     # Corner px cordinates
@@ -111,7 +111,7 @@ def calculate_axis_ratios(
 
 def correct_perspective(
     image: np.ndarray, corners: np.ndarray, real_width_mm: float, real_height_mm: float
-) -> tuple[np.ndarray, float]:
+) -> tuple[np.ndarray, float, float]:
     x_ratio, y_ratio = calculate_axis_ratios(corners, real_width_mm, real_height_mm)
 
     target_width_px = int(real_width_mm * x_ratio)
