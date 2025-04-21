@@ -11,3 +11,9 @@ __pycache__/
 # Ignore environment variables
 .env
 .ropeproject
+
+# Tmux related
+.log
+
+# Output test files
+.dxf

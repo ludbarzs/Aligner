@@ -164,6 +164,7 @@ header {
 
 .active .step-label {
   color: var(--blue);
+  background-color: ;
 }
 
 /* Upload Container */
@@ -177,10 +178,12 @@ header {
   /* padding: 40px; */
   text-align: center;
   min-height: 350px;
+  max-height: 500px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  position: relative;
 }
 
 .upload-icon {
@@ -250,4 +253,9 @@ header {
 }
 
 /* Display image */
-.display_image {}
+.display_image {
+  margin: 3px;
+  object-fit: contain;
+  max-width: 100%;
+  max-height: 100%;
+}
