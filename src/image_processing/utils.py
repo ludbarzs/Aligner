@@ -1,5 +1,49 @@
+from typing import (Union, overload)
+
 import cv2 as cv
 import numpy as np
+
+
+class ImageProcessor:
+    """
+    Handles image loading, processing and contour denection options
+    """
+
+    @overload
+    def __init__(self, image: np.ndarray) -> None: ...
+
+    @overload
+    def __init__(self, image_path: str) -> None: ...
+
+    def __init__(self, image: Union[np.ndarray, str]) -> None:
+        """
+        Inintialize the image processor with either a path to the image
+        or a np.ndarray of the image
+        """
+        self.original_image = None
+        self.gray_image = None
+        self.processed_image = None
+        self.contours = None
+
+        if isinstance(image, str):
+            self.load_from_path(image)
+        elif image is not None:
+            self.original_image = image.copy()
+
+    def load_from_path(self, image_path: str) -> np.ndarray:
+        """
+        Load image from file path
+
+        Raises:
+            FileNotFoundError: If image connot be loaded
+        """
+        image = cv.imread(image_path)
+
+        if image is None:
+            raise FileNotFoundError(f"Could not load image: {image_path}")
+
+        self.original_image = image
+        return self.original_image
 
 
 def load_image(image_path: str) -> np.ndarray:
