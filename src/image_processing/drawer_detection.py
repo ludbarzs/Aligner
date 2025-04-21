@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import (Optional, Tuple)
 
 import cv2 as cv
 import numpy as np
@@ -143,10 +143,7 @@ def correct_perspective(
 
 
 # For testing
-def measure_object_in_drawer(
-    corrected_image: np.ndarray, x_ratio: float, y_ratio: float
-) -> None:
-    windows_name = "Measure Objects"
+def measure_object_in_drawer(corrected_image: np.ndarray, x_ratio: float, y_ratio: float) -> None:
     measuring_image = corrected_image.copy()
     points = []
 
@@ -213,12 +210,12 @@ def find_inscribed_circle_diameter(
     - The diameter of the inscribed circle in mm
     """
     # Find the center of the contour
-    M = cv.moments(contour)
-    if M["m00"] == 0:
+    moments = cv.moments(contour)
+    if moments["m00"] == 0:
         return 0
 
-    cx = int(M["m10"] / M["m00"])  # cx = (sum of x-coordinates) / area
-    cy = int(M["m01"] / M["m00"])  # cy = (sum of y-coordinates) / area
+    cx = int(moments["m10"] / moments["m00"])  # cx = (sum of x-coordinates) / area
+    cy = int(moments["m01"] / moments["m00"])  # cy = (sum of y-coordinates) / area
     center = (cx, cy)
 
     # Calculate distance from center to each point on the contour
@@ -261,9 +258,7 @@ def find_inscribed_circle_diameter(
     )  # Blue circle for enclosing circle
 
     # Draw line from center to closest point
-    cv.line(
-        image, center, closest_point, (255, 255, 0), 2
-    )  # Yellow line showing radius
+    cv.line(image, center, closest_point, (255, 255, 0), 2)  # Yellow line showing radius
 
     # Add text with diameter information
     cv.putText(
@@ -279,9 +274,7 @@ def find_inscribed_circle_diameter(
     return image
 
 
-def draw_contour_line(
-    image: np.ndarray, contour: np.ndarray, x_ratio: float, y_ratio: float
-):
+def draw_contour_line(image: np.ndarray, contour: np.ndarray, x_ratio: float, y_ratio: float):
     cv.drawContours(image, [contour], -1, (0, 255, 0), 1)
 
     max_length = 0
