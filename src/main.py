@@ -1,57 +1,25 @@
-from file_conversion.dxf_exporter import (contours_to_dxf)
-from image_processing.coin_detection import (detect_circles)
-from image_processing.drawer_detection import (correct_perspective, draw_contour_line,
-                                               find_inscribed_circle_diameter,
-                                               select_drawer_corners)
-from image_processing.utils import (find_contours, load_image, prepare_image, view_image)
+from image_processing.utils import (ImageProcessor)
 
 
 def main():
     """
     Main method
     """
-    # Load Image
-    image = load_image("images/test_19.jpg")
 
-    # User selects drawer corners
-    corners = select_drawer_corners(image)
-    # Auto select corners for test_14.jpg
-    # corners = np.array([[149, 82], [1939, 75], [1995, 1213], [115, 1240]])
+    # Initialize and load image
+    proc = ImageProcessor("images/test_19.jpg")
 
-    # Image perspective gets corrected
-    irl_width = 297
-    irl_length = 210
-    corrected_image, x_ratio, y_ratio = correct_perspective(image, corners, irl_width, irl_length)
+    # Image processing and edge detection with default values
+    proc.process_and_find_contours()
 
-    # Prepare corrected image for contour finding (Grayscale, canny, closeing edges)
-    prepared_image = prepare_image(corrected_image)
+    # # Custom processing with individual values
+    # processor.convert_to_grayscale()
+    # processor.apply_gaussian_blur(kernel_size=(7, 7))  # Using a larger blur kernel
+    # processor.detect_edges(low_threshold=30, high_threshold=120)  # Custom edge thresholds
+    # processor.apply_morphology(kernel_size=(11, 11))  # Larger morphology kernel
+    # contours = processor.find_contours(min_area=1500)  # Higher min area
 
-    # Find contours
-    contours = find_contours(prepared_image)
-
-    output_path = contours_to_dxf(
-        contours, "output_file.dxf", x_ratio, y_ratio, irl_width, irl_length
-    )
-    print(f"DXF file saved to: {output_path}")
-
-    # Get all circles in image
-    circles = detect_circles(contours)
-
-    circles_image = corrected_image.copy()
-
-    # Drawes the inscribed diameter of all circles
-    for circle in circles:
-        find_inscribed_circle_diameter(circles_image, circle, x_ratio, y_ratio)
-
-    view_image(circles_image)
-
-    # Draw the largest line in contour for tests
-    for contour in contours:
-        draw_contour_line(corrected_image, contour, x_ratio, y_ratio)
-
-    view_image(corrected_image, contours)
-    # Allows user to measure
-    measure_object_in_drawer(corrected_image, x_ratio, y_ratio)
+    proc.view_image(proc.processed_image)
 
 
 main()
