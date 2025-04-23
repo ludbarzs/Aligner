@@ -3,6 +3,8 @@ from typing import (Optional, Tuple)
 import cv2 as cv
 import numpy as np
 
+from image_processing.image_visualizer import (ImageVisualizer)
+
 
 class Contour:
     """Class representing a contour with methods for analyzing its properties."""
@@ -107,6 +109,7 @@ class CircularContourProcessor:
         self.y_ratio = y_ratio
         self.min_circularity = min_circularity
         self.circular_contours = []
+        self.visualizer = ImageVisualizer()
 
     def filter_circular_contours(self, contours_points):
         """
@@ -131,112 +134,7 @@ class CircularContourProcessor:
         """Convert pixels to millimeters using the average of x and y ratios."""
         return pixels * ((self.x_ratio + self.y_ratio) / 2)
 
-    def draw_contour(self, image, contour, color=(0, 255, 0), thickness=2):
-        """Draw a single contour on the image."""
-        return cv.drawContours(image, [contour.points], 0, color, thickness)
-
-    def draw_circles(self, image, contour, draw_min=True, draw_max=True):
-        """
-        Draw minimum inscribed and maximum enclosing circles for a contour.
-
-        Args:
-            image: The image to draw on
-            contour: Contour object
-            draw_min: Whether to draw the minimum (inscribed) circle
-            draw_max: Whether to draw the maximum (enclosing) circle
-
-        Returns:
-            Image with circles drawn
-        """
-        if contour.center is None:
-            return image
-
-        center = contour.center
-
-        # Draw center point
-        cv.circle(image, center, 3, (0, 0, 255), -1)  # Red dot for center
-
-        # Get center coordinates
-        cx, cy = center
-
-        # Draw the minimum (inscribed) circle if requested
-        if draw_min:
-            min_radius_px = contour.min_radius()
-            min_radius_mm = self.px_to_mm(min_radius_px)
-            min_diameter_mm = 2 * min_radius_mm
-
-            cv.circle(image, center, int(min_radius_px), (0, 255, 0), 2)  # Green circle
-
-            # Add text for minimum radius
-            min_text = f"Min Dia: {min_diameter_mm:.2f}mm"
-            cv.putText(
-                image,
-                min_text,
-                (cx + 10, cy + 20),
-                cv.FONT_HERSHEY_SIMPLEX,
-                0.5,
-                (255, 255, 255),
-                1,
-            )
-
-        # Draw the maximum (enclosing) circle if requested
-        if draw_max:
-            (x, y), max_radius_px = contour.min_enclosing_circle()
-            max_center = (int(x), int(y))
-            max_radius_mm = self.px_to_mm(max_radius_px)
-            max_diameter_mm = 2 * max_radius_mm
-
-            cv.circle(image, max_center, int(max_radius_px), (255, 0, 0), 2)  # Blue circle
-
-            # Add text for maximum radius
-            max_text = f"Max Dia: {max_diameter_mm:.2f}mm"
-            cv.putText(
-                image,
-                max_text,
-                (cx + 10, cy - 10),
-                cv.FONT_HERSHEY_SIMPLEX,
-                0.5,
-                (255, 255, 255),
-                1,
-            )
-
-        return image
-
-    def process_image(self, image, contours_points):
-        """
-        Process an image to find circular objects, draw them, and display measurements.
-
-        Args:
-            image: The image to process
-            contours_points: List of contour points from cv.findContours
-
-        Returns:
-            Processed image with circles and measurements
-        """
-        # Create a copy of the image to draw on
-        output_image = image.copy()
-
-        # Filter contours to get circular ones
-        circular_contours = self.filter_circular_contours(contours_points)
-
-        # Draw each circular contour with its measurements
-        for contour in circular_contours:
-            # Draw the contour itself
-            self.draw_contour(output_image, contour)
-
-            # Draw the circles and their measurements
-            self.draw_circles(output_image, contour)
-
-        return output_image
-
-    def display_results(self, image):
-        """Display the processed image."""
-        cv.namedWindow("Circular Objects", cv.WINDOW_NORMAL)
-        cv.imshow("Circular Objects", image)
-        cv.moveWindow("Circular Objects", 0, 0)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
-
+    # Core analysis methods
     def get_circle_measurements(self):
         """
         Get measurements for all circular contours.
@@ -270,3 +168,131 @@ class CircularContourProcessor:
             measurements.append(measurement)
 
         return measurements
+
+    # Visualization methods
+    def visualize_contour(self, image, contour, color=(0, 255, 0), thickness=2):
+        """Create an image with a single contour drawn."""
+        return self.visualizer.draw_contours(image, [contour.points], color, thickness)
+
+    def visualize_circles(self, image, contour, draw_min=True, draw_max=True):
+        """
+        Create image with minimum inscribed and maximum enclosing circles for a contour.
+
+        Args:
+            image: The image to draw on
+            contour: Contour object
+            draw_min: Whether to draw the minimum (inscribed) circle
+            draw_max: Whether to draw the maximum (enclosing) circle
+
+        Returns:
+            Image with circles drawn
+        """
+        if contour.center is None:
+            return image
+
+        result = image.copy()
+        center = contour.center
+
+        # Draw center point
+        result = self.visualizer.draw_circle(result, center, 3, (0, 0, 255), -1)
+
+        # Get center coordinates
+        cx, cy = center
+
+        # Draw the minimum (inscribed) circle if requested
+        if draw_min:
+            min_radius_px = contour.min_radius()
+            min_radius_mm = self.px_to_mm(min_radius_px)
+            min_diameter_mm = 2 * min_radius_mm
+
+            result = self.visualizer.draw_circle(result, center, int(min_radius_px), (0, 255, 0), 2)
+
+            # Add text for minimum radius
+            min_text = f"Min Dia: {min_diameter_mm:.2f}mm"
+            result = self.visualizer.add_text(
+                result,
+                min_text,
+                (cx + 10, cy + 20),
+                0.5,
+                (255, 255, 255),
+                1,
+            )
+
+        # Draw the maximum (enclosing) circle if requested
+        if draw_max:
+            (x, y), max_radius_px = contour.min_enclosing_circle()
+            max_center = (int(x), int(y))
+            max_radius_mm = self.px_to_mm(max_radius_px)
+            max_diameter_mm = 2 * max_radius_mm
+
+            result = self.visualizer.draw_circle(
+                result, max_center, int(max_radius_px), (255, 0, 0), 2
+            )
+
+            # Add text for maximum radius
+            max_text = f"Max Dia: {max_diameter_mm:.2f}mm"
+            result = self.visualizer.add_text(
+                result,
+                max_text,
+                (cx + 10, cy - 10),
+                0.5,
+                (255, 255, 255),
+                1,
+            )
+
+        return result
+
+    def visualize_image(self, image, contours_points):
+        """
+        Create a visualization of circular objects with measurements.
+
+        Args:
+            image: The image to process
+            contours_points: List of contour points from cv.findContours
+
+        Returns:
+            Processed image with circles and measurements
+        """
+        # Create a copy of the image to draw on
+        output_image = image.copy()
+
+        # Filter contours to get circular ones
+        circular_contours = self.filter_circular_contours(contours_points)
+
+        # Draw each circular contour with its measurements
+        for contour in circular_contours:
+            # Draw the contour itself
+            output_image = self.visualize_contour(output_image, contour)
+
+            # Draw the circles and their measurements
+            output_image = self.visualize_circles(output_image, contour)
+
+        return output_image
+
+    # Methods for displaying to screen
+    def display_contour(self, image, contour, color=(0, 255, 0), thickness=2):
+        """Draw a single contour on the image and display it."""
+        result = self.visualize_contour(image, contour, color, thickness)
+        self.visualizer.display_image(result, "Contour")
+
+    def display_circles(self, image, contour, draw_min=True, draw_max=True):
+        """Draw minimum inscribed and maximum enclosing circles for a contour and display them."""
+        result = self.visualize_circles(image, contour, draw_min, draw_max)
+        self.visualizer.display_image(result, "Circle Measurements")
+
+    def process_image(self, image, contours_points):
+        """
+        Process an image to find circular objects, draw them, and return the visualization.
+
+        Args:
+            image: The image to process
+            contours_points: List of contour points from cv.findContours
+
+        Returns:
+            Processed image with circles and measurements
+        """
+        return self.visualize_image(image, contours_points)
+
+    def display_results(self, image):
+        """Display the processed image."""
+        self.visualizer.display_image(image, "Circular Objects")

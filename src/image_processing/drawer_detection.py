@@ -3,6 +3,8 @@ from typing import (Optional, Tuple)
 import cv2 as cv
 import numpy as np
 
+from image_processing.image_visualizer import (ImageVisualizer)
+
 
 class DrawerProcessro:
     def __init__(self, image: np.ndarray):
@@ -17,6 +19,7 @@ class DrawerProcessro:
         self.corrected_image: Optional[np.ndarray] = None
         self.x_ratio: Optional[float] = None
         self.y_ratio: Optional[float] = None
+        self.visualizer = ImageVisualizer()
 
     @staticmethod
     def order_corners(corners: np.ndarray) -> np.ndarray:
@@ -209,16 +212,18 @@ class DrawerProcessro:
         cv.waitKey(0)
         cv.destroyAllWindows()
 
-    def view_drawer_boundaries(self) -> None:
+    def visualize_drawer_boundaries(self) -> None:
         """Display drawer boundaries on the original image"""
         if self.corners is None:
             raise ValueError("Corners not set. Call select_corners() first.")
 
         image = self.original_image.copy()
 
+        # Draw corner points
         for x, y in self.corners:
             cv.circle(image, (x, y), 3, (0, 255, 0), -1)
 
+        # Draw boundary lines
         for i in range(4):
             start_point = tuple(self.corners[i])
 
@@ -229,12 +234,15 @@ class DrawerProcessro:
                 image, start_point, end_point, (0, 255, 0), 2
             )  # (image, start_point, end_point, color, thickness)
 
-        cv.namedWindow("Drawer boundaries", cv.WINDOW_NORMAL)
-        cv.imshow("Drawer boundaries", image)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
+        return image
+
+    def display_drawer_boundaries(self) -> None:
+        """Display drawer boundaries on the original image"""
+        image = self.visualize_drawer_boundaries()
+        self.visualizer.display_image(image, "Drawer boundaries")
 
 
+# TODO: Either remake the following class to use the image_visualizer.py or delete unnecessary
 class ContourAnalyzer:
     """Class for analyzing contours in drawer images"""
 
