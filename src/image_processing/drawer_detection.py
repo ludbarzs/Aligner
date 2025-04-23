@@ -6,7 +6,7 @@ import numpy as np
 from image_processing.image_visualizer import (ImageVisualizer)
 
 
-class DrawerProcessro:
+class DrawerProcessor:
     def __init__(self, image: np.ndarray):
         """
         Initialize with an image of a drawer.
@@ -52,6 +52,27 @@ class DrawerProcessro:
             ]
         )
 
+    def quick_start(
+        self, real_width_mm: float, real_height_mm: float
+    ) -> Tuple[np.ndarray, float, float]:
+        """
+        Complete drawer processing workflow:
+        1. Opens window for corner selection
+        2. Corrects perspective
+        3. Returns corrected image and pixel-to-mm ratios
+        """
+        # Select corners
+        if not self.select_corners():
+            raise RuntimeError("Failed to select 4 corners")
+
+        # Correct perspective
+        self.correct_perspective(real_width_mm, real_height_mm)
+
+        if self.corrected_image is None or self.x_ratio is None or self.y_ratio is None:
+            raise RuntimeError("Error: DrawerProcessor perspective correction failed!")
+
+        return self.corrected_image, self.x_ratio, self.y_ratio
+
     def select_corners(self, window_name: str = "Select Corners") -> bool:
         """
         Mouse input, user selects drawer corners
@@ -86,7 +107,7 @@ class DrawerProcessro:
         cv.destroyAllWindows()
 
         if len(corners) == 4:
-            self.corners = self.order_corners(np.ndarray(corners))
+            self.corners = self.order_corners(np.array(corners))
             return True
         return False
 

@@ -1,16 +1,27 @@
+from image_processing.drawer_detection import (DrawerProcessor)
+from image_processing.image_visualizer import (ImageVisualizer)
 from image_processing.utils import (ImageProcessor)
 
 
 def main():
     """
-    Main method
+    Main
     """
+    # Image visualizer
+    visualizer = ImageVisualizer
+    image_path = "images/test_8.jpg"
+    image = ImageProcessor.load_from_path(image_path)
+
+    drawer_proc = DrawerProcessor(image)
+    corrected_image, x_ratio, y_ratio = drawer_proc.quick_start(530, 330)
 
     # Initialize and load image
-    proc = ImageProcessor("images/test_19.jpg")
+    proc = ImageProcessor(corrected_image)
 
     # Image processing and edge detection with default values
-    proc.process_and_find_contours()
+    proc.prepare_image()
+    contours = proc.find_contours()
+    visualizer.draw_contours(image, contours)
 
     # # Custom processing with individual values
     # processor.convert_to_grayscale()

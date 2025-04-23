@@ -28,11 +28,12 @@ class ImageProcessor:
         self.contours = None
 
         if isinstance(image, str):
-            self.load_from_path(image)
+            self.original_image = self.load_from_path(image)
         elif image is not None:
             self.original_image = image.copy()
 
-    def load_from_path(self, image_path: str) -> np.ndarray:
+    @staticmethod
+    def load_from_path(image_path: str) -> np.ndarray:
         """
         Load image from file path
 
@@ -44,8 +45,7 @@ class ImageProcessor:
         if image is None:
             raise FileNotFoundError(f"Could not load image: {image_path}")
 
-        self.original_image = image
-        return self.original_image
+        return image
 
     def convert_to_grayscale(self) -> np.ndarray:
         """
@@ -152,9 +152,16 @@ class ImageProcessor:
             Processed image ready for contour detection
         """
         self.convert_to_grayscale()
-        self.apply_gaussian_blur(blur_kernel_size)
-        self.detect_edges(canny_low, canny_high)
-        self.apply_morphology(kernel_size=morph_kernel_size)
+        self.view_image(self.gray_image, "Gray Image")  # Debug
+
+        self.apply_gaussian_blur()
+        self.view_image(self.blurred_image, "Blurred Image")  # Debug
+
+        self.detect_edges()
+        self.view_image(self.edges_image, "Edges Image")  # Debug
+
+        self.apply_morphology()
+        self.view_image(self.processed_image, "Processed Image")  # Debug
 
         return self.processed_image
 
@@ -221,16 +228,3 @@ class ImageProcessor:
         cv.moveWindow(window_name, 0, 0)
         cv.waitKey(0)
         cv.destroyAllWindows()
-
-    def process_and_find_contours(self, min_area: float = 1000) -> List[np.ndarray]:
-        """
-        Convenience method to prepare the image and find contours in one step.
-
-        Args:
-            min_area: Minimum contour area to include in results
-
-        Returns:
-            List of contours meeting the minimum area requirement
-        """
-        self.prepare_image()
-        return self.find_contours(min_area)
