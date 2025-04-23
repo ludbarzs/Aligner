@@ -7,13 +7,16 @@ __pycache__/
 *.pyo
 *.pyd
 *.pyc
+*.ini
 
 # Ignore environment variables
 .env
 .ropeproject
 
 # Tmux related
-.log
+*.log
 
 # Output test files
-.dxf
+*.dxf
+
+
