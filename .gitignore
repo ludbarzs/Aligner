@@ -1,5 +1,7 @@
 # Ignore vitrual env dir
 venv/
+ui/
+*.log
 
 # Ignore Python cache dir
 __pycache__/
