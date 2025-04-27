@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Aligner</title>
+  <link rel="stylesheet" href="styles/styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <script defer src="scripts/renderer.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <div class="logo-container">
+        <img class="logo" src="assets/logo_v1.png" alt="Logo of capital A" />
+        <div class="logo-text">
+          <h1>Aligner</h1>
+          <p>Program that works</p>
+        </div>
+      </div>
+      <div class="header-icons">
+        <button class="icon-button">
+          <i class="fas fa-question fa-solid"></i>
+        </button>
+        <button class="icon-button"><i class="fas fa-cog"></i></button>
+      </div>
+    </header>
+
+    <div class="steps-container">
+      <div class="step step-active">
+        <div class="step-number">1</div>
+        <div class="step-label">Upload</div>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-label">Process</div>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-label">Align</div>
+      </div>
+      <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-label">Export</div>
+      </div>
+    </div>
+
+    <div class="upload-container">
+      <div class="upload-box">
+        <div class="upload-icon">
+          <i class="fas fa-folder"></i>
+        </div>
+        <h3 class="upload-h3">Upload your image</h3>
+        <p>
+          Drag and drop your image here or click to browse files. Support JPG,
+          PNG
+        </p>
+        <button class="select-file-btn">Select file</button>
+      </div>
+    </div>
+    <div class="action-buttons">
+      <button class="reupload-btn">
+        <i class="fas fa-arrow-rotate-left"></i>
+        REUPLOAD IMAGE
+      </button>
+      <button class="continue-btn">
+        CONTINUE
+        <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+</body>
+
+</html>
