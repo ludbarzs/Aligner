@@ -33,7 +33,7 @@ def main():  # Load Image
     # Find contours
     contours = find_contours(prepared_image)
 
-    view_image(image, contours)
+    view_image(corrected_image, contours)
 
     # output_path = contours_to_dxf(
     #     contours, "output_file.dxf", x_ratio, y_ratio, irl_width, irl_length
@@ -45,19 +45,20 @@ def main():  # Load Image
     #
     # circles_image = corrected_image.copy()
     #
+
     # # Drawes the inscribed diameter of all circles
     # for circle in circles:
     #     find_inscribed_circle_diameter(circles_image, circle, x_ratio, y_ratio)
     #
     # view_image(circles_image)
     #
+
     # # Draw the largest line in contour for tests
     # for contour in contours:
     #     draw_contour_line(corrected_image, contour, x_ratio, y_ratio)
     #
     # # Allows user to measure
     # measure_object_in_drawer(corrected_image, x_ratio, y_ratio)
-    #
 
 
 main()
