@@ -53,12 +53,12 @@ def main():  # Load Image
     # view_image(circles_image)
     #
 
-    # # Draw the largest line in contour for tests
-    # for contour in contours:
-    #     draw_contour_line(corrected_image, contour, x_ratio, y_ratio)
-    #
-    # # Allows user to measure
-    # measure_object_in_drawer(corrected_image, x_ratio, y_ratio)
+    # Draw the largest line in contour for tests
+    for contour in contours:
+        draw_contour_line(corrected_image, contour, x_ratio, y_ratio)
+
+    # Allows user to measure
+    measure_object_in_drawer(corrected_image, x_ratio, y_ratio)
 
 
 main()
