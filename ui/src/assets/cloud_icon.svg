@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="149.486" height="104.666" viewBox="0 0 149.486 104.666">
+  <defs>
+    <filter id="Path_10" x="0" y="0" width="149.486" height="104.666" filterUnits="userSpaceOnUse">
+      <feOffset input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-color="#b312d4" flood-opacity="0.639"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="SVGRepo_iconCarrier" transform="translate(10.5 10.505)">
+    <g transform="matrix(1, 0, 0, 1, -10.5, -10.51)" filter="url(#Path_10)">
+      <path id="Path_10-2" data-name="Path 10" d="M108.958,42.552S111.4,9.691,81.291,5.943c-25.8-2.635-33.658,21.345-33.658,21.345s-7.769-7.472-18.312-1.368c-9.438,5.826-7.769,16.492-7.769,16.492S.6,46.487.6,67.85C1.061,89.188,23.349,89.4,23.349,89.4H58.5V66.851H47.22L66.012,48.058,84.805,66.851H73.53V89.4h31.824s20.747.023,23.66-20.277C130.4,46.927,108.958,42.552,108.958,42.552Z" transform="translate(9.9 4.76)" fill="rgba(255,255,255,0.04)" stroke="#c975f8" stroke-width="3"/>
+    </g>
+  </g>
+</svg>
