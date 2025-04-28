@@ -9,7 +9,7 @@ let currentWorkflowStep = 1; // Step 1: Adjust image, Step 2: Place dots
 // Initialize event listeners for control buttons once DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
   // Get reference to the image element
-  const imageElement = document.getElementById("uploadedImage");
+  const imageElement = document.getElementById("uploaded-image");
 
   // Setup rotation button
   const rotateButton = document.querySelector(".control-button:nth-child(1)");
@@ -22,19 +22,25 @@ document.addEventListener("DOMContentLoaded", () => {
   // Setup reupload button
   const reuploadButton = document.querySelector(".control-button:nth-child(3)");
   reuploadButton.addEventListener("click", () => {
-    document.getElementById("imageUpload").click();
+    document.getElementById("image-upload").click();
   });
 
   // Setup continue button
-  const continueButton = document.querySelector(
-    '.control-button[style*="background-color: var(--neon-color)"]',
-  );
+  const continueButton = document.querySelector(".control-button.primary");
   if (continueButton) {
     continueButton.addEventListener("click", () => {
       if (currentWorkflowStep === 1) {
         switchToStep2();
+        // Update progress when continuing to step 2
+        if (window.progressTracker) {
+          window.progressTracker.nextStep();
+        }
       } else {
         sendToAPI();
+        // Update progress when submitting
+        if (window.progressTracker) {
+          window.progressTracker.nextStep();
+        }
       }
     });
   }
@@ -166,7 +172,7 @@ function mirrorImage(imageElement) {
  * @returns {string} - The processed image data URL
  */
 function getProcessedImageData() {
-  return document.getElementById("uploadedImage").src;
+  return document.getElementById("uploaded-image").src;
 }
 
 /**
@@ -181,15 +187,14 @@ function switchToStep2() {
   // Hide first three buttons (rotate, mirror, reupload)
   for (let i = 0; i < 3; i++) {
     if (controlButtons[i]) {
-      controlButtons[i].style.display = "none";
+      controlButtons[i].classList.remove("flex");
     }
   }
 
   // Create back button to replace them
   const backButton = document.createElement("button");
-  backButton.className = "control-button";
+  backButton.className = "control-button flex";
   backButton.innerHTML = "<span>Back</span>";
-  backButton.style.display = "flex";
   backButton.addEventListener("click", switchToStep1);
 
   // Get the controls container and insert the back button at the beginning
@@ -197,9 +202,7 @@ function switchToStep2() {
   controlsContainer.insertBefore(backButton, controlsContainer.firstChild);
 
   // Change continue button text to "Submit"
-  const continueButton = document.querySelector(
-    '.control-button[style*="background-color: var(--neon-color)"]',
-  );
+  const continueButton = document.querySelector(".control-button.primary");
   if (continueButton) {
     continueButton.querySelector("span").textContent = "Submit";
   }
@@ -221,15 +224,7 @@ function switchToStep2() {
   // Display instruction to user
   const instructionElement = document.createElement("div");
   instructionElement.id = "placement-instruction";
-  instructionElement.style.position = "fixed";
-  instructionElement.style.top = "60px";
-  instructionElement.style.left = "50%";
-  instructionElement.style.transform = "translateX(-50%)";
-  instructionElement.style.padding = "10px 20px";
-  instructionElement.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
-  instructionElement.style.color = "white";
-  instructionElement.style.borderRadius = "5px";
-  instructionElement.style.zIndex = "1000";
+  instructionElement.className = "placement-instruction";
   instructionElement.textContent = "Click to place up to 4 points on the image";
   document.body.appendChild(instructionElement);
 }
@@ -252,14 +247,12 @@ function switchToStep1() {
   const controlButtons = document.querySelectorAll(".control-button");
   for (let i = 0; i < 3; i++) {
     if (controlButtons[i]) {
-      controlButtons[i].style.display = "flex";
+      controlButtons[i].classList.add("flex");
     }
   }
 
   // Change continue button text back to "Continue"
-  const continueButton = document.querySelector(
-    '.control-button[style*="background-color: var(--neon-color)"]',
-  );
+  const continueButton = document.querySelector(".control-button.primary");
   if (continueButton) {
     continueButton.querySelector("span").textContent = "Continue";
   }
@@ -282,5 +275,10 @@ function switchToStep1() {
   const instructionElement = document.getElementById("placement-instruction");
   if (instructionElement) {
     instructionElement.remove();
+  }
+
+  // Move progress bar back one step
+  if (window.progressTracker) {
+    window.progressTracker.previousStep();
   }
 }

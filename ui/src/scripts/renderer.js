@@ -1,53 +1,60 @@
 // Store coordinates
 let coordinates = [];
-let imageElement = document.getElementById("uploadedImage");
-let uploadInterface = document.getElementById("uploadInterface");
+let imageElement = document.getElementById("uploaded-image");
+let uploadInterface = document.getElementById("upload-interface");
 
 // Initialize global variable for dot placement permission
 window.allowDotPlacement = false;
 
 // Handle image upload
-document.getElementById("imageUpload").addEventListener("change", function (e) {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
+document
+  .getElementById("image-upload")
+  .addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
 
-    reader.onload = function (event) {
-      imageElement.src = event.target.result;
-      imageElement.style.display = "block";
-      uploadInterface.style.display = "none";
-      // Show all control buttons
-      document.querySelectorAll(".control-button").forEach((button) => {
-        button.style.display = "flex";
-      });
-      coordinates = []; // Reset coordinates when new image is loaded
-      removeAllMarkers(); // Remove any existing markers
-      updateCoordinateList();
+      reader.onload = function (event) {
+        imageElement.src = event.target.result;
+        imageElement.style.display = "block";
+        uploadInterface.style.display = "none";
 
-      // If we're in the controls.js context, reset rotation and mirror values
-      if (typeof currentRotation !== "undefined") {
-        currentRotation = 0;
-      }
-      if (typeof isMirrored !== "undefined") {
-        isMirrored = false;
-      }
-      if (typeof originalImageData !== "undefined") {
-        originalImageData = imageElement.src;
-      }
-      if (typeof currentWorkflowStep !== "undefined") {
-        // Make sure we're in step 1 after a new upload
-        if (currentWorkflowStep !== 1) {
-          switchToStep1();
+        // Show all control buttons
+        document.querySelectorAll(".control-button").forEach((button) => {
+          button.classList.add("flex");
+        });
+
+        coordinates = []; // Reset coordinates when new image is loaded
+        removeAllMarkers(); // Remove any existing markers
+        updateCoordinateList();
+
+        // If we're in the controls.js context, reset rotation and mirror values
+        if (typeof currentRotation !== "undefined") {
+          currentRotation = 0;
         }
+        if (typeof isMirrored !== "undefined") {
+          isMirrored = false;
+        }
+        if (typeof originalImageData !== "undefined") {
+          originalImageData = imageElement.src;
+        }
+        if (typeof currentWorkflowStep !== "undefined") {
+          // Make sure we're in step 1 after a new upload
+          if (currentWorkflowStep !== 1) {
+            switchToStep1();
+          }
+        }
+
+        // Reset dot placement permission
+        window.allowDotPlacement = false;
+      };
+
+      reader.readAsDataURL(file);
+      if (window.progressTracker) {
+        window.progressTracker.nextStep();
       }
-
-      // Reset dot placement permission
-      window.allowDotPlacement = false;
-    };
-
-    reader.readAsDataURL(file);
-  }
-});
+    }
+  });
 
 // Handle clicks on the image
 imageElement.addEventListener("click", function (e) {
