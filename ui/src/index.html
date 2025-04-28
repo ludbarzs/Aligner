@@ -1,75 +1,244 @@
 <!doctype html>
 <html>
+  <head>
+    <title>Aligner</title>
+    <style>
+      :root {
+        --neon-color: #8a43fc;
+        --dark-bg: #121212;
+        --card-bg: #1e1e1e;
+        --text-color: #f5f5f5;
+        --accent-color: #2a2a2a;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        color: white;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+          Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        outline: none;
+      }
+      .progress-container {
+        width: 100%;
+        height: 6px;
+        background-color: rgba(0, 0, 0, 0.3);
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 10;
+      }
+      .progress-bar {
+        height: 100%;
+        width: 25%;
+        background-color: var(--neon-color);
+        box-shadow: 0 0 50px var(--neon-color);
+        transition: width 0.3s ease;
+        border-top-right-radius: 3px;
+        border-bottom-right-radius: 3px;
+      }
+      .container {
+        overflow: hidden;
+        height: 100dvh;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
 
-<head>
-  <meta charset="UTF-8" />
-  <title>Aligner</title>
-  <link rel="stylesheet" href="styles/styles.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <script defer src="scripts/renderer.js"></script>
-</head>
+        background-color: #08010d;
+        background-image: url("assets/background.jpg");
+        background-size: cover;
+        background-position: center;
+      }
+      .container::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 0;
+      }
+      .box {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 750px;
+        width: 1310px;
 
-<body>
-  <div class="container">
-    <header>
-      <div class="logo-container">
-        <img class="logo" src="assets/logo_v1.png" alt="Logo of capital A" />
-        <div class="logo-text">
-          <h1>Aligner</h1>
-          <p>Program that works</p>
+        background: rgba(255, 255, 255, 0.01);
+        backdrop-filter: blur(14px);
+        border-radius: 10px;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+
+        position: relative;
+        z-index: 1;
+        border: 2px solid red;
+      }
+
+      #uploadedImage {
+        max-height: 720px;
+        max-width: 1280px;
+        display: none;
+      }
+
+      #cloud-icon {
+        height: 100px;
+        width: 130px;
+        margin-bottom: 20px;
+        margin-top: 40px;
+      }
+
+      .upload-button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-weight: 400;
+
+        width: 230px;
+        height: 48px;
+
+        font-size: 16px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 25px;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+      }
+
+      #description {
+        font-size: 20px;
+        max-width: 284px;
+        text-align: center;
+        margin-bottom: 190px;
+      }
+      #supports {
+        font-size: 14px;
+        color: #888888;
+        margin-top: 13px;
+      }
+      #uploadInterface {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .controls-container {
+        width: 1310px;
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+
+      .controls {
+        display: flex;
+        gap: 15px;
+      }
+
+      .control-button {
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        border-radius: 20px;
+        font-size: 16px;
+        color: white;
+        padding: 8px 16px;
+        align-items: center;
+        justify-content: center;
+        transition:
+          background 0.3s,
+          transform 0.2s;
+
+        display: none;
+        z-index: 100;
+      }
+
+      .control-button:hover {
+        background: var(--neon-color);
+        transform: scale(1.05);
+      }
+
+      .control-icon {
+        width: 20px;
+        height: 20px;
+        fill: white;
+      }
+
+      .control-button span {
+        margin-left: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="progress-container">
+      <div class="progress-bar"></div>
+    </div>
+    <div class="container">
+      <div class="box">
+        <div id="uploadInterface">
+          <img
+            id="cloud-icon"
+            src="assets/cloud_icon.svg"
+            alt="Icon"
+            width="100"
+            height="100"
+          />
+          <p id="description">
+            Drag and drop your image here or click "Select File"
+          </p>
+          <!-- Image upload input -->
+          <label for="imageUpload" class="upload-button">Select File</label>
+          <input
+            type="file"
+            id="imageUpload"
+            accept=".jpg,.jpeg,.png"
+            name="Select file"
+            style="display: none"
+          />
+          <span id="supports">Supports: PNG, JPG, JPEG</span>
+        </div>
+
+        <!-- Container for the image -->
+        <div>
+          <img id="uploadedImage" />
         </div>
       </div>
-      <div class="header-icons">
-        <button class="icon-button">
-          <i class="fas fa-question fa-solid"></i>
+
+      <div class="controls-container">
+        <div class="controls">
+          <button class="control-button">
+            <svg class="control-icon" viewBox="0 0 24 24">
+              <path
+                d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"
+              />
+            </svg>
+            <span>Rotate</span>
+          </button>
+          <button class="control-button">
+            <svg class="control-icon" viewBox="0 0 24 24">
+              <path
+                d="M15 21h2v-2h-2v2zm4-12h2V7h-2v2zM3 5v14c0 1.1.9 2 2 2h4v-2H5V5h4V3H5c-1.1 0-2 .9-2 2zm16-2v2h2c0-1.1-.9-2-2-2zm-8 20h2V1h-2v22zm8-6h2v-2h-2v2zM15 5h2V3h-2v2zm4 8h2v-2h-2v2zm0 8c1.1 0 2-.9 2-2h-2v2z"
+              />
+            </svg>
+            <span>Mirror</span>
+          </button>
+          <button class="control-button">
+            <svg class="control-icon" viewBox="0 0 24 24">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+            </svg>
+            <span>Reupload</span>
+          </button>
+        </div>
+        <button
+          class="control-button"
+          style="background-color: var(--neon-color)"
+        >
+          <span>Continue</span>
         </button>
-        <button class="icon-button"><i class="fas fa-cog"></i></button>
-      </div>
-    </header>
-
-    <div class="steps-container">
-      <div class="step step-active">
-        <div class="step-number">1</div>
-        <div class="step-label">Upload</div>
-      </div>
-      <div class="step">
-        <div class="step-number">2</div>
-        <div class="step-label">Process</div>
-      </div>
-      <div class="step">
-        <div class="step-number">3</div>
-        <div class="step-label">Align</div>
-      </div>
-      <div class="step">
-        <div class="step-number">4</div>
-        <div class="step-label">Export</div>
       </div>
     </div>
 
-    <div class="upload-container">
-      <div class="upload-box">
-        <div class="upload-icon">
-          <i class="fas fa-folder"></i>
-        </div>
-        <h3 class="upload-h3">Upload your image</h3>
-        <p>
-          Drag and drop your image here or click to browse files. Support JPG,
-          PNG
-        </p>
-        <button class="select-file-btn">Select file</button>
-      </div>
-    </div>
-    <div class="action-buttons">
-      <button class="reupload-btn">
-        <i class="fas fa-arrow-rotate-left"></i>
-        REUPLOAD IMAGE
-      </button>
-      <button class="continue-btn">
-        CONTINUE
-        <i class="fas fa-arrow-right"></i>
-      </button>
-    </div>
-  </div>
-</body>
-
+    <script src="scripts/renderer.js"></script>
+  </body>
 </html>
