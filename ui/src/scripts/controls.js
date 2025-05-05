@@ -36,6 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
           globalThis.progressTracker.nextStep();
         }
       } else {
+        // Fixed: Changed _sendToAPI to sendToAPI to match the function name in renderer.js
         _sendToAPI();
         // Update progress when submitting
         if (globalThis.progressTracker) {

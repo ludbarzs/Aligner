@@ -56,6 +56,12 @@ def process_image():
         # Process image with coordinates
         processed_image = process_with_coordinates(image, coordinates)
 
+        # Calculate area
+        points = np.array(
+            [(coord["x"], coord["y"]) for coord in coordinates], dtype=np.int32
+        )
+        area = calculate_area(points)
+
         # Encode the processed image to send back
         _, buffer = cv.imencode(".png", processed_image)
         encoded_image = base64.b64encode(buffer).decode("utf-8")
@@ -64,7 +70,7 @@ def process_image():
             {
                 "success": True,
                 "processedImage": f"data:image/png;base64,{encoded_image}",
-                "TEST": "WORKED",
+                "area": area,
             }
         )
 
@@ -100,6 +106,21 @@ def process_with_coordinates(image, coordinates):
     )
 
     return result
+
+
+def calculate_area(points):
+    """Calculate the area of a polygon defined by points"""
+    # Use the Shoelace formula (Gauss's area formula)
+    n = len(points)
+    area = 0.0
+
+    for i in range(n):
+        j = (i + 1) % n
+        area += points[i][0] * points[j][1]
+        area -= points[j][0] * points[i][1]
+
+    area = abs(area) / 2.0
+    return area
 
 
 if __name__ == "__main__":

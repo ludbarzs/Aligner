@@ -1,6 +1,6 @@
 let coordinates = [];
-let imageElement = document.getElementById("uploaded-image");
-let uploadInterface = document.getElementById("upload-interface");
+const imageElement = document.getElementById("uploaded-image");
+const uploadInterface = document.getElementById("upload-interface");
 
 // Initialize global variable for dot placement permission
 globalThis.allowDotPlacement = false;
@@ -112,7 +112,6 @@ function createMarker(clientX, clientY, number) {
   marker.style.textAlign = "center";
   marker.style.lineHeight = "20px";
   marker.style.zIndex = "1000";
-  marker.textContent = number;
 
   document.body.appendChild(marker);
 }
@@ -132,7 +131,7 @@ function updateCoordinateList() {
 }
 
 // Send to API with the current image and coordinates
-async function sendToAPI() {
+async function _sendToAPI() {
   const imageElement = document.getElementById("uploaded-image");
   const imageData = imageElement.src;
 
@@ -165,6 +164,7 @@ async function sendToAPI() {
     }
 
     const data = await response.json();
+    console.log(data);
 
     if (data.success) {
       imageElement.src = data.processedImage;

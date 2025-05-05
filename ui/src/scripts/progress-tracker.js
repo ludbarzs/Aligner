@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Export functions for other modules to use
-window.progressTracker = {
+globalThis.progressTracker = {
   nextStep: () => progressTracker.nextStep(),
   previousStep: () => progressTracker.previousStep(),
   setStep: (step) => progressTracker.setStep(step),
