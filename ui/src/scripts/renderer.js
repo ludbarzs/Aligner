@@ -36,8 +36,8 @@ export class Renderer {
       this.showControlButtons();
       this.removeAllMarkers();
 
-      if (gloablThis.progressTracker) {
-        gloablThis.progressTracker.nextStep();
+      if (window.progressTracker) {
+        window.progressTracker.nextStep();
       }
     };
     reader.readAsDataURL(file);

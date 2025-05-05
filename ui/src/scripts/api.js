@@ -30,6 +30,7 @@ export async function sendToAPI() {
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
     const data = await response.json();
+    console.log(data);
     if (data.success) {
       renderer.imageElement.src = data.processedImage;
       appState.setImageData(data.processedImage);

@@ -119,4 +119,5 @@ export class Controls {
   }
 }
 
-export const controls = new Controls();
+// Create and export a single instance - no longer using a variable name that could conflict
+export const controlsManager = new Controls();

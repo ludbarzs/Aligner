@@ -1,8 +1,9 @@
 import { renderer } from "./renderer.js";
-import { controls } from "./controls.js";
+import { controlsManager } from "./controls.js"; // Updated import name
+import "./progress-tracker.js";
 
 // Initialize the application
 document.addEventListener("DOMContentLoaded", () => {
-  renderer; // This initializes the renderer
-  controls; // This initializes the controls
+  console.log("Application initialized");
+  // The modules will self-initialize via their constructors
 });

@@ -57,6 +57,7 @@ def process_image():
             {
                 "success": True,
                 "processedImage": f"data:image/png;base64,{encoded_image}",
+                "test": "succcess",
             }
         )
 
