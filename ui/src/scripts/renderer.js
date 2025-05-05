@@ -1,10 +1,9 @@
-// Store coordinates
 let coordinates = [];
 let imageElement = document.getElementById("uploaded-image");
 let uploadInterface = document.getElementById("upload-interface");
 
 // Initialize global variable for dot placement permission
-window.allowDotPlacement = false;
+globalThis.allowDotPlacement = false;
 
 // Handle image upload
 document
@@ -46,12 +45,12 @@ document
         }
 
         // Reset dot placement permission
-        window.allowDotPlacement = false;
+        globalThis.allowDotPlacement = false;
       };
 
       reader.readAsDataURL(file);
-      if (window.progressTracker) {
-        window.progressTracker.nextStep();
+      if (globalThis.progressTracker) {
+        globalThis.progressTracker.nextStep();
       }
     }
   });
@@ -59,7 +58,7 @@ document
 // Handle clicks on the image
 imageElement.addEventListener("click", function (e) {
   // Only allow placing dots if we're in step 2
-  if (!window.allowDotPlacement) {
+  if (!globalThis.allowDotPlacement) {
     return;
   }
 
@@ -133,41 +132,74 @@ function updateCoordinateList() {
 }
 
 // Send to API with the current image and coordinates
-function sendToAPI() {
-  // Check if we have all 4 points
-  if (coordinates.length < 4) {
-    alert("Please place 4 points on the image before submitting.");
+async function sendToAPI() {
+  const imageElement = document.getElementById("uploaded-image");
+  const imageData = imageElement.src;
+
+  if (typeof coordinates === "undefined" || coordinates.length !== 4) {
+    alert("Please place exactly 4 points on the image");
     return;
   }
 
-  // Get the current processed image data
-  const imageData =
-    typeof getProcessedImageData === "function"
-      ? getProcessedImageData()
-      : imageElement.src;
+  // Show loading state
+  const continueButton = document.querySelector(".control-button.primary");
+  if (continueButton) {
+    continueButton.disabled = true;
+    continueButton.querySelector("span").textContent = "Processing...";
+  }
 
-  console.log("Coordinates to send:", coordinates);
-  console.log("Image data is ready to send to API");
+  try {
+    const response = await fetch("http://localhost:5000/process-image", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        imageData: imageData,
+        coordinates: coordinates,
+      }),
+    });
 
-  // Here you would make your API call with the image data and coordinates
-  // Example:
-  /*
-  fetch('your-api-endpoint', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      imageData: imageData,
-      coordinates: coordinates
-    })
-  })
-  .then(response => response.json())
-  .then(data => {
-    console.log('Success:', data);
-  })
-  .catch((error) => {
-    console.error('Error:', error);
-  });
-  */
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.success) {
+      imageElement.src = data.processedImage;
+      // Optional: Display area to user
+      showResultMessage(`Area: ${data.area.toFixed(2)} px²`);
+    } else {
+      throw new Error(data.error || "Unknown error occurred");
+    }
+  } catch (error) {
+    console.error("API Error:", error);
+    showResultMessage(`Failed to process image: ${error.message}`, true);
+  } finally {
+    // Reset button state
+    if (continueButton) {
+      continueButton.disabled = false;
+      continueButton.querySelector("span").textContent = "Submit";
+    }
+  }
+}
+
+function showResultMessage(message, isError = false) {
+  // Remove any existing messages
+  const existingMsg = document.getElementById("api-result-message");
+  if (existingMsg) existingMsg.remove();
+
+  const msgElement = document.createElement("div");
+  msgElement.id = "api-result-message";
+  msgElement.className = `result-message ${isError ? "error" : "success"}`;
+  msgElement.textContent = message;
+
+  // Add to DOM (adjust selector as needed)
+  document.body.appendChild(msgElement);
+
+  // Auto-hide after 5 seconds
+  setTimeout(() => {
+    msgElement.remove();
+  }, 5000);
 }

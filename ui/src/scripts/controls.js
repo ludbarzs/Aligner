@@ -32,14 +32,14 @@ document.addEventListener("DOMContentLoaded", () => {
       if (currentWorkflowStep === 1) {
         switchToStep2();
         // Update progress when continuing to step 2
-        if (window.progressTracker) {
-          window.progressTracker.nextStep();
+        if (globalThis.progressTracker) {
+          globalThis.progressTracker.nextStep();
         }
       } else {
-        sendToAPI();
+        _sendToAPI();
         // Update progress when submitting
-        if (window.progressTracker) {
-          window.progressTracker.nextStep();
+        if (globalThis.progressTracker) {
+          globalThis.progressTracker.nextStep();
         }
       }
     });
