@@ -12,7 +12,7 @@ CORS(app)  # Enable CORS for all routes
 @app.route("/process-image", methods=["POST"])
 def process_image():
     """
-    Endpoint to process an image with coordinates
+    Simplified endpoint to receive an image with coordinates
     Expected JSON format:
     {
         "imageData": "data:image/png;base64,iVBORw0KGgo...",
@@ -35,10 +35,6 @@ def process_image():
         image_data = data["imageData"]
         coordinates = data["coordinates"]
 
-        # Check for exactly 4 coordinates
-        if len(coordinates) != 4:
-            return jsonify({"error": "Exactly 4 coordinates are required"}), 400
-
         # Process base64 image data
         if "," in image_data:
             _, encoded = image_data.split(",", 1)
@@ -53,74 +49,19 @@ def process_image():
         if image is None:
             return jsonify({"error": "Invalid image data"}), 400
 
-        # Process image with coordinates
-        processed_image = process_with_coordinates(image, coordinates)
-
-        # Calculate area
-        points = np.array(
-            [(coord["x"], coord["y"]) for coord in coordinates], dtype=np.int32
-        )
-        area = calculate_area(points)
-
-        # Encode the processed image to send back
-        _, buffer = cv.imencode(".png", processed_image)
+        # Just return the image without any processing
+        _, buffer = cv.imencode(".png", image)
         encoded_image = base64.b64encode(buffer).decode("utf-8")
 
         return jsonify(
             {
                 "success": True,
                 "processedImage": f"data:image/png;base64,{encoded_image}",
-                "area": area,
             }
         )
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
-
-
-def process_with_coordinates(image, coordinates):
-    """Process the image by drawing points and connecting lines"""
-    points = np.array(
-        [(coord["x"], coord["y"]) for coord in coordinates], dtype=np.int32
-    )
-
-    result = image.copy()
-
-    # Draw red circles at each point
-    for point in points:
-        cv.circle(result, tuple(point), 10, (0, 0, 255), -1)
-
-    # Draw green connecting lines
-    cv.polylines(result, [points], True, (0, 255, 0), 3)
-
-    # Add area text
-    area = calculate_area(points)
-    cv.putText(
-        result,
-        f"Area: {area:.2f} px²",
-        (10, 30),
-        cv.FONT_HERSHEY_SIMPLEX,
-        1,
-        (255, 255, 255),
-        2,
-    )
-
-    return result
-
-
-def calculate_area(points):
-    """Calculate the area of a polygon defined by points"""
-    # Use the Shoelace formula (Gauss's area formula)
-    n = len(points)
-    area = 0.0
-
-    for i in range(n):
-        j = (i + 1) % n
-        area += points[i][0] * points[j][1]
-        area -= points[j][0] * points[i][1]
-
-    area = abs(area) / 2.0
-    return area
 
 
 if __name__ == "__main__":
