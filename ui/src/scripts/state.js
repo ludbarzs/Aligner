@@ -55,6 +55,15 @@ class AppState {
       this.originalImageData = data;
     }
   }
+  /**
+   * Update real world dimensions of the drawer
+   * @param {number} width - Width in mm
+   * @param {number} height - Height in mm
+   */
+  updateDimensions(width, height) {
+    this.realWidthMm = width;
+    this.realHeightMm = height;
+  }
 }
 
 export const appState = new AppState();

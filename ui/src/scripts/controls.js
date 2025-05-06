@@ -14,7 +14,11 @@ import { sendToAPI } from "./api.js";
 export class Controls {
   constructor() {
     this.imageElement = document.getElementById("uploaded-image");
+    this.dimensionsContainer = document.getElementById("drawer-dimensions");
+    this.widthInput = document.getElementById("drawer-width");
+    this.heightInput = document.getElementById("drawer-height");
     this.initControls();
+    this.initDimensionInput();
   }
 
   initControls() {
@@ -45,6 +49,29 @@ export class Controls {
         continueButton.addEventListener("click", () => this.handleContinue());
       }
     });
+  }
+
+  initDimensionInput() {
+    // Initialize with default values from appState
+    if (this.widthInput && this.heightInput) {
+      this.widthInput.value = appState.realWidthMm;
+      this.heightInput.value = appState.realHeightMm;
+
+      // Add event listeners to update state when inputs change
+      this.widthInput.addEventListener("change", () => {
+        const width = parseFloat(this.widthInput.value);
+        if (width > 0) {
+          appState.updateDimensions(width, appState.realHeightMm);
+        }
+      });
+
+      this.heightInput.addEventListener("change", () => {
+        const height = parseFloat(this.heightInput.value);
+        if (height > 0) {
+          appState.updateDimensions(appState.realWidthMm, height);
+        }
+      });
+    }
   }
 
   rotateImage() {
@@ -92,6 +119,38 @@ export class Controls {
     }
   }
 
+  switchToStep1() {
+    /**
+     * Reupload
+     */
+    appState.currentWorkflowStep = 1;
+    appState.allowDotPlacement = false;
+    appState.resetCoordinates();
+    renderer.removeAllMarkers();
+
+    // UI Changes
+    document.querySelector(".controls .control-button:first-child").remove();
+
+    const controlButtons = document.querySelectorAll(".control-button");
+    for (let i = 0; i < 3; i++) {
+      if (controlButtons[i]) controlButtons[i].classList.add("flex");
+    }
+
+    const continueButton = document.querySelector(".control-button.primary");
+    if (continueButton)
+      continueButton.querySelector("span").textContent = "Continue";
+
+    const instructionElement = document.getElementById("placement-instruction");
+    if (instructionElement) instructionElement.remove();
+
+    if (window.progressTracker) window.progressTracker.previousStep();
+
+    // Hide dimensions input
+    if (this.dimensionsContainer) {
+      this.dimensionsContainer.classList.remove("visible");
+    }
+  }
+
   switchToStep2() {
     /**
      * Update to step 2, allow dot placemnt
@@ -122,33 +181,11 @@ export class Controls {
       continueButton.querySelector("span").textContent = "Submit";
 
     renderer.updateInstruction("Click to place up to 4 points on the image");
-  }
 
-  switchToStep1() {
-    /**
-     * Reupload
-     */
-    appState.currentWorkflowStep = 1;
-    appState.allowDotPlacement = false;
-    appState.resetCoordinates();
-    renderer.removeAllMarkers();
-
-    // UI Changes
-    document.querySelector(".controls .control-button:first-child").remove();
-
-    const controlButtons = document.querySelectorAll(".control-button");
-    for (let i = 0; i < 3; i++) {
-      if (controlButtons[i]) controlButtons[i].classList.add("flex");
+    // Show dimensions input
+    if (this.dimensionsContainer) {
+      this.dimensionsContainer.classList.add("visible");
     }
-
-    const continueButton = document.querySelector(".control-button.primary");
-    if (continueButton)
-      continueButton.querySelector("span").textContent = "Continue";
-
-    const instructionElement = document.getElementById("placement-instruction");
-    if (instructionElement) instructionElement.remove();
-
-    if (window.progressTracker) window.progressTracker.previousStep();
   }
 }
 

@@ -15,6 +15,8 @@
     Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   outline: none;
 }
+
+/* Progress bar */
 .progress-container {
   width: 100%;
   height: 6px;
@@ -33,6 +35,7 @@
   border-top-right-radius: 3px;
   border-bottom-right-radius: 3px;
 }
+/* Main image container */
 .container {
   overflow: hidden;
   height: 100dvh;
@@ -175,14 +178,77 @@
   margin-left: 5px;
 }
 
-.placement-instruction {
-  position: fixed;
-  top: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 10px 20px;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  border-radius: 5px;
-  z-index: 1000;
+/* Dimensions input */
+.drawer-dimensions-container {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: 15px 0;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
 }
+
+.drawer-dimensions-container.visible {
+  display: flex;
+}
+
+.dimension-title {
+  font-size: 16px;
+  margin-bottom: 10px;
+  color: white;
+  font-weight: 300;
+}
+
+.dimensions-inputs {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.dimension-input-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dimension-input-group label {
+  font-size: 14px;
+  margin-bottom: 5px;
+  color: white;
+}
+
+.dimension-input-group input {
+  width: 100px;
+  padding: 8px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  text-align: center;
+  font-size: 16px;
+}
+
+.dimension-input-group input:focus {
+  border-color: var(--neon-color);
+  box-shadow: 0 0 5px rgba(138, 67, 252, 0.5);
+}
+
+.dimension-input-group input::-webkit-inner-spin-button,
+.dimension-input-group input::-webkit-outer-spin-button {
+  opacity: 1;
+}
+
+/* TODO: DELETE placement-instruction */
+/* .placement-instruction { */
+/*   position: fixed; */
+/*   top: 60px; */
+/*   left: 50%; */
+/*   transform: translateX(-50%); */
+/*   padding: 10px 20px; */
+/*   background-color: rgba(0, 0, 0, 0.7); */
+/*   color: white; */
+/*   border-radius: 5px; */
+/*   z-index: 1000; */
+/* } */
