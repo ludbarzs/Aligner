@@ -46,11 +46,15 @@ def process_image():
         image = np.asarray(bytearray(binary), dtype=np.uint8)
         image = cv.imdecode(image, cv.IMREAD_COLOR)
 
+        cv.imshow(image)
+
         if image is None:
             return jsonify({"error": "Invalid image data"}), 400
 
         _, buffer = cv.imencode(".png", image)
         encoded_image = base64.b64encode(buffer).decode("utf-8")
+
+        print(f"ALERT: {encoded_image}")
 
         return jsonify(
             {

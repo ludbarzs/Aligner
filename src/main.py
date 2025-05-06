@@ -1,15 +1,64 @@
-import cv2 as cv
 import numpy as np
 
-from core.image_processor import ImageProcessor
+from file_conversion.dxf_exporter import contours_to_dxf
+from image_processing.coin_detection import detect_circles
+from image_processing.drawer_detection import (correct_perspective,
+                                               draw_contour_line,
+                                               find_inscribed_circle_diameter,
+                                               measure_object_in_drawer,
+                                               select_drawer_corners)
+from image_processing.utils import (find_contours, load_image, prepare_image,
+                                    view_image)
 
 
-def main():
-    """Main"""
+def main():  # Load Image
+    image = load_image("images/test_14.jpg")
 
-    image_path = "images/test_1.jpg"
-    ImageProcessor.load_image(image_path)
+    # User selects drawer corners
+    corners = select_drawer_corners(image)
+
+    # Auto select corners for test_14.jpg
+    # corners = np.array([[149, 82], [1939, 75], [1995, 1213], [115, 1240]])
+
+    # Image perspective gets corrected
+    irl_width = 540
+    irl_length = 340
+    corrected_image, x_ratio, y_ratio = correct_perspective(
+        image, corners, irl_width, irl_length
+    )
+
+    # Prepare corrected image for contour finding (Grayscale, canny, closeing edges)
+    prepared_image = prepare_image(corrected_image)
+
+    # Find contours
+    contours = find_contours(prepared_image)
+
+    view_image(corrected_image, contours)
+
+    # output_path = contours_to_dxf(
+    #     contours, "output_file.dxf", x_ratio, y_ratio, irl_width, irl_length
+    # )
+    # print(f"DXF file saved to: {output_path}")
+    #
+    # # Get all circles in image
+    # circles = detect_circles(contours)
+    #
+    # circles_image = corrected_image.copy()
+    #
+
+    # # Drawes the inscribed diameter of all circles
+    # for circle in circles:
+    #     find_inscribed_circle_diameter(circles_image, circle, x_ratio, y_ratio)
+    #
+    # view_image(circles_image)
+    #
+
+    # Draw the largest line in contour for tests
+    for contour in contours:
+        draw_contour_line(corrected_image, contour, x_ratio, y_ratio)
+
+    # Allows user to measure
+    measure_object_in_drawer(corrected_image, x_ratio, y_ratio)
 
 
-if __name__ == "__main__":
-    main()
+main()

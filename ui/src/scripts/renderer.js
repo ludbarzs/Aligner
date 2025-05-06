@@ -139,21 +139,42 @@ export class Renderer {
   }
 
   /**
-   * Display feedback to the user
+   * Displays a notification message to the user
+   * @param {string} message - Message to display
+   * @param {string} isError - Error on info
    */
   showMessage(message, isError = false) {
-    const existingMsg = document.getElementById("api-result-message");
+    // Remove any existing messages first
+    const existingMsg = document.getElementById("notification-message");
     if (existingMsg) existingMsg.remove();
 
+    const message_type = isError ? "error" : "info";
+
+    // Create message element
     const msgElement = document.createElement("div");
-    msgElement.id = "api-result-message";
-    msgElement.className = `result-message ${isError ? "error" : "success"}`;
+    msgElement.id = "notification-message";
+    msgElement.className = `message-notification ${message_type}`;
     msgElement.textContent = message;
+
+    // Add to DOM
     document.body.appendChild(msgElement);
 
-    setTimeout(() => msgElement.remove(), 5000);
-  }
+    // Force reflow to ensure transition works
+    void msgElement.offsetWidth;
 
+    // Make visible
+    setTimeout(() => {
+      msgElement.classList.add("visible");
+    }, 10);
+
+    // Set timeout to remove
+    setTimeout(() => {
+      msgElement.classList.remove("visible");
+
+      // Remove from DOM after fade out
+      setTimeout(() => msgElement.remove(), 300);
+    }, 10000);
+  }
   /**
    * Updates the instruction text for the current step
    */
