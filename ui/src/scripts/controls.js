@@ -2,6 +2,15 @@ import { appState } from "./state.js";
 import { renderer } from "./renderer.js";
 import { sendToAPI } from "./api.js";
 
+/**
+ * Manages UI controls and workflow transitions
+ *
+ * Responsibilities:
+ * - Initializing control button event listeners
+ * - Handling image transformations (rotate, mirror)
+ * - Managing workflow step transitions
+ * - Updating UI based on current workflow step
+ */
 export class Controls {
   constructor() {
     this.imageElement = document.getElementById("uploaded-image");
@@ -9,6 +18,9 @@ export class Controls {
   }
 
   initControls() {
+    /**
+     * Sets up event listeners for control buttons
+     */
     document.addEventListener("DOMContentLoaded", () => {
       // Rotation button
       document
@@ -38,6 +50,14 @@ export class Controls {
   rotateImage() {
     if (!this.imageElement.src || appState.currentWorkflowStep !== 1) return;
 
+    const computedStyle = window.getComputedStyle(this.imageElement);
+    const maxWidth = computedStyle.maxWidth;
+    const maxHeight = computedStyle.maxHeight;
+
+    // Swap the maxWidth and maxHeight using inline styles
+    this.imageElement.style.maxWidth = maxHeight;
+    this.imageElement.style.maxHeight = maxWidth;
+
     appState.currentRotation = (appState.currentRotation + 90) % 360;
     this.applyTransformations();
   }
@@ -50,6 +70,9 @@ export class Controls {
   }
 
   applyTransformations() {
+    /*
+     * Updates image CSS to reflect transformations
+     */
     this.imageElement.style.transform = `
       rotate(${appState.currentRotation}deg)
       scaleX(${appState.isMirrored ? -1 : 1})
@@ -57,6 +80,9 @@ export class Controls {
   }
 
   handleContinue() {
+    /**
+     * Process Continue button click
+     */
     if (appState.currentWorkflowStep === 1) {
       this.switchToStep2();
       if (window.progressTracker) window.progressTracker.nextStep();
@@ -67,17 +93,21 @@ export class Controls {
   }
 
   switchToStep2() {
+    /**
+     * Update to step 2, allow dot placemnt
+     */
     appState.currentWorkflowStep = 2;
     appState.allowDotPlacement = true;
-    appState.resetCoordinates();
+    appState.resetCoordinates(); // Clear cordinates
     renderer.removeAllMarkers();
 
-    // UI Changes
+    // Hide Roatate, Miror, Reupload buttons
     const controlButtons = document.querySelectorAll(".control-button");
     for (let i = 0; i < 3; i++) {
       if (controlButtons[i]) controlButtons[i].classList.remove("flex");
     }
 
+    // Create Back button to go to step 1
     const backButton = document.createElement("button");
     backButton.className = "control-button flex";
     backButton.innerHTML = "<span>Back</span>";
@@ -95,6 +125,9 @@ export class Controls {
   }
 
   switchToStep1() {
+    /**
+     * Reupload
+     */
     appState.currentWorkflowStep = 1;
     appState.allowDotPlacement = false;
     appState.resetCoordinates();
@@ -119,5 +152,5 @@ export class Controls {
   }
 }
 
-// Create and export a single instance - no longer using a variable name that could conflict
-export const controlsManager = new Controls();
+// Create and export a single instance
+export const controls = new Controls();

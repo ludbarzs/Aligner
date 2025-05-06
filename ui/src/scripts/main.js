@@ -1,9 +1,12 @@
+/**
+ * Application entry poin t
+ * Loads and initializes all modules
+ */
 import { renderer } from "./renderer.js";
-import { controlsManager } from "./controls.js"; // Updated import name
+import { controls } from "./controls.js";
 import "./progress-tracker.js";
 
 // Initialize the application
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Application initialized");
-  // The modules will self-initialize via their constructors
 });

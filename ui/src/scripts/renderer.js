@@ -1,6 +1,14 @@
 import { appState } from "./state.js";
 import { sendToAPI } from "./api.js";
 
+/**
+ * Handles:
+ * - Image uploading and display
+ * - Processing image click for coordinate retrival
+ * - Manages visual cordinate markers on screen
+ * - Display messages and instructions for user
+ * - Calculates image cordinates based on click
+ */
 export class Renderer {
   constructor() {
     this.imageElement = document.getElementById("uploaded-image");
@@ -21,6 +29,12 @@ export class Renderer {
     );
   }
 
+  /**
+   * Processes file input changes
+   * - Display uploaded image
+   * - Show control buttons (CSS class: control-button)
+   * - Update progress tracker
+   */
   handleImageUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -43,6 +57,9 @@ export class Renderer {
     reader.readAsDataURL(file);
   }
 
+  /**
+   * Process clicks on image for marker placement
+   */
   handleImageClick(e) {
     if (!appState.allowDotPlacement || !this.imageElement.src) return;
 
@@ -66,27 +83,37 @@ export class Renderer {
     }
   }
 
+  /**
+   * Converts screen coordinates to image coordinates
+   * - Gets image position/size on screen
+   * - Calculates scale from displayed to natural size
+   * - Adjusts mouse offset by scale to get true image (x, y)
+   */
   calculateImageCoordinates(event) {
     const rect = this.imageElement.getBoundingClientRect();
+    // Ratio between actual image size and displayed size in pixels
     const scaleX = this.imageElement.naturalWidth / rect.width;
     const scaleY = this.imageElement.naturalHeight / rect.height;
 
     return {
-      x: (event.clientX - rect.left) * scaleX,
-      y: (event.clientY - rect.top) * scaleY,
+      x: (event.clientX - rect.left) * scaleX, // Mouse X position on screen - image edge position * scale
+      y: (event.clientY - rect.top) * scaleY, // Mouse Y position on screen - image edge position * scale
     };
   }
 
+  /**
+   * Create dot on image
+   */
   createMarker(clientX, clientY, number) {
     this.removeMarker(number);
 
     const marker = document.createElement("div");
     marker.className = `marker marker-${number}`;
     marker.style.position = "absolute";
-    marker.style.left = `${clientX - 10}px`;
-    marker.style.top = `${clientY - 10}px`;
-    marker.style.width = "20px";
-    marker.style.height = "20px";
+    marker.style.left = `${clientX}px`;
+    marker.style.top = `${clientY}px`;
+    marker.style.width = "10px";
+    marker.style.height = "10px";
     marker.style.backgroundColor = "#7CFC00";
     marker.style.borderRadius = "50%";
     marker.style.zIndex = "1000";
@@ -104,10 +131,16 @@ export class Renderer {
     document.querySelectorAll(".marker").forEach((el) => el.remove());
   }
 
+  /**
+   * Display control buttons (Continue...)
+   */
   showControlButtons() {
     this.controlButtons.forEach((button) => button.classList.add("flex"));
   }
 
+  /**
+   * Display feedback to the user
+   */
   showMessage(message, isError = false) {
     const existingMsg = document.getElementById("api-result-message");
     if (existingMsg) existingMsg.remove();
@@ -121,6 +154,9 @@ export class Renderer {
     setTimeout(() => msgElement.remove(), 5000);
   }
 
+  /**
+   * Updates the instruction text for the current step
+   */
   updateInstruction(text) {
     let instructionElement = document.getElementById("placement-instruction");
     if (!instructionElement) {

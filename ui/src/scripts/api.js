@@ -1,11 +1,16 @@
+/**
+ * Manages communication with the backend server
+ */
 import { appState } from "./state.js";
 import { renderer } from "./renderer.js";
 
 const API_BASE_URL = "http://localhost:5000";
 
 export async function sendToAPI() {
+  console.log("Here");
+  renderer.showMessage("Please place 4 dots on the image", true);
   if (!appState.coordinates || appState.coordinates.length !== 4) {
-    renderer.showMessage("Please place exactly 4 points on the image", true);
+    renderer.showMessage("Please place 4 dots on the image", true);
     return;
   }
 

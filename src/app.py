@@ -12,7 +12,7 @@ CORS(app)  # Enable CORS for all routes
 @app.route("/process-image", methods=["POST"])
 def process_image():
     """
-    Simplified endpoint to receive an image with coordinates
+    Endpoint to receive an image with coordinates
     Expected JSON format:
     {
         "imageData": "data:image/png;base64,iVBORw0KGgo...",
@@ -49,7 +49,6 @@ def process_image():
         if image is None:
             return jsonify({"error": "Invalid image data"}), 400
 
-        # Just return the image without any processing
         _, buffer = cv.imencode(".png", image)
         encoded_image = base64.b64encode(buffer).decode("utf-8")
 
@@ -57,7 +56,7 @@ def process_image():
             {
                 "success": True,
                 "processedImage": f"data:image/png;base64,{encoded_image}",
-                "test": "succcess",
+                "coordinates": coordinates,
             }
         )
 
