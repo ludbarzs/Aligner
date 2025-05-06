@@ -2,8 +2,11 @@ import base64
 
 import cv2 as cv
 import numpy as np
+import requests
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+
+from detection.drawer_processor import DrawerProcessor
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -22,6 +25,8 @@ def process_image():
             {"x": 300, "y": 400},
             {"x": 100, "y": 400}
         ]
+        "real_width_mm": 530,
+        "real_height_mm": 330,
     }
     """
     try:
@@ -34,6 +39,8 @@ def process_image():
 
         image_data = data["imageData"]
         coordinates = data["coordinates"]
+        real_width_mm = data["realWidthMm"]
+        real_height_mm = data["realHeightMm"]
 
         # Process base64 image data
         if "," in image_data:
@@ -49,7 +56,11 @@ def process_image():
         if image is None:
             return jsonify({"error": "Invalid image data"}), 400
 
-        _, buffer = cv.imencode(".png", image)
+        corrected_image, x_ratio, y_ratio = DrawerProcessor.process_drawer_image(
+            image, coordinates, real_width_mm, real_height_mm
+        )
+
+        _, buffer = cv.imencode(".png", corrected_image)
         encoded_image = base64.b64encode(buffer).decode("utf-8")
 
         return jsonify(

@@ -172,4 +172,3 @@ class DrawerProcessor:
         )
 
         return corrected_image, x_ratio, y_ratio
-        )

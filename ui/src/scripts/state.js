@@ -9,10 +9,13 @@ class AppState {
     this.coordinates = [];
     this.currentRotation = 0;
     this.isMirrored = false;
-    this.currentWorkflowStep = 1; // 1: Adjust, 2: Place dots
+    this.currentWorkflowStep = 1; // 1: Adjust image, 2: Place dots
     this.allowDotPlacement = false;
     this.imageData = null;
     this.originalImageData = null;
+    // Real width and height of drawer in mm
+    this.realWidthMm = 530;
+    this.realHeightMm = 330;
   }
 
   /**

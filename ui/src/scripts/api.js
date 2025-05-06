@@ -26,9 +26,13 @@ export async function sendToAPI() {
         imageData: appState.imageData,
         coordinates: appState.coordinates,
         transformations: appState.getTransformations(),
+        realWidthMm: appState.realWidthMm,
+        realHeightMm: appState.realWidthMm,
       }),
       timeout: 30000,
     });
+
+    console.log(response);
 
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
