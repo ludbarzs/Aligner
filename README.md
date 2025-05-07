@@ -8,4 +8,5 @@
 
 TODO:
 
-- ( ) Test
+- ( ) Fix rotation and mirroring, so python processed the image correctly
+- ( )

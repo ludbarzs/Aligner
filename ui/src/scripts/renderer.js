@@ -50,6 +50,11 @@ export class Renderer {
       this.showControlButtons();
       this.removeAllMarkers();
 
+      // Reset transformations on new upload
+      appState.currentRotation = 0;
+      appState.isMirrored = false;
+      this.imageElement.style.transform = "";
+
       if (window.progressTracker) {
         window.progressTracker.nextStep();
       }
@@ -88,16 +93,70 @@ export class Renderer {
    * - Gets image position/size on screen
    * - Calculates scale from displayed to natural size
    * - Adjusts mouse offset by scale to get true image (x, y)
+   * - Accounts for transformations like rotation and mirroring
    */
   calculateImageCoordinates(event) {
     const rect = this.imageElement.getBoundingClientRect();
-    // Ratio between actual image size and displayed size in pixels
-    const scaleX = this.imageElement.naturalWidth / rect.width;
-    const scaleY = this.imageElement.naturalHeight / rect.height;
+    const naturalWidth = this.imageElement.naturalWidth;
+    const naturalHeight = this.imageElement.naturalHeight;
+    const displayedWidth = rect.width;
+    const displayedHeight = rect.height;
+
+    // Calculate scale factors for the image
+    const scaleX = naturalWidth / displayedWidth;
+    const scaleY = naturalHeight / displayedHeight;
+
+    // Calculate relative position within the displayed image
+    let relX = event.clientX - rect.left;
+    let relY = event.clientY - rect.top;
+
+    // Adjust for rotation and mirroring transformations
+    let adjustedX, adjustedY;
+
+    // Handle rotation
+    switch (appState.currentRotation) {
+      case 0:
+        adjustedX = relX;
+        adjustedY = relY;
+        break;
+      case 90:
+        // For 90° rotation, X becomes Y and Y becomes width-X
+        adjustedX = relY;
+        adjustedY = displayedWidth - relX;
+        break;
+      case 180:
+        // For 180° rotation, X becomes width-X and Y becomes height-Y
+        adjustedX = displayedWidth - relX;
+        adjustedY = displayedHeight - relY;
+        break;
+      case 270:
+        // For 270° rotation, X becomes height-Y and Y becomes X
+        adjustedX = displayedHeight - relY;
+        adjustedY = relX;
+        break;
+      default:
+        adjustedX = relX;
+        adjustedY = relY;
+    }
+
+    // Handle mirroring (horizontal flip)
+    if (appState.isMirrored) {
+      if (appState.currentRotation === 0 || appState.currentRotation === 180) {
+        // For 0° or 180° rotation, mirror affects X
+        adjustedX = displayedWidth - adjustedX;
+      } else {
+        // For 90° or 270° rotation, mirror affects Y
+        adjustedY = displayedHeight - adjustedY;
+      }
+    }
+
+    // Apply scaling to get coordinates in the original image dimensions
+    const finalX = adjustedX * scaleX;
+    const finalY = adjustedY * scaleY;
 
     return {
-      x: (event.clientX - rect.left) * scaleX, // Mouse X position on screen - image edge position * scale
-      y: (event.clientY - rect.top) * scaleY, // Mouse Y position on screen - image edge position * scale
+      x: finalX,
+      y: finalY,
     };
   }
 
