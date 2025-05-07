@@ -19,6 +19,7 @@ export async function sendToAPI() {
   }
 
   try {
+    console.log(appState.getTransformations());
     const response = await fetch(`${API_BASE_URL}/process-image`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
