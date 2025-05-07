@@ -76,6 +76,16 @@ def process_image():
         is_mirror = bool(transformations["mirrored"])
         rotation = int(transformations["rotation"])
 
+        # Get original image dimensions before any transformations
+        original_width = image.shape[1]
+        original_height = image.shape[0]
+
+        # Transform coordinates from transformed image back to original image space
+        # This step is crucial - it maps UI coordinates back to original image space
+        coordinates_array = ImageProcessor.transform_coordinates(
+            coordinates_array, (original_width, original_height), is_mirror, rotation
+        )
+
         transformed_image = ImageProcessor.process_transformations(
             image, is_mirror, rotation
         )
@@ -84,7 +94,7 @@ def process_image():
             transformed_image, coordinates_array, real_width_mm, real_height_mm
         )
 
-        _, buffer = cv.imencode(".png", transformed_image)
+        _, buffer = cv.imencode(".png", corrected_image)
         encoded_image = base64.b64encode(buffer).decode("utf-8")
 
         return jsonify(

@@ -17,9 +17,16 @@ export async function sendToAPI() {
     continueButton.disabled = true;
     continueButton.querySelector("span").textContent = "Processing...";
   }
-
+  console.log("Before:");
+  console.log({
+    imageData: appState.imageData,
+    coordinates: appState.coordinates,
+    transformations: appState.getTransformations(),
+    realWidthMm: appState.realWidthMm,
+    realHeightMm: appState.realHeightMm,
+  });
+  console.log("After:");
   try {
-    console.log(appState.getTransformations());
     const response = await fetch(`${API_BASE_URL}/process-image`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -38,9 +45,18 @@ export async function sendToAPI() {
     const data = await response.json();
     console.log(data);
     if (data.success) {
+      // Clear any existing CSS transformations before setting the new image
+      renderer.imageElement.style.transform = "";
+      renderer.imageElement.style.maxWidth = "1280px";
+      renderer.imageElement.style.maxHeight = "720px";
       renderer.imageElement.src = data.processedImage;
       appState.setImageData(data.processedImage);
       appState.updateRatios(data.xRatio, data.yRatio);
+
+      // Reset transformation state in appState since the API response
+      // image already has these transformations applied
+      appState.currentRotation = 0;
+      appState.isMirrored = false;
     } else {
       throw new Error(data.error || "Unknown error occurred");
     }

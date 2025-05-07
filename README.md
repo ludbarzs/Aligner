@@ -8,5 +8,5 @@
 
 TODO:
 
-- ( ) Fix rotation and mirroring, so python processed the image correctly
-- ( )
+- [-] Fix rotation and mirroring, so python processed the image correctly
+- [ ] The width and height of the image is hardcoaded at 1280x720px
