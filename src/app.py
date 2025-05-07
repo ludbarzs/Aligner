@@ -39,8 +39,17 @@ def process_image():
 
         image_data = data["imageData"]
         coordinates = data["coordinates"]
-        real_width_mm = data["realWidthMm"]
-        real_height_mm = data["realHeightMm"]
+        real_width_mm = float(data["realWidthMm"])
+        real_height_mm = float(data["realHeightMm"])
+
+        coordinate_list = []
+        # Loop through each point in the coordinates list
+        for point in coordinates:
+            x = point["x"]
+            y = point["y"]
+            coordinate_pair = [x, y]
+            coordinate_list.append(coordinate_pair)
+        coordinates_array = np.array(coordinate_list)
 
         # Process base64 image data
         if "," in image_data:
@@ -57,7 +66,7 @@ def process_image():
             return jsonify({"error": "Invalid image data"}), 400
 
         corrected_image, x_ratio, y_ratio = DrawerProcessor.process_drawer_image(
-            image, coordinates, real_width_mm, real_height_mm
+            image, coordinates_array, real_width_mm, real_height_mm
         )
 
         _, buffer = cv.imencode(".png", corrected_image)
@@ -68,6 +77,8 @@ def process_image():
                 "success": True,
                 "processedImage": f"data:image/png;base64,{encoded_image}",
                 "coordinates": coordinates,
+                "xRatio": x_ratio,
+                "yRatio": y_ratio,
             }
         )
 

@@ -27,12 +27,10 @@ export async function sendToAPI() {
         coordinates: appState.coordinates,
         transformations: appState.getTransformations(),
         realWidthMm: appState.realWidthMm,
-        realHeightMm: appState.realWidthMm,
+        realHeightMm: appState.realHeightMm,
       }),
       timeout: 30000,
     });
-
-    console.log(response);
 
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
@@ -41,6 +39,7 @@ export async function sendToAPI() {
     if (data.success) {
       renderer.imageElement.src = data.processedImage;
       appState.setImageData(data.processedImage);
+      appState.updateRatios(data.xRatio, data.yRatio);
     } else {
       throw new Error(data.error || "Unknown error occurred");
     }

@@ -3,6 +3,7 @@
  * Track image rotation, mirroring
  * Manages workflow step state
  * Stores image data
+ * Stores drawer width/height
  */
 class AppState {
   constructor() {
@@ -16,6 +17,9 @@ class AppState {
     // Real width and height of drawer in mm
     this.realWidthMm = 530;
     this.realHeightMm = 330;
+    // x, y axis ratios
+    this.xRatio = null;
+    this.yRatio = null;
   }
 
   /**
@@ -63,6 +67,10 @@ class AppState {
   updateDimensions(width, height) {
     this.realWidthMm = width;
     this.realHeightMm = height;
+  }
+  updateRatios(xRatio, yRatio) {
+    this.xRatio = xRatio;
+    this.yRatio = yRatio;
   }
 }
 

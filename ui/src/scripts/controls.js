@@ -115,6 +115,10 @@ export class Controls {
       if (window.progressTracker) window.progressTracker.nextStep();
     } else {
       sendToAPI();
+
+      this.switchToStep3(); // Define this if it doesn't exist
+      // Only proceed to step 3 if API call succeeds
+      this.switchToStep3(); // You need to define this function
       if (window.progressTracker) window.progressTracker.nextStep();
     }
   }
@@ -186,6 +190,16 @@ export class Controls {
     if (this.dimensionsContainer) {
       this.dimensionsContainer.classList.add("visible");
     }
+  }
+
+  switchToStep3() {
+    /**
+     * Update to step 2, allow dot placemnt
+     */
+    appState.currentWorkflowStep = 3;
+    appState.allowDotPlacement = true;
+    appState.resetCoordinates(); // Clear cordinates
+    renderer.removeAllMarkers();
   }
 }
 
