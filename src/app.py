@@ -2,12 +2,11 @@ import base64
 
 import cv2 as cv
 import numpy as np
-import requests
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-from detection.drawer_processor import DrawerProcessor
 from processors.image_processor import ImageProcessor
+from processors.request_processor import RequestProcessor
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -35,87 +34,39 @@ def process_image():
     }
     """
     try:
-        # Get data from request
         data = request.json
 
         # Validate input
-        if not data or "imageData" not in data or "coordinates" not in data:
-            return jsonify({"error": "Missing required data"}), 400
+        is_valid, error = ImageProcessor.validate_input(data)
+        if not is_valid:
+            return jsonify({"error": error}), 400
 
-        image_data = data["imageData"]
-        coordinates = data["coordinates"]
-        real_width_mm = float(data["realWidthMm"])
-        real_height_mm = float(data["realHeightMm"])
-        transformations = data.get(
-            "transformations", {"mirrored": False, "rotation": 0}
-        )
-
-        coordinate_list = []
-        # Loop through each point in the coordinates list
-        for point in coordinates:
-            x = point["x"]
-            y = point["y"]
-            coordinate_pair = [x, y]
-            coordinate_list.append(coordinate_pair)
-        coordinates_array = np.array(coordinate_list)
-
-        # Process base64 image data
-        if "," in image_data:
-            _, encoded = image_data.split(",", 1)
-        else:
-            encoded = image_data
-
-        # Decode image
-        binary = base64.b64decode(encoded)
-        image = np.asarray(bytearray(binary), dtype=np.uint8)
-        image = cv.imdecode(image, cv.IMREAD_COLOR)
-
+        # Decode and validate image
+        image = ImageProcessor.decode_image(data["imageData"])
         if image is None:
             return jsonify({"error": "Invalid image data"}), 400
 
-        is_mirror = bool(transformations["mirrored"])
-        rotation = int(transformations["rotation"])
-
-        # Get original image dimensions before any transformations
-        original_width = image.shape[1]
-        original_height = image.shape[0]
-
-        transformed_image = ImageProcessor.process_transformations(
-            image, is_mirror, rotation
+        # Validate coordinates
+        is_valid, error = ImageProcessor.validate_coordinates(
+            image, data["coordinates"]
         )
+        if not is_valid:
+            return jsonify({"success": False, "error": error}), 400
 
-        height, width = transformed_image.shape[:2]
-        for point in coordinates:
-            x = point["x"]
-            y = point["y"]
-            if x < 0 or x >= width or y < 0 or y >= height:
-                return (
-                    jsonify(
-                        {
-                            "success": False,
-                            "error": f"Coordinate ({x}, {y}) is outside image boundaries (width: {width}, height: {height})",
-                        }
-                    ),
-                    400,
-                )
+        # Process request
+        result = RequestProcessor.process_request(data)
 
-        corrected_image, x_ratio, y_ratio = DrawerProcessor.process_drawer_image(
-            transformed_image, coordinates_array, real_width_mm, real_height_mm
-        )
+        # Prepare response
+        response = {
+            "success": True,
+            "processedImage": ImageProcessor.encode_image(result["image"]),
+            "coordinates": result["coordinates"],
+            "xRatio": result["x_ratio"],
+            "yRatio": result["y_ratio"],
+            "transformations": result["transformations"],
+        }
 
-        _, buffer = cv.imencode(".png", corrected_image)
-        encoded_image = base64.b64encode(buffer).decode("utf-8")
-
-        return jsonify(
-            {
-                "success": True,
-                "processedImage": f"data:image/png;base64,{encoded_image}",
-                "coordinates": coordinates,
-                "xRatio": x_ratio,
-                "yRatio": y_ratio,
-                "transformations": transformations,
-            }
-        )
+        return jsonify(response)
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
