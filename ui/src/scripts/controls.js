@@ -127,26 +127,29 @@ export class Controls {
     /**
      * Reupload
      */
+    // Reset workflow state
     appState.currentWorkflowStep = 1;
     appState.allowDotPlacement = false;
     appState.resetCoordinates();
     renderer.removeAllMarkers();
 
-    // UI Changes
+    // Update UI controls visibility
     document.querySelector(".controls .control-button:first-child").remove();
-
     const controlButtons = document.querySelectorAll(".control-button");
     for (let i = 0; i < 3; i++) {
       if (controlButtons[i]) controlButtons[i].classList.add("flex");
     }
 
+    // Update continue button text
     const continueButton = document.querySelector(".control-button.primary");
     if (continueButton)
       continueButton.querySelector("span").textContent = "Continue";
 
+    // Clean up instructions
     const instructionElement = document.getElementById("placement-instruction");
     if (instructionElement) instructionElement.remove();
 
+    // Update progress tracker
     if (window.progressTracker) window.progressTracker.previousStep();
 
     // Hide dimensions input
@@ -159,31 +162,34 @@ export class Controls {
     /**
      * Update to step 2, allow dot placemnt
      */
+
+    // Update workflow state
     appState.currentWorkflowStep = 2;
     appState.allowDotPlacement = true;
-    appState.resetCoordinates(); // Clear cordinates
+    appState.resetCoordinates();
     renderer.removeAllMarkers();
 
-    // Hide Roatate, Miror, Reupload buttons
+    // Hide transformation buttons
     const controlButtons = document.querySelectorAll(".control-button");
     for (let i = 0; i < 3; i++) {
       if (controlButtons[i]) controlButtons[i].classList.remove("flex");
     }
 
-    // Create Back button to go to step 1
+    // Add back button
     const backButton = document.createElement("button");
     backButton.className = "control-button flex";
     backButton.innerHTML = "<span>Back</span>";
     backButton.addEventListener("click", () => this.switchToStep1());
-
     document
       .querySelector(".controls")
       .insertBefore(backButton, document.querySelector(".controls").firstChild);
 
+    // Update submit button text
     const continueButton = document.querySelector(".control-button.primary");
     if (continueButton)
       continueButton.querySelector("span").textContent = "Submit";
 
+    // Update instructions
     renderer.updateInstruction("Click to place up to 4 points on the image");
 
     // Show dimensions input

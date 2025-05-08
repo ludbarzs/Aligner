@@ -46,12 +46,13 @@ def process_image():
         if image is None:
             return jsonify({"error": "Invalid image data"}), 400
 
-        # Validate coordinates
-        is_valid, error = ImageProcessor.validate_coordinates(
-            image, data["coordinates"]
-        )
-        if not is_valid:
-            return jsonify({"success": False, "error": error}), 400
+        # TODO: Delete the following or transfrom before validation
+        # # Validate coordinates
+        # is_valid, error = ImageProcessor.validate_coordinates(
+        #     image, data["coordinates"]
+        # )
+        # if not is_valid:
+        #     return jsonify({"success": False, "error": error}), 400
 
         # Process request
         result = RequestProcessor.process_request(data)

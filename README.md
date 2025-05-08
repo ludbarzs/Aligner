@@ -15,10 +15,11 @@ Feature:
 UI:
 
 - [ ] Fix the drawer size inputs
+- [ ] Fix the error and message output
 
 Bugs:
 
 - [-] Fix rotation and mirroring, so python processed the image correctly
 - [ ] The width and height of the image is hardcoaded at 1280x720px
 - [-] Center of axis when rotated is top right, instead of top left, hence issue
-- [ ] Fix mirroring issue in py
+- [ ] Fix mirroring issue in py (Mirrored and rotated)
