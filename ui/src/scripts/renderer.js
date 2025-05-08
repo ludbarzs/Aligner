@@ -77,6 +77,7 @@ export class Renderer {
     }
 
     const coord = this.calculateImageCoordinates(e);
+    console.log(coord);
     if (appState.addCoordinate(coord)) {
       this.createMarker(e.clientX, e.clientY, appState.coordinates.length);
 
@@ -97,10 +98,15 @@ export class Renderer {
    */
   calculateImageCoordinates(event) {
     const rect = this.imageElement.getBoundingClientRect();
-    const naturalWidth = this.imageElement.naturalWidth;
-    const naturalHeight = this.imageElement.naturalHeight;
+    let naturalWidth = this.imageElement.naturalWidth;
+    let naturalHeight = this.imageElement.naturalHeight;
     const displayedWidth = rect.width;
     const displayedHeight = rect.height;
+
+    // Swap natural dimensions if image is rotated 90° or 270°
+    if (appState.currentRotation === 90 || appState.currentRotation === 270) {
+      [naturalWidth, naturalHeight] = [naturalHeight, naturalWidth];
+    }
 
     // Calculate scale factors for the image
     const scaleX = naturalWidth / displayedWidth;
