@@ -80,15 +80,24 @@ def process_image():
         original_width = image.shape[1]
         original_height = image.shape[0]
 
-        # Transform coordinates from transformed image back to original image space
-        # This step is crucial - it maps UI coordinates back to original image space
-        coordinates_array = ImageProcessor.transform_coordinates(
-            coordinates_array, (original_width, original_height), is_mirror, rotation
-        )
-
         transformed_image = ImageProcessor.process_transformations(
             image, is_mirror, rotation
         )
+
+        height, width = transformed_image.shape[:2]
+        for point in coordinates:
+            x = point["x"]
+            y = point["y"]
+            if x < 0 or x >= width or y < 0 or y >= height:
+                return (
+                    jsonify(
+                        {
+                            "success": False,
+                            "error": f"Coordinate ({x}, {y}) is outside image boundaries (width: {width}, height: {height})",
+                        }
+                    ),
+                    400,
+                )
 
         corrected_image, x_ratio, y_ratio = DrawerProcessor.process_drawer_image(
             transformed_image, coordinates_array, real_width_mm, real_height_mm
