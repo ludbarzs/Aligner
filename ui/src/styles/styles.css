@@ -178,7 +178,7 @@
   margin-left: 5px;
 }
 
-/* Dimensions input */
+/* Dimensions input - updated with your colors */
 .drawer-dimensions-container {
   display: none;
   flex-direction: column;
@@ -194,11 +194,33 @@
   display: flex;
 }
 
-.dimension-title {
-  font-size: 16px;
-  margin-bottom: 10px;
-  color: white;
-  font-weight: 300;
+.dimensions-inputs {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.dimension-input-group {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 20000;
+}
+/* Dimensions input - updated with your colors */
+.drawer-dimensions-container {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: 15px 0;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.drawer-dimensions-container.visible {
+  display: flex;
 }
 
 .dimensions-inputs {
@@ -208,47 +230,78 @@
 }
 
 .dimension-input-group {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
+  z-index: 20000;
 }
 
-.dimension-input-group label {
-  font-size: 14px;
-  margin-bottom: 5px;
-  color: white;
-}
-
+/* Base input styling */
 .dimension-input-group input {
-  width: 100px;
-  padding: 8px;
-  border-radius: 5px;
+  width: 160px;
+  height: 40px;
+  padding: 8px 40px 8px 40px;
+  border-radius: 20px;
   background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid var(--neon-color, #b300ff);
   color: white;
-  text-align: center;
   font-size: 16px;
+  outline: none;
+  transition: all 0.3s ease;
+  text-align: center;
+  -moz-appearance: textfield; /* Remove spinner for Firefox */
 }
 
+/* Remove spinner for Chrome/Safari/Edge */
+.dimension-input-group input::-webkit-outer-spin-button,
+.dimension-input-group input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Focus state */
 .dimension-input-group input:focus {
-  border-color: var(--neon-color);
+  border-color: var(--neon-color, #b300ff);
   box-shadow: 0 0 5px rgba(138, 67, 252, 0.5);
 }
 
-.dimension-input-group input::-webkit-inner-spin-button,
-.dimension-input-group input::-webkit-outer-spin-button {
-  opacity: 1;
+/* Label before the input (w) */
+.dimension-input-group::before {
+  content: "w";
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--neon-color, #b300ff);
+  font-weight: 500;
+  font-size: 14px;
+  pointer-events: none;
+  width: 20px;
+  text-align: center;
 }
 
-/* TODO: DELETE placement-instruction */
-/* .placement-instruction { */
-/*   position: fixed; */
-/*   top: 60px; */
-/*   left: 50%; */
-/*   transform: translateX(-50%); */
-/*   padding: 10px 20px; */
-/*   background-color: rgba(0, 0, 0, 0.7); */
-/*   color: white; */
-/*   border-radius: 5px; */
-/*   z-index: 1000; */
-/* } */
+/* Units after the input (mm) */
+.dimension-input-group::after {
+  content: "mm";
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--neon-color, #b300ff);
+  font-weight: 500;
+  font-size: 14px;
+  pointer-events: none;
+  width: 24px;
+  text-align: center;
+}
+
+/* Different labels for height input */
+.dimension-input-group:nth-child(2)::before {
+  content: "h";
+}
+
+/* Additional hover state */
+.dimension-input-group input:hover {
+  border-color: var(--neon-color, #b300ff);
+}
