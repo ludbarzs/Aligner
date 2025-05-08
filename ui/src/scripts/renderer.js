@@ -113,8 +113,8 @@ export class Renderer {
     const scaleY = naturalHeight / displayedHeight;
 
     // Calculate relative position within the displayed image
-    let relX = event.clientX - rect.left;
-    let relY = event.clientY - rect.top;
+    const relX = event.clientX - rect.left;
+    const relY = event.clientY - rect.top;
 
     console.log(relX, relY);
 
