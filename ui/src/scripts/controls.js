@@ -206,6 +206,11 @@ export class Controls {
     appState.allowDotPlacement = true;
     appState.resetCoordinates(); // Clear cordinates
     renderer.removeAllMarkers();
+
+    // Hide dimensions input
+    if (this.dimensionsContainer) {
+      this.dimensionsContainer.classList.remove("visible");
+    }
   }
 }
 

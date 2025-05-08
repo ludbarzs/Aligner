@@ -19,4 +19,7 @@ __pycache__/
 # Output test files
 *.dxf
 
-
+# Node modules
+node_modules/
+.eslintrc.js
+eslint.config.mjs

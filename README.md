@@ -9,7 +9,8 @@
 TODO:
 Feature:
 
-- [ ] Implement image processing (grayscale, blur, canny, edge_closing)
+- [-] Implement image processing (grayscale, blur, canny, edge_closing)
+- [ ] Add slider to fine tune the edge finder
 - [ ] Export to DXF
 
 UI:
