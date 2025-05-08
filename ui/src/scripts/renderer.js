@@ -116,49 +116,11 @@ export class Renderer {
     let relX = event.clientX - rect.left;
     let relY = event.clientY - rect.top;
 
-    // Adjust for rotation and mirroring transformations
-    let adjustedX, adjustedY;
-
-    // Handle rotation
-    switch (appState.currentRotation) {
-      case 0:
-        adjustedX = relX;
-        adjustedY = relY;
-        break;
-      case 90:
-        // For 90° rotation, X becomes Y and Y becomes width-X
-        adjustedX = relY;
-        adjustedY = displayedWidth - relX;
-        break;
-      case 180:
-        // For 180° rotation, X becomes width-X and Y becomes height-Y
-        adjustedX = displayedWidth - relX;
-        adjustedY = displayedHeight - relY;
-        break;
-      case 270:
-        // For 270° rotation, X becomes height-Y and Y becomes X
-        adjustedX = displayedHeight - relY;
-        adjustedY = relX;
-        break;
-      default:
-        adjustedX = relX;
-        adjustedY = relY;
-    }
-
-    // Handle mirroring (horizontal flip)
-    if (appState.isMirrored) {
-      if (appState.currentRotation === 0 || appState.currentRotation === 180) {
-        // For 0° or 180° rotation, mirror affects X
-        adjustedX = displayedWidth - adjustedX;
-      } else {
-        // For 90° or 270° rotation, mirror affects Y
-        adjustedY = displayedHeight - adjustedY;
-      }
-    }
+    console.log(relX, relY);
 
     // Apply scaling to get coordinates in the original image dimensions
-    const finalX = adjustedX * scaleX;
-    const finalY = adjustedY * scaleY;
+    const finalX = scaleX * relX;
+    const finalY = scaleY * relY;
 
     return {
       x: finalX,

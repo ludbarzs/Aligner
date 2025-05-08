@@ -15,8 +15,8 @@ class AppState {
     this.imageData = null;
     this.originalImageData = null;
     // Real width and height of drawer in mm
-    this.realWidthMm = 530;
-    this.realHeightMm = 330;
+    this.realWidthMm = 330;
+    this.realHeightMm = 530;
     // x, y axis ratios
     this.xRatio = null;
     this.yRatio = null;
