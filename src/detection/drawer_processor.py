@@ -144,6 +144,7 @@ class DrawerProcessor:
 
         return corrected_image, final_x_ratio, final_y_ratio
 
+    @staticmethod
     def process_drawer_image(
         image: np.ndarray,
         corners: np.ndarray,
