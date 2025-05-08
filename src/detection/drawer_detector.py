@@ -6,10 +6,8 @@ from typing import Tuple
 import cv2 as cv
 import numpy as np
 
-from errors.error import Error
 
-
-class DrawerProcessor:
+class DrawerDetector:
     """
     Handles drawer detection and perspective correction
     Containst stateless methods for processing drawer image
@@ -113,7 +111,7 @@ class DrawerProcessor:
         Returns:
             Tuple of (corrected_image, x_ratio, y_ratio)
         """
-        x_ratio, y_ratio = DrawerProcessor.calculate_axis_ratios(
+        x_ratio, y_ratio = DrawerDetector.calculate_axis_ratios(
             corners, real_width_mm, real_height_mm
         )
 
@@ -166,9 +164,9 @@ class DrawerProcessor:
         """
 
         # Order corners
-        ordered_corners = DrawerProcessor.order_corners(corners)
+        ordered_corners = DrawerDetector.order_corners(corners)
 
-        corrected_image, x_ratio, y_ratio = DrawerProcessor.correct_perspective(
+        corrected_image, x_ratio, y_ratio = DrawerDetector.correct_perspective(
             image, ordered_corners, real_width_mm, real_height_mm
         )
 

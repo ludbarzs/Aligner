@@ -1,7 +1,8 @@
 from typing import Dict, Any
+from detection.edge_detecttor import EdgeDetector
 import numpy as np
 from processors.image_processor import ImageProcessor
-from detection.drawer_processor import DrawerProcessor
+from detection.drawer_detector import DrawerDetector
 
 
 class RequestProcessor:
@@ -25,15 +26,25 @@ class RequestProcessor:
         )
 
         # Process drawer image
-        corrected_image, x_ratio, y_ratio = DrawerProcessor.process_drawer_image(
+        corrected_image, x_ratio, y_ratio = DrawerDetector.process_drawer_image(
             transformed_image,
             coordinates,
             float(data["realWidthMm"]),
             float(data["realHeightMm"]),
         )
 
+        # Run edge detection and find contours
+
+        edge_results = EdgeDetector.process_image(
+            corrected_image,
+            min_contour_area=1000,
+            return_edges=True,
+        )
+
         return {
             "image": corrected_image,
+            "contoured_image": edge_results["contoured_image"],
+            "edge_image": ImageProcessor.encode_image(edge_results["edge_image"]),
             "coordinates": data["coordinates"],
             "x_ratio": x_ratio,
             "y_ratio": y_ratio,

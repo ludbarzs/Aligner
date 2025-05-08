@@ -57,8 +57,8 @@ export const apiService = {
     renderer.imageElement.style.maxWidth = "1280px";
     renderer.imageElement.style.maxHeight = "720px";
 
-    renderer.imageElement.src = data.processedImage;
-    appState.setImageData(data.processedImage);
+    renderer.imageElement.src = data.contouredImage;
+    appState.setImageData(data.contouredImage);
     appState.updateRatios(data.xRatio, data.yRatio);
 
     // Reset transformation state since the API response image

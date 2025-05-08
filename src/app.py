@@ -61,6 +61,8 @@ def process_image():
         response = {
             "success": True,
             "processedImage": ImageProcessor.encode_image(result["image"]),
+            "edgeImage": result["edge_image"],
+            "contouredImage": ImageProcessor.encode_image(result["contoured_image"]),
             "coordinates": result["coordinates"],
             "xRatio": result["x_ratio"],
             "yRatio": result["y_ratio"],

@@ -14,6 +14,9 @@ class AppState {
     this.allowDotPlacement = false;
     this.imageData = null;
     this.originalImageData = null;
+    // Image types for edge detection
+    this.edgeImage = null;
+    this.contouredImage = null;
     // Real width and height of drawer in mm
     this.realWidthMm = 540;
     this.realHeightMm = 340;
@@ -48,6 +51,19 @@ class AppState {
       rotation: this.currentRotation,
       mirrored: this.isMirrored,
     };
+  }
+  /**
+   * Store edge image data
+   */
+  setEdgeImage(data) {
+    this.edgeImage = data;
+  }
+
+  /**
+   * Store contoured image data
+   */
+  setContouredImage(data) {
+    this.contouredImage = data;
   }
 
   /**
