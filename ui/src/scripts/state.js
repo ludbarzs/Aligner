@@ -23,6 +23,38 @@ class AppState {
     // x, y axis ratios
     this.xRatio = null;
     this.yRatio = null;
+    this.edgeDetectionSettings = {
+      blurKernelSize: [5, 5],
+      cannyLow: 30,
+      cannyHigh: 130,
+      morphKernelSize: [5, 5],
+      edgeThreshold: 80,
+    };
+  }
+  /**
+   * Edge detection parameters
+   */
+
+  /**
+   * Update edge detection settings
+   * @param {Object} settings - The settings to update
+   */
+  updateEdgeDetectionSettings(settings) {
+    this.edgeDetectionSettings = {
+      ...this.edgeDetectionSettings,
+      ...settings,
+    };
+
+    // If a single edge threshold is provided, convert it to canny low/high
+    if (settings.edgeThreshold !== undefined) {
+      this.edgeDetectionSettings.cannyLow = Math.max(
+        10,
+        settings.edgeThreshold * 0.3,
+      );
+      this.edgeDetectionSettings.cannyHigh = settings.edgeThreshold;
+    }
+
+    console.log("Updated edge detection settings:", this.edgeDetectionSettings);
   }
 
   /**

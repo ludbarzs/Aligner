@@ -44,6 +44,7 @@ export const apiService = {
       transformations: appState.getTransformations(),
       realWidthMm: appState.realWidthMm,
       realHeightMm: appState.realHeightMm,
+      edgeDetectionSettings: appState.edgeDetectionSettings,
     });
   },
 
@@ -96,6 +97,7 @@ export const apiService = {
           transformations: appState.getTransformations(),
           realWidthMm: appState.realWidthMm,
           realHeightMm: appState.realHeightMm,
+          edgeDetectionSettings: appState.edgeDetectionSettings,
         }),
         timeout: PROCESSING_TIMEOUT,
       });

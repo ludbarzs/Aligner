@@ -1,6 +1,7 @@
 import { appState } from "./state.js";
 import { renderer } from "./renderer.js";
 import { sendToAPI } from "./api.js";
+import { edgeControls } from "./edge-detection-controls.js";
 
 /**
  * Manages UI controls and workflow transitions
@@ -200,16 +201,39 @@ export class Controls {
 
   switchToStep3() {
     /**
-     * Update to step 2, allow dot placemnt
+     * Update to step 3, enable edge detection controls
      */
     appState.currentWorkflowStep = 3;
-    appState.allowDotPlacement = true;
-    appState.resetCoordinates(); // Clear cordinates
-    renderer.removeAllMarkers();
+    appState.allowDotPlacement = false; // Disable dot placement in step 3
 
-    // Hide dimensions input
-    if (this.dimensionsContainer) {
+    // Remove back button if it exists
+    const backButton = document.querySelector(
+      ".controls .control-button:first-child",
+    );
+    if (backButton && backButton.textContent.includes("Back")) {
+      backButton.remove();
+    }
+
+    // Update instructions
+    renderer.updateInstruction(
+      "Adjust edge detection parameters to improve contour finding",
+    );
+
+    // Hide dimensions input if visible
+    if (
+      this.dimensionsContainer &&
+      this.dimensionsContainer.classList.contains("visible")
+    ) {
       this.dimensionsContainer.classList.remove("visible");
+    }
+
+    // Show edge detection controls
+    edgeControls.show();
+
+    // Update submit button text
+    const continueButton = document.querySelector(".control-button.primary");
+    if (continueButton) {
+      continueButton.querySelector("span").textContent = "Export";
     }
   }
 }

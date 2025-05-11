@@ -91,6 +91,10 @@ class EdgeDetector:
         image: np.ndarray,
         min_contour_area: float = 1000,
         return_edges: bool = False,
+        blur_kernel_size: Tuple[int, int] = (5, 5),
+        canny_low: int = 30,
+        canny_high: int = 130,
+        morph_kernel_size: Tuple[int, int] = (5, 5),
     ) -> dict:
         """
         Complete edge detection workflow
@@ -99,6 +103,10 @@ class EdgeDetector:
             image: Original input image
             min_contour_area: Minimum contour area to keep
             return_edges: Whether to include edge image in result
+            blur_kernel_size: Size of the Gaussian blur kernel
+            canny_low: First threshold for Canny edge detector
+            canny_high: Second threshold for Canny edge detector
+            morph_kernel_size: Size of the morphological operations kernel
 
         Returns:
             Dictionary with processed results:
@@ -109,7 +117,13 @@ class EdgeDetector:
             }
         """
         # Process the image to find edges
-        edge_image = EdgeDetector.prepare_image(image)
+        edge_image = EdgeDetector.prepare_image(
+            image,
+            blur_kernel_size=blur_kernel_size,
+            canny_low=canny_low,
+            canny_high=canny_high,
+            morph_kernel_size=morph_kernel_size,
+        )
 
         # Find contours
         contours = EdgeDetector.find_contours(edge_image, min_contour_area)

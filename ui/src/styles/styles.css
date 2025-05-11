@@ -305,3 +305,74 @@
 .dimension-input-group input:hover {
   border-color: var(--neon-color, #b300ff);
 }
+/* Sliders */
+/* Add this to your CSS file */
+.edge-controls-container {
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 20px;
+  max-width: 500px;
+  display: none; /* Hidden by default, will show in step 3 */
+}
+
+.edge-controls-container.visible {
+  display: block;
+}
+
+.edge-controls-container h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.slider-container {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.slider-container label {
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.info-tooltip {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #3498db;
+  color: white;
+  font-size: 12px;
+  margin-left: 8px;
+  cursor: help;
+  position: relative;
+}
+
+.info-tooltip:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 100%;
+  top: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  width: 200px;
+  z-index: 1000;
+  font-weight: normal;
+}
+
+.slider-value {
+  margin-top: 3px;
+  font-size: 12px;
+  color: #666;
+}
+
+#apply-edge-settings {
+  margin-top: 10px;
+}

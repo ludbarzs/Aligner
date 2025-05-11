@@ -33,12 +33,22 @@ class RequestProcessor:
             float(data["realHeightMm"]),
         )
 
-        # Run edge detection and find contours
+        # Extract edge detection settings if provided
+        edge_settings = data.get("edgeDetectionSettings", {})
+        blur_kernel_size = tuple(edge_settings.get("blurKernelSize", (5, 5)))
+        canny_low = int(edge_settings.get("cannyLow", 30))
+        canny_high = int(edge_settings.get("cannyHigh", 130))
+        morph_kernel_size = tuple(edge_settings.get("morphKernelSize", (5, 5)))
 
+        # Run edge detection and find contours
         edge_results = EdgeDetector.process_image(
             corrected_image,
             min_contour_area=1000,
             return_edges=True,
+            blur_kernel_size=blur_kernel_size,
+            canny_low=canny_low,
+            canny_high=canny_high,
+            morph_kernel_size=morph_kernel_size,
         )
 
         return {
