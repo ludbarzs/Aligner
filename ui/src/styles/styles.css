@@ -314,6 +314,7 @@
   margin-top: 20px;
   max-width: 500px;
   display: none; /* Hidden by default, will show in step 3 */
+  z-index: 20000;
 }
 
 .edge-controls-container.visible {

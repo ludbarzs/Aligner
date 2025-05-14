@@ -205,6 +205,8 @@ export class Controls {
      */
     appState.currentWorkflowStep = 3;
     appState.allowDotPlacement = false; // Disable dot placement in step 3
+    appState.resetCoordinates();
+    renderer.removeAllMarkers();
 
     // Remove back button if it exists
     const backButton = document.querySelector(

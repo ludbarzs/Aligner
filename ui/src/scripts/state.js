@@ -32,10 +32,6 @@ class AppState {
     };
   }
   /**
-   * Edge detection parameters
-   */
-
-  /**
    * Update edge detection settings
    * @param {Object} settings - The settings to update
    */
