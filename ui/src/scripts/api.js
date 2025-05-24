@@ -55,9 +55,7 @@ export const apiService = {
   handleSuccess: (data) => {
     // Clear any existing CSS transformations before setting the new image
     renderer.imageElement.style.transform = "";
-    renderer.imageElement.style.maxWidth = "1280px";
-    renderer.imageElement.style.maxHeight = "720px";
-
+    
     renderer.imageElement.src = data.contouredImage;
     appState.setImageData(data.contouredImage);
     appState.updateRatios(data.xRatio, data.yRatio);

@@ -93,7 +93,7 @@ document
   .querySelector(".control-button:not(.primary):not(.guest)")
   .addEventListener("click", () => {
     // This will be implemented when backend is ready
-    window.location.href = "/register";
+    window.location.href = "register.html";
   });
 
 // Guest button handler

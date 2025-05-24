@@ -53,6 +53,12 @@ export class Renderer {
       appState.isMirrored = false;
       this.imageElement.style.transform = "";
 
+      // Reset frame selector
+      if (this.frameSelector) {
+        this.frameSelector.hide();
+        this.frameSelector = null;  // Destroy old frame selector
+      }
+
       if (window.progressTracker) {
         window.progressTracker.nextStep();
       }

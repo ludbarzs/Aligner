@@ -78,14 +78,6 @@ export class Controls {
   rotateImage() {
     if (!this.imageElement.src || appState.currentWorkflowStep !== 1) return;
 
-    const computedStyle = window.getComputedStyle(this.imageElement);
-    const maxWidth = computedStyle.maxWidth;
-    const maxHeight = computedStyle.maxHeight;
-
-    // Swap the maxWidth and maxHeight using inline styles
-    this.imageElement.style.maxWidth = maxHeight;
-    this.imageElement.style.maxHeight = maxWidth;
-
     appState.currentRotation = (appState.currentRotation + 90) % 360;
     this.applyTransformations();
   }
@@ -139,14 +131,21 @@ export class Controls {
     // Update UI controls visibility
     document.querySelector(".controls .control-button:first-child").remove();
     const controlButtons = document.querySelectorAll(".control-button");
-    for (let i = 0; i < 3; i++) {
-      if (controlButtons[i]) controlButtons[i].classList.add("flex");
-    }
+    controlButtons.forEach(button => {
+      if (button.querySelector("span")?.textContent === "Reupload") {
+        button.style.display = ""; // Reset the display style
+      }
+      if (!button.classList.contains("primary")) {
+        button.classList.add("flex");
+      }
+    });
 
     // Update continue button text
     const continueButton = document.querySelector(".control-button.primary");
-    if (continueButton)
+    if (continueButton) {
       continueButton.querySelector("span").textContent = "Continue";
+      continueButton.classList.add("flex");
+    }
 
     // Clean up instructions
     const instructionElement = document.getElementById("placement-instruction");
@@ -174,11 +173,14 @@ export class Controls {
     // Show frame selector
     renderer.showFrameSelector();
 
-    // Hide transformation buttons
+    // Hide all control buttons first
     const controlButtons = document.querySelectorAll(".control-button");
-    for (let i = 0; i < 3; i++) {
-      if (controlButtons[i]) controlButtons[i].classList.remove("flex");
-    }
+    controlButtons.forEach(button => {
+      button.classList.remove("flex");
+      if (button.querySelector("span")?.textContent === "Reupload") {
+        button.style.display = "none";
+      }
+    });
 
     // Add back button
     const backButton = document.createElement("button");
@@ -191,8 +193,10 @@ export class Controls {
 
     // Update submit button text
     const continueButton = document.querySelector(".control-button.primary");
-    if (continueButton)
+    if (continueButton) {
       continueButton.querySelector("span").textContent = "Submit";
+      continueButton.classList.add("flex");
+    }
 
     // Update instructions
     renderer.updateInstruction("Drag the corners to adjust the frame");
