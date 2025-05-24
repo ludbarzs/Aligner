@@ -15,101 +15,103 @@
     </div>
     <div class="container">
       <div class="main-content">
-        <div class="box">
-          <div id="upload-interface">
-            <img
-              id="cloud-icon"
-              src="assets/cloud_icon.svg"
-              alt="Icon"
-              width="100"
-              height="100"
-            />
-            <p id="description">
-              Drag and drop your image here or click "Select File"
-            </p>
-            <!-- Image upload input -->
-            <label for="image-upload" class="upload-button">Select File</label>
-            <input
-              type="file"
-              id="image-upload"
-              accept=".jpg,.jpeg,.png"
-              name="Select file"
-              class="hidden"
-            />
-            <span id="supports">Supports: PNG, JPG, JPEG</span>
+        <div class="image-and-controls-wrapper">
+          <div class="box">
+            <div id="upload-interface">
+              <img
+                id="cloud-icon"
+                src="assets/cloud_icon.svg"
+                alt="Icon"
+                width="100"
+                height="100"
+              />
+              <p id="description">
+                Drag and drop your image here or click "Select File"
+              </p>
+              <!-- Image upload input -->
+              <label for="image-upload" class="upload-button">Select File</label>
+              <input
+                type="file"
+                id="image-upload"
+                accept=".jpg,.jpeg,.png"
+                name="Select file"
+                class="hidden"
+              />
+              <span id="supports">Supports: PNG, JPG, JPEG</span>
+            </div>
+
+            <!-- Container for the image -->
+            <div>
+              <img id="uploaded-image" />
+            </div>
           </div>
 
-          <!-- Container for the image -->
-          <div>
-            <img id="uploaded-image" />
+          <div id="edge-detection-controls" class="edge-controls-container">
+            <h3>Edge Detection Parameters</h3>
+
+            <div class="slider-container">
+              <label for="blur-slider"
+                >Blur Amount
+                <span
+                  class="info-tooltip"
+                  data-tooltip="Controls how much the image is blurred before edge detection. Higher values smooth out noise but may miss fine details."
+                  >i</span
+                >
+              </label>
+              <input
+                type="range"
+                id="blur-slider"
+                min="1"
+                max="15"
+                step="2"
+                value="5"
+              />
+              <span class="slider-value">5</span>
+            </div>
+
+            <div class="slider-container">
+              <label for="edge-threshold-slider"
+                >Edge Sensitivity
+                <span
+                  class="info-tooltip"
+                  data-tooltip="Controls how sensitive edge detection is. Lower values detect more edges including noise, higher values detect only strong edges."
+                  >i</span
+                >
+              </label>
+              <input
+                type="range"
+                id="edge-threshold-slider"
+                min="10"
+                max="200"
+                value="80"
+              />
+              <span class="slider-value">80</span>
+            </div>
+
+            <div class="slider-container">
+              <label for="morph-slider"
+                >Edge Closing
+                <span
+                  class="info-tooltip"
+                  data-tooltip="Controls how aggressively edges are connected. Higher values help connect broken lines but may join unrelated edges."
+                  >i</span
+                >
+              </label>
+              <input
+                type="range"
+                id="morph-slider"
+                min="1"
+                max="15"
+                step="2"
+                value="5"
+              />
+              <span class="slider-value">5</span>
+            </div>
+
+            <button id="apply-edge-settings" class="control-button">
+              Apply Settings
+            </button>
           </div>
-        </div>
-
-        <div id="edge-detection-controls" class="edge-controls-container">
-          <h3>Edge Detection Parameters</h3>
-
-          <div class="slider-container">
-            <label for="blur-slider"
-              >Blur Amount
-              <span
-                class="info-tooltip"
-                data-tooltip="Controls how much the image is blurred before edge detection. Higher values smooth out noise but may miss fine details."
-                >i</span
-              >
-            </label>
-            <input
-              type="range"
-              id="blur-slider"
-              min="1"
-              max="15"
-              step="2"
-              value="5"
-            />
-            <span class="slider-value">5</span>
-          </div>
-
-          <div class="slider-container">
-            <label for="edge-threshold-slider"
-              >Edge Sensitivity
-              <span
-                class="info-tooltip"
-                data-tooltip="Controls how sensitive edge detection is. Lower values detect more edges including noise, higher values detect only strong edges."
-                >i</span
-              >
-            </label>
-            <input
-              type="range"
-              id="edge-threshold-slider"
-              min="10"
-              max="200"
-              value="80"
-            />
-            <span class="slider-value">80</span>
-          </div>
-
-          <div class="slider-container">
-            <label for="morph-slider"
-              >Edge Closing
-              <span
-                class="info-tooltip"
-                data-tooltip="Controls how aggressively edges are connected. Higher values help connect broken lines but may join unrelated edges."
-                >i</span
-              >
-            </label>
-            <input
-              type="range"
-              id="morph-slider"
-              min="1"
-              max="15"
-              step="2"
-              value="5"
-            />
-            <span class="slider-value">5</span>
-          </div>
-
-          <button id="apply-edge-settings" class="control-button">
-            Apply Settings
-          </button>
         </div>
       </div>
 

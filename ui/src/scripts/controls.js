@@ -132,7 +132,9 @@ export class Controls {
     appState.currentWorkflowStep = 1;
     appState.allowDotPlacement = false;
     appState.resetCoordinates();
-    renderer.removeAllMarkers();
+    
+    // Hide frame selector
+    renderer.hideFrameSelector();
 
     // Update UI controls visibility
     document.querySelector(".controls .control-button:first-child").remove();
@@ -161,14 +163,16 @@ export class Controls {
 
   switchToStep2() {
     /**
-     * Update to step 2, allow dot placemnt
+     * Update to step 2, show frame selector
      */
 
     // Update workflow state
     appState.currentWorkflowStep = 2;
-    appState.allowDotPlacement = true;
+    appState.allowDotPlacement = false;
     appState.resetCoordinates();
-    renderer.removeAllMarkers();
+
+    // Show frame selector
+    renderer.showFrameSelector();
 
     // Hide transformation buttons
     const controlButtons = document.querySelectorAll(".control-button");
@@ -191,7 +195,7 @@ export class Controls {
       continueButton.querySelector("span").textContent = "Submit";
 
     // Update instructions
-    renderer.updateInstruction("Click to place up to 4 points on the image");
+    renderer.updateInstruction("Drag the corners to adjust the frame");
 
     // Show dimensions input
     if (this.dimensionsContainer) {
@@ -205,8 +209,9 @@ export class Controls {
      */
     appState.currentWorkflowStep = 3;
     appState.allowDotPlacement = false;
-    appState.resetCoordinates();
-    renderer.removeAllMarkers();
+    
+    // Hide frame selector
+    renderer.hideFrameSelector();
 
     // Remove back button if it exists
     const backButton = document.querySelector(
