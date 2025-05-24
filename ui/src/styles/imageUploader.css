@@ -1,0 +1,65 @@
+.box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 750px;
+  width: 1310px;
+  background: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(14px);
+  border-radius: 10px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+  position: relative;
+  z-index: 1;
+}
+
+#uploaded-image {
+  max-height: 720px;
+  max-width: 1280px;
+  display: none;
+}
+
+#cloud-icon {
+  height: 100px;
+  width: 130px;
+  margin-bottom: 20px;
+  margin-top: 40px;
+}
+
+.upload-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-weight: 400;
+  width: 230px;
+  height: 48px;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 25px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+}
+
+#description {
+  font-size: 20px;
+  max-width: 284px;
+  text-align: center;
+  margin-bottom: 190px;
+}
+
+#supports {
+  font-size: 14px;
+  color: #888888;
+  margin-top: 13px;
+}
+
+#upload-interface {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hidden {
+  display: none;
+} 

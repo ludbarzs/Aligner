@@ -1,6 +1,6 @@
 import { appState } from "./state.js";
 import { renderer } from "./renderer.js";
-import { sendToAPI } from "./api.js";
+import { apiService } from "./api.js";
 import { edgeControls } from "./edge-detection-controls.js";
 
 /**
@@ -12,7 +12,7 @@ import { edgeControls } from "./edge-detection-controls.js";
  * - Managing workflow step transitions
  * - Updating UI based on current workflow step
  */
-export class Controls {
+class Controls {
   constructor() {
     this.imageElement = document.getElementById("uploaded-image");
     this.dimensionsContainer = document.getElementById("drawer-dimensions");
@@ -75,53 +75,39 @@ export class Controls {
     }
   }
 
+  handleContinue() {
+    switch (appState.currentWorkflowStep) {
+      case 1:
+        this.switchToStep2();
+        break;
+      case 2:
+        if (appState.coordinates.length === 4) {
+          apiService.sendToAPI();
+        } else {
+          renderer.showMessage("Please place all 4 corner points", true);
+        }
+        break;
+      case 3:
+        this.switchToStep4();
+        break;
+      case 4:
+        apiService.sendToAPI();
+        break;
+    }
+  }
+
   rotateImage() {
-    if (!this.imageElement.src || appState.currentWorkflowStep !== 1) return;
-
-    const computedStyle = window.getComputedStyle(this.imageElement);
-    const maxWidth = computedStyle.maxWidth;
-    const maxHeight = computedStyle.maxHeight;
-
-    // Swap the maxWidth and maxHeight using inline styles
-    this.imageElement.style.maxWidth = maxHeight;
-    this.imageElement.style.maxHeight = maxWidth;
-
     appState.currentRotation = (appState.currentRotation + 90) % 360;
-    this.applyTransformations();
+    renderer.imageElement.style.transform = `${
+      appState.isMirrored ? "scaleX(-1)" : ""
+    } rotate(${appState.currentRotation}deg)`;
   }
 
   mirrorImage() {
-    if (!this.imageElement.src || appState.currentWorkflowStep !== 1) return;
-
     appState.isMirrored = !appState.isMirrored;
-    this.applyTransformations();
-  }
-
-  applyTransformations() {
-    /*
-     * Updates image CSS to reflect transformations
-     */
-    this.imageElement.style.transform = `
-      rotate(${appState.currentRotation}deg)
-      scaleX(${appState.isMirrored ? -1 : 1})
-    `;
-  }
-
-  handleContinue() {
-    /**
-     * Process Continue button click
-     */
-    if (appState.currentWorkflowStep === 1) {
-      this.switchToStep2();
-      if (window.progressTracker) window.progressTracker.nextStep();
-    } else if (appState.currentWorkflowStep === 2) {
-      sendToAPI();
-      this.switchToStep3();
-      if (window.progressTracker) window.progressTracker.nextStep();
-    } else if (appState.currentWorkflowStep === 3) {
-      this.switchToStep4();
-      if (window.progressTracker) window.progressTracker.nextStep();
-    }
+    renderer.imageElement.style.transform = `${
+      appState.isMirrored ? "scaleX(-1)" : ""
+    } rotate(${appState.currentRotation}deg)`;
   }
 
   switchToStep1() {
@@ -132,14 +118,19 @@ export class Controls {
     appState.currentWorkflowStep = 1;
     appState.allowDotPlacement = false;
     appState.resetCoordinates();
-    renderer.removeAllMarkers();
 
-    // Update UI controls visibility
-    document.querySelector(".controls .control-button:first-child").remove();
-    const controlButtons = document.querySelectorAll(".control-button");
-    for (let i = 0; i < 3; i++) {
-      if (controlButtons[i]) controlButtons[i].classList.add("flex");
+    // Hide frame selector if it exists
+    if (renderer.frameSelector) {
+      renderer.frameSelector.hide();
     }
+
+    // Show transformation controls
+    const transformControls = document.querySelectorAll(".transform-control");
+    transformControls.forEach((control) => control.classList.add("flex"));
+
+    // Show reupload button
+    const reuploadButton = document.querySelector(".reupload-button");
+    if (reuploadButton) reuploadButton.classList.add("flex");
 
     // Update continue button text
     const continueButton = document.querySelector(".control-button.primary");
@@ -151,39 +142,66 @@ export class Controls {
     if (instructionElement) instructionElement.remove();
 
     // Update progress tracker
-    if (window.progressTracker) window.progressTracker.previousStep();
+    if (window.progressTracker) {
+      window.progressTracker.previousStep();
+    }
 
     // Hide dimensions input
     if (this.dimensionsContainer) {
       this.dimensionsContainer.classList.remove("visible");
     }
+
+    // Hide edge detection controls if they exist
+    const edgeControls = document.getElementById("edge-detection-controls");
+    if (edgeControls) {
+      edgeControls.classList.remove("visible");
+    }
   }
 
   switchToStep2() {
     /**
-     * Update to step 2, allow dot placemnt
+     * Update to step 2, show frame selector
      */
 
     // Update workflow state
     appState.currentWorkflowStep = 2;
     appState.allowDotPlacement = true;
     appState.resetCoordinates();
-    renderer.removeAllMarkers();
 
-    // Hide transformation buttons
-    const controlButtons = document.querySelectorAll(".control-button");
-    for (let i = 0; i < 3; i++) {
-      if (controlButtons[i]) controlButtons[i].classList.remove("flex");
+    // Show frame selector
+    if (renderer.frameSelector) {
+      renderer.frameSelector.show();
+    } else {
+      renderer.frameSelector = new FrameSelector(renderer.imageElement);
     }
 
-    // Add back button
-    const backButton = document.createElement("button");
-    backButton.className = "control-button flex";
-    backButton.innerHTML = "<span>Back</span>";
-    backButton.addEventListener("click", () => this.switchToStep1());
-    document
-      .querySelector(".controls")
-      .insertBefore(backButton, document.querySelector(".controls").firstChild);
+    // Hide rotate and mirror buttons
+    document.querySelector(".control-button:nth-child(1)").style.display =
+      "none"; // Rotate button
+    document.querySelector(".control-button:nth-child(2)").style.display =
+      "none"; // Mirror button
+
+    // Hide transformation controls
+    const transformControls = document.querySelectorAll(".transform-control");
+    transformControls.forEach((control) => control.classList.remove("flex"));
+
+    // Hide reupload button
+    const reuploadButton = document.querySelector(".reupload-button");
+    if (reuploadButton) reuploadButton.classList.remove("flex");
+
+    // Add back button if it doesn't exist
+    if (!document.querySelector(".control-button.back")) {
+      const backButton = document.createElement("button");
+      backButton.className = "control-button back flex";
+      backButton.innerHTML = "<span>Back</span>";
+      backButton.addEventListener("click", () => this.switchToStep1());
+      document
+        .querySelector(".controls")
+        .insertBefore(
+          backButton,
+          document.querySelector(".controls").firstChild,
+        );
+    }
 
     // Update submit button text
     const continueButton = document.querySelector(".control-button.primary");
@@ -191,7 +209,9 @@ export class Controls {
       continueButton.querySelector("span").textContent = "Submit";
 
     // Update instructions
-    renderer.updateInstruction("Click to place up to 4 points on the image");
+    renderer.updateInstruction(
+      "Drag the corner points to align with the drawer",
+    );
 
     // Show dimensions input
     if (this.dimensionsContainer) {
@@ -201,62 +221,63 @@ export class Controls {
 
   switchToStep3() {
     /**
-     * Update to step 3
+     * Edge detection controls
      */
     appState.currentWorkflowStep = 3;
-    appState.allowDotPlacement = false;
-    appState.resetCoordinates();
-    renderer.removeAllMarkers();
 
-    // Remove back button if it exists
-    const backButton = document.querySelector(
-      ".controls .control-button:first-child",
-    );
-    if (backButton && backButton.textContent.includes("Back")) {
+    // Hide frame selector
+    if (renderer.frameSelector) {
+      renderer.frameSelector.hide();
+    }
+
+    // Hide back button
+    const backButton = document.querySelector(".control-button.back");
+    if (backButton) {
       backButton.remove();
     }
 
-    // Update instructions
-    renderer.updateInstruction(
-      "Review the detected edges",
-    );
-
-    // Hide dimensions input if visible
-    if (
-      this.dimensionsContainer &&
-      this.dimensionsContainer.classList.contains("visible")
-    ) {
+    // Hide dimensions input
+    if (this.dimensionsContainer) {
       this.dimensionsContainer.classList.remove("visible");
     }
 
-    // Update submit button text
+    // Show edge detection controls
+    const edgeControls = document.getElementById("edge-detection-controls");
+    if (edgeControls) {
+      edgeControls.classList.add("visible");
+    }
+
+    // Update instructions
+    renderer.updateInstruction("Adjust edge detection settings");
+
+    // Update button text
     const continueButton = document.querySelector(".control-button.primary");
     if (continueButton) {
-      continueButton.querySelector("span").textContent = "Adjust Edges";
+      continueButton.querySelector("span").textContent = "Export";
     }
   }
 
   switchToStep4() {
     /**
-     * Update to step 4, enable edge detection controls
+     * Update to step 4
      */
     appState.currentWorkflowStep = 4;
 
-    // Update instructions
-    renderer.updateInstruction(
-      "Adjust edge detection parameters to improve contour finding",
-    );
-
     // Show edge detection controls
-    edgeControls.show();
+    const edgeControls = document.getElementById("edge-detection-controls");
+    if (edgeControls) {
+      edgeControls.classList.add("visible");
+    }
 
     // Update submit button text
     const continueButton = document.querySelector(".control-button.primary");
     if (continueButton) {
-      continueButton.querySelector("span").textContent = "Export";
+      continueButton.querySelector("span").textContent = "Submit";
     }
   }
 }
 
 // Create and export a single instance
 export const controls = new Controls();
+// Make it available globally for the API service
+window.controls = controls;

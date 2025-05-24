@@ -1,0 +1,64 @@
+.frame-selector {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.frame-corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--neon-color);
+  border-radius: 50%;
+  background: rgba(138, 67, 252, 0.2);
+  backdrop-filter: blur(4px);
+  transform: translate(-50%, -50%);
+  cursor: move;
+  pointer-events: auto;
+  transition: all 0.15s ease;
+  box-shadow: 0 0 15px rgba(138, 67, 252, 0.5);
+}
+
+.frame-corner:hover {
+  background: rgba(138, 67, 252, 0.4);
+  transform: translate(-50%, -50%) scale(1.2);
+  box-shadow: 0 0 20px rgba(138, 67, 252, 0.7);
+}
+
+.frame-corner.dragging {
+  background: rgba(138, 67, 252, 0.6);
+  transform: translate(-50%, -50%) scale(1.3);
+  box-shadow: 0 0 25px rgba(138, 67, 252, 0.9);
+}
+
+.frame-line {
+  position: absolute;
+  background: var(--neon-color);
+  transform-origin: 0 0;
+  pointer-events: none;
+  height: 2px;
+  box-shadow: 0 0 10px rgba(138, 67, 252, 0.5);
+}
+
+.frame-guide {
+  position: absolute;
+  background: rgba(138, 67, 252, 0.2);
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.frame-guide.horizontal {
+  height: 1px;
+  width: 100%;
+}
+
+.frame-guide.vertical {
+  width: 1px;
+  height: 100%;
+}
+
+.frame-guide.active {
+  background: rgba(138, 67, 252, 0.6);
+  box-shadow: 0 0 10px rgba(138, 67, 252, 0.3);
+} 

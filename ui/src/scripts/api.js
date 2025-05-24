@@ -3,6 +3,7 @@
  */
 import { appState } from "./state.js";
 import { renderer } from "./renderer.js";
+import { controls } from "./controls.js";
 
 const API_BASE_URL = "http://localhost:5000";
 const PROCESSING_TIMEOUT = 30000;
@@ -66,6 +67,9 @@ export const apiService = {
     // already has these transformations applied
     appState.currentRotation = 0;
     appState.isMirrored = false;
+
+    // Switch to edge detection step
+    controls.switchToStep3();
   },
 
   /**
