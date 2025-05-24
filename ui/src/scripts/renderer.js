@@ -14,6 +14,7 @@ export class Renderer {
     this.imageElement = document.getElementById("uploaded-image");
     this.uploadInterface = document.getElementById("upload-interface");
     this.controlButtons = document.querySelectorAll(".control-button");
+    this.authButtons = document.getElementById("auth-buttons");
     this.initEventListeners();
   }
 
@@ -44,6 +45,7 @@ export class Renderer {
       this.imageElement.src = event.target.result;
       this.imageElement.style.display = "block";
       this.uploadInterface.style.display = "none";
+      this.authButtons.style.display = "none";
 
       appState.setImageData(event.target.result);
       appState.resetCoordinates();

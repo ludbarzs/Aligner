@@ -114,12 +114,12 @@ export class Controls {
     if (appState.currentWorkflowStep === 1) {
       this.switchToStep2();
       if (window.progressTracker) window.progressTracker.nextStep();
-    } else {
+    } else if (appState.currentWorkflowStep === 2) {
       sendToAPI();
-
-      this.switchToStep3(); // Define this if it doesn't exist
-      // Only proceed to step 3 if API call succeeds
-      this.switchToStep3(); // You need to define this function
+      this.switchToStep3();
+      if (window.progressTracker) window.progressTracker.nextStep();
+    } else if (appState.currentWorkflowStep === 3) {
+      this.switchToStep4();
       if (window.progressTracker) window.progressTracker.nextStep();
     }
   }
@@ -201,10 +201,10 @@ export class Controls {
 
   switchToStep3() {
     /**
-     * Update to step 3, enable edge detection controls
+     * Update to step 3
      */
     appState.currentWorkflowStep = 3;
-    appState.allowDotPlacement = false; // Disable dot placement in step 3
+    appState.allowDotPlacement = false;
     appState.resetCoordinates();
     renderer.removeAllMarkers();
 
@@ -218,7 +218,7 @@ export class Controls {
 
     // Update instructions
     renderer.updateInstruction(
-      "Adjust edge detection parameters to improve contour finding",
+      "Review the detected edges",
     );
 
     // Hide dimensions input if visible
@@ -228,6 +228,24 @@ export class Controls {
     ) {
       this.dimensionsContainer.classList.remove("visible");
     }
+
+    // Update submit button text
+    const continueButton = document.querySelector(".control-button.primary");
+    if (continueButton) {
+      continueButton.querySelector("span").textContent = "Adjust Edges";
+    }
+  }
+
+  switchToStep4() {
+    /**
+     * Update to step 4, enable edge detection controls
+     */
+    appState.currentWorkflowStep = 4;
+
+    // Update instructions
+    renderer.updateInstruction(
+      "Adjust edge detection parameters to improve contour finding",
+    );
 
     // Show edge detection controls
     edgeControls.show();
