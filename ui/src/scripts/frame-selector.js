@@ -94,14 +94,13 @@ export class FrameSelector {
     if (!this.activeDragCorner) return;
 
     const rect = this.container.getBoundingClientRect();
-    const cornerSize = 20;
-    const halfCornerSize = cornerSize / 2;
 
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
 
-    x = Math.max(halfCornerSize, Math.min(rect.width - halfCornerSize, x));
-    y = Math.max(halfCornerSize, Math.min(rect.height - halfCornerSize, y));
+    // Clamp to container bounds without any padding
+    x = Math.max(0, Math.min(rect.width, x));
+    y = Math.max(0, Math.min(rect.height, y));
 
     this.activeDragCorner.style.left = `${x}px`;
     this.activeDragCorner.style.top = `${y}px`;
