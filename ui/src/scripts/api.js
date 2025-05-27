@@ -13,6 +13,11 @@ export const apiService = {
    * @returns {boolean} True if valid, false otherwise
    */
   validateRequest: () => {
+    // For edge detection updates, we don't need to validate coordinates
+    if (appState.currentWorkflowStep === 4) {
+      return true;
+    }
+    // For initial processing, validate coordinates
     if (!appState.coordinates || appState.coordinates.length !== 4) {
       renderer.showMessage("Please place 4 dots on the image", true);
       return false;
@@ -30,7 +35,7 @@ export const apiService = {
       continueButton.disabled = isProcessing;
       continueButton.querySelector("span").textContent = isProcessing
         ? "Processing..."
-        : "Submit";
+        : appState.currentWorkflowStep === 4 ? "Export" : "Submit";
     }
   },
 
@@ -84,13 +89,17 @@ export const apiService = {
 
     try {
       apiService.updateProcessingUI(true);
-      apiService.logRequest();
+      
+      // Use the original cropped image for edge detection updates
+      const imageToProcess = appState.currentWorkflowStep === 4 
+        ? appState.originalImageData 
+        : appState.imageData;
 
       const response = await fetch(`${API_BASE_URL}/process-image`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          imageData: appState.imageData,
+          imageData: imageToProcess,
           coordinates: appState.coordinates,
           transformations: appState.getTransformations(),
           realWidthMm: appState.realWidthMm,
@@ -108,7 +117,20 @@ export const apiService = {
       console.log("API Response:", data);
 
       if (data.success) {
-        apiService.handleSuccess(data);
+        // Clear any existing CSS transformations before setting the new image
+        renderer.imageElement.style.transform = "";
+        
+        renderer.imageElement.src = data.contouredImage;
+        // Only update stored image data on initial processing, not during edge detection updates
+        if (appState.currentWorkflowStep !== 4) {
+          appState.setImageData(data.contouredImage);
+          appState.updateRatios(data.xRatio, data.yRatio);
+        }
+
+        // Reset transformation state since the API response image
+        // already has these transformations applied
+        appState.currentRotation = 0;
+        appState.isMirrored = false;
       } else {
         throw new Error(data.error || "Unknown error occurred");
       }

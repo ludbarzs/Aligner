@@ -32,12 +32,30 @@ export class FrameSelector {
 
     // Update on window resize
     window.addEventListener("resize", () => {
+      const oldRect = this.container.getBoundingClientRect();
       const newRect = this.imageElement.getBoundingClientRect();
+      
+      // Calculate scale factors for the resize
+      const scaleX = newRect.width / oldRect.width;
+      const scaleY = newRect.height / oldRect.height;
+      
+      // Update container dimensions
       this.container.style.width = `${newRect.width}px`;
       this.container.style.height = `${newRect.height}px`;
       this.container.style.top = `${this.imageElement.offsetTop}px`;
       this.container.style.left = `${this.imageElement.offsetLeft}px`;
-      this.initializeCornerPositions();
+      
+      // Scale corner positions proportionally
+      this.corners.forEach(corner => {
+        const oldX = parseFloat(corner.style.left);
+        const oldY = parseFloat(corner.style.top);
+        
+        corner.style.left = `${oldX * scaleX}px`;
+        corner.style.top = `${oldY * scaleY}px`;
+      });
+      
+      this.updateLines();
+      this.updateAppState();
     });
   }
 

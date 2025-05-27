@@ -1,271 +1,137 @@
-import { appState } from "./state.js";
-import { renderer } from "./renderer.js";
-import { sendToAPI } from "./api.js";
-import { edgeControls } from "./edge-detection-controls.js";
+import { appState } from './state.js';
+import { renderer } from './renderer.js';
+import { sendToAPI } from './api.js';
+import { ImageTransformController } from './controllers/ImageTransformController.js';
+import { DimensionsController } from './controllers/DimensionsController.js';
+import { WORKFLOW_STEPS, BUTTON_TEXT, UI_ELEMENTS } from './constants.js';
 
 /**
  * Manages UI controls and workflow transitions
  *
  * Responsibilities:
  * - Initializing control button event listeners
- * - Handling image transformations (rotate, mirror)
  * - Managing workflow step transitions
- * - Updating UI based on current workflow step
+ * - Coordinating between different controllers
  */
 export class Controls {
   constructor() {
-    this.imageElement = document.getElementById("uploaded-image");
-    this.dimensionsContainer = document.getElementById("drawer-dimensions");
-    this.widthInput = document.getElementById("drawer-width");
-    this.heightInput = document.getElementById("drawer-height");
+    this.imageTransform = new ImageTransformController();
+    this.dimensions = new DimensionsController();
     this.initControls();
-    this.initDimensionInput();
   }
 
   initControls() {
-    /**
-     * Sets up event listeners for control buttons
-     */
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener('DOMContentLoaded', () => {
       // Rotation button
       document
-        .querySelector(".control-button:nth-child(1)")
-        .addEventListener("click", () => this.rotateImage());
+        .querySelector('.control-button:nth-child(1)')
+        .addEventListener('click', () => this.imageTransform.rotateImage());
 
       // Mirror button
       document
-        .querySelector(".control-button:nth-child(2)")
-        .addEventListener("click", () => this.mirrorImage());
+        .querySelector('.control-button:nth-child(2)')
+        .addEventListener('click', () => this.imageTransform.mirrorImage());
 
       // Reupload button
       document
-        .querySelector(".control-button:nth-child(3)")
-        .addEventListener("click", () => {
-          document.getElementById("image-upload").click();
+        .querySelector('.control-button:nth-child(3)')
+        .addEventListener('click', () => {
+          document.getElementById(UI_ELEMENTS.IMAGE_UPLOAD).click();
         });
 
       // Continue/Submit button
-      const continueButton = document.querySelector(".control-button.primary");
+      const continueButton = document.querySelector('.control-button.primary');
       if (continueButton) {
-        continueButton.addEventListener("click", () => this.handleContinue());
+        continueButton.addEventListener('click', () => this.handleContinue());
       }
     });
-  }
-
-  initDimensionInput() {
-    // Initialize with default values from appState
-    if (this.widthInput && this.heightInput) {
-      this.widthInput.value = appState.realWidthMm;
-      this.heightInput.value = appState.realHeightMm;
-
-      // Add event listeners to update state when inputs change
-      this.widthInput.addEventListener("change", () => {
-        const width = parseFloat(this.widthInput.value);
-        if (width > 0) {
-          appState.updateDimensions(width, appState.realHeightMm);
-        }
-      });
-
-      this.heightInput.addEventListener("change", () => {
-        const height = parseFloat(this.heightInput.value);
-        if (height > 0) {
-          appState.updateDimensions(appState.realWidthMm, height);
-        }
-      });
-    }
-  }
-
-  rotateImage() {
-    if (!this.imageElement.src || appState.currentWorkflowStep !== 1) return;
-
-    appState.currentRotation = (appState.currentRotation + 90) % 360;
-    this.applyTransformations();
-  }
-
-  mirrorImage() {
-    if (!this.imageElement.src || appState.currentWorkflowStep !== 1) return;
-
-    appState.isMirrored = !appState.isMirrored;
-    this.applyTransformations();
-  }
-
-  applyTransformations() {
-    /*
-     * Updates image CSS to reflect transformations
-     */
-    this.imageElement.style.transform = `
-      rotate(${appState.currentRotation}deg)
-      scaleX(${appState.isMirrored ? -1 : 1})
-    `;
   }
 
   handleContinue() {
-    /**
-     * Process Continue button click
-     */
-    if (appState.currentWorkflowStep === 1) {
-      this.switchToStep2();
-      if (window.progressTracker) window.progressTracker.nextStep();
-    } else if (appState.currentWorkflowStep === 2) {
-      sendToAPI();
-      this.switchToStep3();
-      if (window.progressTracker) window.progressTracker.nextStep();
-    } else if (appState.currentWorkflowStep === 3) {
-      this.switchToStep4();
-      if (window.progressTracker) window.progressTracker.nextStep();
+    switch (appState.currentWorkflowStep) {
+      case WORKFLOW_STEPS.UPLOAD:
+        this.switchToStep2();
+        break;
+      case WORKFLOW_STEPS.FRAME_SELECTION:
+        sendToAPI();
+        this.switchToStep3();
+        break;
+      case WORKFLOW_STEPS.PROCESSING:
+        this.switchToStep4();
+        break;
     }
+    if (window.progressTracker) window.progressTracker.nextStep();
   }
 
   switchToStep1() {
-    /**
-     * Reupload
-     */
     // Reset workflow state
-    appState.currentWorkflowStep = 1;
+    appState.currentWorkflowStep = WORKFLOW_STEPS.UPLOAD;
     appState.allowDotPlacement = false;
     appState.resetCoordinates();
     
-    // Hide frame selector
+    // Hide frame selector and dimensions
     renderer.hideFrameSelector();
+    this.dimensions.hide();
 
-    // Update UI controls visibility
-    document.querySelector(".controls .control-button:first-child").remove();
-    const controlButtons = document.querySelectorAll(".control-button");
-    controlButtons.forEach(button => {
-      if (button.querySelector("span")?.textContent === "Reupload") {
-        button.style.display = ""; // Reset the display style
-      }
-      if (!button.classList.contains("primary")) {
-        button.classList.add("flex");
-      }
-    });
-
-    // Update continue button text
-    const continueButton = document.querySelector(".control-button.primary");
-    if (continueButton) {
-      continueButton.querySelector("span").textContent = "Continue";
-      continueButton.classList.add("flex");
-    }
-
+    // Update UI controls
+    this.updateControlButtons(WORKFLOW_STEPS.UPLOAD);
+    
     // Clean up instructions
-    const instructionElement = document.getElementById("placement-instruction");
+    const instructionElement = document.getElementById(UI_ELEMENTS.PLACEMENT_INSTRUCTION);
     if (instructionElement) instructionElement.remove();
 
-    // Update progress tracker
     if (window.progressTracker) window.progressTracker.previousStep();
-
-    // Hide dimensions input
-    if (this.dimensionsContainer) {
-      this.dimensionsContainer.classList.remove("visible");
-    }
   }
 
   switchToStep2() {
-    /**
-     * Update to step 2, show frame selector
-     */
-
-    // Update workflow state
-    appState.currentWorkflowStep = 2;
+    appState.currentWorkflowStep = WORKFLOW_STEPS.FRAME_SELECTION;
     appState.allowDotPlacement = false;
     appState.resetCoordinates();
 
-    // Show frame selector
     renderer.showFrameSelector();
-
-    // Hide all control buttons first
-    const controlButtons = document.querySelectorAll(".control-button");
-    controlButtons.forEach(button => {
-      button.classList.remove("flex");
-      if (button.querySelector("span")?.textContent === "Reupload") {
-        button.style.display = "none";
-      }
-    });
-
-    // Add back button
-    const backButton = document.createElement("button");
-    backButton.className = "control-button flex";
-    backButton.innerHTML = "<span>Back</span>";
-    backButton.addEventListener("click", () => this.switchToStep1());
-    document
-      .querySelector(".controls")
-      .insertBefore(backButton, document.querySelector(".controls").firstChild);
-
-    // Update submit button text
-    const continueButton = document.querySelector(".control-button.primary");
-    if (continueButton) {
-      continueButton.querySelector("span").textContent = "Submit";
-      continueButton.classList.add("flex");
-    }
-
-    // Update instructions
-    renderer.updateInstruction("Drag the corners to adjust the frame");
-
-    // Show dimensions input
-    if (this.dimensionsContainer) {
-      this.dimensionsContainer.classList.add("visible");
-    }
+    this.updateControlButtons(WORKFLOW_STEPS.FRAME_SELECTION);
   }
 
   switchToStep3() {
-    /**
-     * Update to step 3
-     */
-    appState.currentWorkflowStep = 3;
-    appState.allowDotPlacement = false;
-    
-    // Hide frame selector
-    renderer.hideFrameSelector();
-
-    // Remove back button if it exists
-    const backButton = document.querySelector(
-      ".controls .control-button:first-child",
-    );
-    if (backButton && backButton.textContent.includes("Back")) {
-      backButton.remove();
-    }
-
-    // Update instructions
-    renderer.updateInstruction(
-      "Review the detected edges",
-    );
-
-    // Hide dimensions input if visible
-    if (
-      this.dimensionsContainer &&
-      this.dimensionsContainer.classList.contains("visible")
-    ) {
-      this.dimensionsContainer.classList.remove("visible");
-    }
-
-    // Update submit button text
-    const continueButton = document.querySelector(".control-button.primary");
-    if (continueButton) {
-      continueButton.querySelector("span").textContent = "Adjust Edges";
-    }
+    appState.currentWorkflowStep = WORKFLOW_STEPS.PROCESSING;
+    this.updateControlButtons(WORKFLOW_STEPS.PROCESSING);
   }
 
   switchToStep4() {
-    /**
-     * Update to step 4, enable edge detection controls
-     */
-    appState.currentWorkflowStep = 4;
+    appState.currentWorkflowStep = WORKFLOW_STEPS.COMPLETE;
+    this.updateControlButtons(WORKFLOW_STEPS.COMPLETE);
+  }
 
-    // Update instructions
-    renderer.updateInstruction(
-      "Adjust edge detection parameters to improve contour finding",
-    );
+  updateControlButtons(step) {
+    const controls = document.querySelector('.controls');
+    const controlButtons = document.querySelectorAll('.control-button');
+    const continueButton = document.querySelector('.control-button.primary');
 
-    // Show edge detection controls
-    edgeControls.show();
+    // Hide all buttons first
+    controlButtons.forEach(button => {
+      button.classList.remove('flex');
+      if (button.querySelector('span')?.textContent === BUTTON_TEXT.REUPLOAD) {
+        button.style.display = step === WORKFLOW_STEPS.UPLOAD ? '' : 'none';
+      }
+    });
 
-    // Update submit button text
-    const continueButton = document.querySelector(".control-button.primary");
+    // Add back button for steps after upload
+    if (step > WORKFLOW_STEPS.UPLOAD) {
+      const backButton = document.createElement('button');
+      backButton.className = 'control-button flex';
+      backButton.innerHTML = `<span>${BUTTON_TEXT.BACK}</span>`;
+      backButton.addEventListener('click', () => this.switchToStep1());
+      controls.insertBefore(backButton, controls.firstChild);
+    }
+
+    // Update continue button
     if (continueButton) {
-      continueButton.querySelector("span").textContent = "Export";
+      continueButton.querySelector('span').textContent = 
+        step === WORKFLOW_STEPS.FRAME_SELECTION ? BUTTON_TEXT.SUBMIT : BUTTON_TEXT.CONTINUE;
+      continueButton.classList.add('flex');
     }
   }
 }
 
-// Create and export a single instance
+// Export a singleton instance
 export const controls = new Controls();

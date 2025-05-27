@@ -11,7 +11,6 @@ export class EdgeDetectionControls {
     this.blurSlider = document.getElementById("blur-slider");
     this.edgeThresholdSlider = document.getElementById("edge-threshold-slider");
     this.morphSlider = document.getElementById("morph-slider");
-    this.applyButton = document.getElementById("apply-edge-settings");
 
     // Default values
     this.blurSize = 5;
@@ -32,37 +31,35 @@ export class EdgeDetectionControls {
     this.setupSliderValueDisplay(this.edgeThresholdSlider);
     this.setupSliderValueDisplay(this.morphSlider);
 
-    // Apply button listener
-    if (this.applyButton) {
-      this.applyButton.addEventListener("click", () => this.applySettings());
-    }
-
-    // Store slider values in state
-    this.blurSlider.addEventListener("change", () => {
+    // Store slider values in state and trigger API update immediately
+    this.blurSlider.addEventListener("input", () => {
       this.blurSize = parseInt(this.blurSlider.value);
       appState.updateEdgeDetectionSettings({
         blurKernelSize: this.getBlurKernelSize(),
         edgeThreshold: this.edgeThreshold,
         morphKernelSize: this.getMorphKernelSize(),
       });
+      apiService.sendToAPI();
     });
 
-    this.edgeThresholdSlider.addEventListener("change", () => {
+    this.edgeThresholdSlider.addEventListener("input", () => {
       this.edgeThreshold = parseInt(this.edgeThresholdSlider.value);
       appState.updateEdgeDetectionSettings({
         blurKernelSize: this.getBlurKernelSize(),
         edgeThreshold: this.edgeThreshold,
         morphKernelSize: this.getMorphKernelSize(),
       });
+      apiService.sendToAPI();
     });
 
-    this.morphSlider.addEventListener("change", () => {
+    this.morphSlider.addEventListener("input", () => {
       this.morphSize = parseInt(this.morphSlider.value);
       appState.updateEdgeDetectionSettings({
         blurKernelSize: this.getBlurKernelSize(),
         edgeThreshold: this.edgeThreshold,
         morphKernelSize: this.getMorphKernelSize(),
       });
+      apiService.sendToAPI();
     });
   }
 
@@ -102,13 +99,6 @@ export class EdgeDetectionControls {
     // Ensure odd numbers for kernel size
     const size = this.morphSize % 2 === 0 ? this.morphSize + 1 : this.morphSize;
     return [size, size];
-  }
-
-  /**
-   * Apply current settings and send to API
-   */
-  applySettings() {
-    apiService.sendToAPI();
   }
 
   /**
