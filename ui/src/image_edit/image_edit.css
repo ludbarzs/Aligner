@@ -80,5 +80,16 @@
 
 .control-button {
   display: flex;
+  align-items: center;
   margin: 0 5px; /* Add some spacing between buttons */
+}
+
+/* Add styles for button groups */
+.edit-buttons-group {
+  display: flex;
+  gap: 10px; /* Space between buttons in the group */
+}
+
+.continue-button-group {
+  margin-left: auto; /* Push to the right */
 }

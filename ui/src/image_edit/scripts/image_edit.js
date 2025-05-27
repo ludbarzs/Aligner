@@ -5,9 +5,17 @@ const imageElement = document.getElementById("edit-image");
 const editContainer = document.querySelector(".edit-container");
 const noImageMessage = document.querySelector(".no-image-message");
 const buttons = document.querySelectorAll(".control-button");
-let rotateButton, mirrorButton;
+let rotateButton, mirrorButton, reuploadButton;
 
-// Find the rotate and mirror buttons by their text content
+// Create hidden file input for reupload
+const fileInput = document.createElement('input');
+fileInput.type = 'file';
+fileInput.accept = '.jpg,.jpeg,.png';
+fileInput.style.display = 'none';
+fileInput.id = 'reupload-input';
+document.body.appendChild(fileInput);
+
+// Find the rotate, mirror, and reupload buttons by their text content
 buttons.forEach((button) => {
   const span = button.querySelector("span");
   if (span) {
@@ -15,9 +23,34 @@ buttons.forEach((button) => {
       rotateButton = button;
     } else if (span.textContent === "Mirror") {
       mirrorButton = button;
+    } else if (span.textContent === "Reupload") {
+      reuploadButton = button;
     }
   }
 });
+
+// Handle file reupload
+function handleReupload(file) {
+  if (!file.type.startsWith('image/')) {
+    alert('Please upload an image file');
+    return;
+  }
+
+  const reader = new FileReader();
+  
+  reader.onload = function(e) {
+    // Save new image to app state
+    AppState.setCurrentImage(e.target.result);
+    // Refresh the page to reset the UI
+    window.location.reload();
+  };
+  
+  reader.onerror = function() {
+    alert('Error reading file');
+  };
+  
+  reader.readAsDataURL(file);
+}
 
 // Function to load image from AppState
 function loadImageFromState() {
@@ -169,6 +202,19 @@ if (rotateButton) {
 if (mirrorButton) {
   mirrorButton.addEventListener("click", mirrorImage);
 }
+if (reuploadButton) {
+  reuploadButton.addEventListener("click", () => {
+    fileInput.click();
+  });
+}
+
+// Handle file selection
+fileInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    handleReupload(file);
+  }
+});
 
 // Add resize listener to handle responsive updates
 window.addEventListener('resize', () => {
