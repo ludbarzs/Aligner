@@ -137,7 +137,7 @@ document.querySelector('.control-button:not(.primary):not(.guest)').addEventList
 
 // Guest button handler
 document.querySelector('.control-button.guest').addEventListener('click', () => {
-    window.location.href = 'processing.html';
+    window.location.href = '../processing.html';
 });
 
 // Backend integration function (to be implemented)

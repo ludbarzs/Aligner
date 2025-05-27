@@ -1,9 +1,9 @@
 <!doctype html>
 <html>
   <head>
-    <title>Aligner - Register</title>
-    <link rel="stylesheet" href="styles/styles.css" />
-    <link rel="stylesheet" href="styles/showMessage.css" />
+    <title>Aligner - Login</title>
+    <link rel="stylesheet" href="../styles/styles.css" />
+    <link rel="stylesheet" href="../styles/showMessage.css" />
   </head>
   <body>
     <div class="progress-container">
@@ -14,30 +14,24 @@
         <div class="login-container">
           <img
             id="cloud-icon"
-            src="assets/cloud_icon.svg"
+            src="../assets/cloud_icon.svg"
             alt="Icon"
             width="100"
             height="100"
           />
-          <h2>Create Account</h2>
+          <h2>Welcome to Aligner</h2>
           <form class="login-form">
-            <div class="form-group">
-              <input type="text" id="username" placeholder="Username" required />
-            </div>
             <div class="form-group">
               <input type="email" id="email" placeholder="Email" required />
             </div>
             <div class="form-group">
               <input type="password" id="password" placeholder="Password" required />
             </div>
-            <div class="form-group">
-              <input type="password" id="confirm-password" placeholder="Confirm Password" required />
-            </div>
             <button type="submit" class="control-button primary">
-              <span>Register</span>
+              <span>Log In</span>
             </button>
             <button type="button" class="control-button">
-              <span>Back to Login</span>
+              <span>Register</span>
             </button>
             <button type="button" class="control-button guest">
               <span>Continue as Guest</span>
@@ -46,6 +40,6 @@
         </div>
       </div>
     </div>
-    <script type="module" src="scripts/register.js"></script>
+    <script type="module" src="./js/login.js"></script>
   </body>
 </html> 

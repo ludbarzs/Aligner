@@ -92,7 +92,6 @@ loginForm.addEventListener("submit", async (e) => {
 document
   .querySelector(".control-button:not(.primary):not(.guest)")
   .addEventListener("click", () => {
-    // This will be implemented when backend is ready
     window.location.href = "register.html";
   });
 
@@ -100,7 +99,7 @@ document
 document
   .querySelector(".control-button.guest")
   .addEventListener("click", () => {
-    window.location.href = "processing.html";
+    window.location.href = "../processing.html";
   });
 
 // Backend integration function (to be implemented)
@@ -125,4 +124,4 @@ async function handleLogin(email, password) {
     localStorage.setItem('token', data.token);
     window.location.href = '/dashboard';
     */
-}
+} 
