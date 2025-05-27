@@ -1,155 +1,28 @@
-:root {
-  --neon-color: #8a43fc;
-  --dark-bg: #121212;
-  --card-bg: #1e1e1e;
-  --text-color: #f5f5f5;
-  --accent-color: #2a2a2a;
-}
-
-/* Progress bar */
-.progress-container {
-  width: 100%;
-  height: 6px;
-  background-color: rgba(0, 0, 0, 0.3);
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 10;
-}
-
-.progress-bar {
-  height: 100%;
-  width: 0; /* Start at 0% width */
-  background-color: var(--neon-color);
-  box-shadow: 0 0 50px var(--neon-color);
-  transition: width 0.5s ease;
-  border-top-right-radius: 3px;
-  border-bottom-right-radius: 3px;
-}
-
-/* Main container */
-.container {
-  overflow: hidden;
-  height: 100dvh;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  position: relative;
-  background-color: #08010d;
-  background-image: url("../assets/background.jpg");
-  background-size: cover;
-  background-position: center;
-}
-
-.container::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  z-index: 0;
-}
-
-.main-content {
-  display: flex;
-  gap: 30px;
-  align-items: flex-start;
-  justify-content: center;
-  align-items: center;
-  z-index: 1;
-}
-
-.box {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: min(95vw, 1310px);
-  height: min(90vh, 750px);
-  margin: 20px;
-  padding: 20px;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.01);
-  backdrop-filter: blur(14px);
-  border-radius: 10px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
-  position: relative;
-  z-index: 1;
-}
-
-/* Controls */
-.controls-container {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  margin-top: 30px;
-  height: 45px;
-  position: relative;
-}
-
-.control-button {
-  cursor: pointer;
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  border-radius: 25px;
-  font-size: 14px;
-  color: white;
-  padding: 8px 20px;
-  height: 45px;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  z-index: 100;
-  display: flex;
-}
-
-.control-button.flex {
-  display: flex;
-}
-
-.control-button.primary {
-  background-color: var(--neon-color);
-  order: 3;
-}
-
-.control-button:hover {
-  background: var(--neon-color);
-  transform: scale(1.05);
-}
-
+/* Edit page specific styles */
 .control-icon {
   width: 20px;
   height: 20px;
   fill: white;
 }
 
-.control-button span {
-  margin-left: 5px;
+/* Main content layout */
+.box {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* This ensures space between image and controls */
+  min-height: 0; /* Allows content to shrink */
 }
 
-/* Base styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  color: white;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
-    Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  outline: none;
-}
-
-/* Edit page specific styles */
 .edit-container {
   width: 100%;
-  height: 100%;
+  height: calc(100% - 70px); /* Subtract space for controls */
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
+  position: relative;
+  flex: 1;
+  min-height: 0; /* Allows container to shrink */
 }
 
 .image-wrapper {
@@ -159,13 +32,32 @@
   justify-content: center;
   align-items: center;
   position: relative;
+  padding: 20px;
 }
 
 #edit-image {
   max-width: 90%;
-  max-height: 90%;
+  max-height: calc(90vh - 90px);
+  width: auto;
+  height: auto;
   object-fit: contain;
   transition: transform 0.3s ease;
+  will-change: transform;
+  position: relative;
+  transform-origin: center center;
+  transform-style: preserve-3d;
+}
+
+/* Controls container */
+.controls-container {
+  width: 100%;
+  min-height: 60px; /* Fixed height for controls */
+  padding: 10px 20px;
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0; /* Prevent controls from shrinking */
 }
 
 .no-image-message {
@@ -179,4 +71,14 @@
 .no-image-message p {
   font-size: 18px;
   color: var(--text-color);
+}
+
+/* Overrides of styles.css */
+.container::before {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.control-button {
+  display: flex;
+  margin: 0 5px; /* Add some spacing between buttons */
 }
