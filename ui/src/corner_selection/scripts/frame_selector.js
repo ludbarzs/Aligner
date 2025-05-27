@@ -1,0 +1,197 @@
+import { AppState } from "../../scripts/app_state.js";
+
+export class FrameSelector {
+  constructor(imageElement) {
+    this.imageElement = imageElement;
+    this.container = null;
+    this.corners = [];
+    this.lines = [];
+    this.activeDragCorner = null;
+    this.init();
+  }
+
+  init() {
+    // Create container
+    this.container = document.createElement("div");
+    this.container.className = "frame-selector";
+
+    // Position container over the image
+    const rect = this.imageElement.getBoundingClientRect();
+    this.container.style.width = `${rect.width}px`;
+    this.container.style.height = `${rect.height}px`;
+    this.container.style.position = "absolute";
+    this.container.style.top = "0";
+    this.container.style.left = "0";
+
+    // Add container to the image's parent
+    this.imageElement.parentElement.appendChild(this.container);
+
+    // Create corners and lines
+    this.createCorners();
+    this.createLines();
+    this.initializeCornerPositions();
+
+    // Update on window resize
+    window.addEventListener("resize", () => {
+      const oldRect = this.container.getBoundingClientRect();
+      const newRect = this.imageElement.getBoundingClientRect();
+      
+      // Calculate scale factors for the resize
+      const scaleX = newRect.width / oldRect.width;
+      const scaleY = newRect.height / oldRect.height;
+      
+      // Update container dimensions
+      this.container.style.width = `${newRect.width}px`;
+      this.container.style.height = `${newRect.height}px`;
+      
+      // Scale corner positions proportionally
+      this.corners.forEach(corner => {
+        const oldX = parseFloat(corner.style.left);
+        const oldY = parseFloat(corner.style.top);
+        
+        corner.style.left = `${oldX * scaleX}px`;
+        corner.style.top = `${oldY * scaleY}px`;
+      });
+      
+      this.updateLines();
+      this.updateAppState();
+    });
+  }
+
+  createCorners() {
+    for (let i = 0; i < 4; i++) {
+      const corner = document.createElement("div");
+      corner.className = "frame-corner";
+      corner.dataset.index = i;
+      
+      // Set initial position to prevent NaN values
+      corner.style.left = "0px";
+      corner.style.top = "0px";
+      
+      corner.addEventListener("mousedown", (e) => this.startDragging(e, corner));
+      this.corners.push(corner);
+      this.container.appendChild(corner);
+    }
+
+    document.addEventListener("mousemove", this.handleDrag.bind(this));
+    document.addEventListener("mouseup", this.stopDragging.bind(this));
+  }
+
+  createLines() {
+    for (let i = 0; i < 4; i++) {
+      const line = document.createElement("div");
+      line.className = "frame-line";
+      line.style.height = "2px"; // Set a default line thickness
+      this.lines.push(line);
+      this.container.appendChild(line);
+    }
+  }
+
+  initializeCornerPositions() {
+    const rect = this.container.getBoundingClientRect();
+    const padding = Math.min(rect.width, rect.height) * 0.15;
+
+    const positions = [
+      { x: padding, y: padding }, // Top-left
+      { x: rect.width - padding, y: padding }, // Top-right
+      { x: rect.width - padding, y: rect.height - padding }, // Bottom-right
+      { x: padding, y: rect.height - padding }, // Bottom-left
+    ];
+
+    positions.forEach((pos, i) => {
+      const corner = this.corners[i];
+      corner.style.left = `${pos.x}px`;
+      corner.style.top = `${pos.y}px`;
+    });
+
+    this.updateLines();
+    this.updateAppState();
+  }
+
+  startDragging(e, corner) {
+    e.preventDefault();
+    this.activeDragCorner = corner;
+    corner.classList.add("dragging");
+  }
+
+  handleDrag(e) {
+    if (!this.activeDragCorner) return;
+
+    const rect = this.container.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Clamp to container bounds
+    const clampedX = Math.max(0, Math.min(rect.width, x));
+    const clampedY = Math.max(0, Math.min(rect.height, y));
+
+    this.activeDragCorner.style.left = `${clampedX}px`;
+    this.activeDragCorner.style.top = `${clampedY}px`;
+
+    this.updateLines();
+    this.updateAppState();
+  }
+
+  stopDragging() {
+    if (!this.activeDragCorner) return;
+    this.activeDragCorner.classList.remove("dragging");
+    this.activeDragCorner = null;
+  }
+
+  updateLines() {
+    this.corners.forEach((corner, i) => {
+      const nextCorner = this.corners[(i + 1) % 4];
+      const line = this.lines[i];
+
+      const x1 = parseFloat(corner.style.left);
+      const y1 = parseFloat(corner.style.top);
+      const x2 = parseFloat(nextCorner.style.left);
+      const y2 = parseFloat(nextCorner.style.top);
+
+      const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+      const angle = Math.atan2(y2 - y1, x2 - x1);
+
+      line.style.width = `${length}px`;
+      line.style.left = `${x1}px`;
+      line.style.top = `${y1}px`;
+      line.style.transform = `rotate(${angle}rad)`;
+      line.style.transformOrigin = "left center";
+    });
+  }
+
+  updateAppState() {
+    const scaleX = this.imageElement.naturalWidth / this.container.offsetWidth;
+    const scaleY = this.imageElement.naturalHeight / this.container.offsetHeight;
+
+    const imageCoordinates = this.corners.map((corner) => ({
+      x: parseFloat(corner.style.left) * scaleX,
+      y: parseFloat(corner.style.top) * scaleY,
+    }));
+
+    // Update the AppState with the new coordinates
+    AppState.setCornerCoordinates(imageCoordinates);
+  }
+
+  setCornerPositions(coordinates) {
+    if (!coordinates || coordinates.length !== 4) return;
+    
+    const scaleX = this.container.offsetWidth / this.imageElement.naturalWidth;
+    const scaleY = this.container.offsetHeight / this.imageElement.naturalHeight;
+
+    coordinates.forEach((coord, i) => {
+      const corner = this.corners[i];
+      corner.style.left = `${coord.x * scaleX}px`;
+      corner.style.top = `${coord.y * scaleY}px`;
+    });
+
+    this.updateLines();
+  }
+
+  show() {
+    this.container.style.display = "block";
+  }
+
+  hide() {
+    this.container.style.display = "none";
+  }
+}

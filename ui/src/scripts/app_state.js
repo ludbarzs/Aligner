@@ -5,6 +5,7 @@ export const AppState = {
   currentImage: null,
   currentRotation: 0,
   isMirrored: false,
+  cornerCoordinates: [],
   
   setCurrentImage(imageData) {
     this.currentImage = imageData;
@@ -36,7 +37,30 @@ export const AppState = {
     this.resetTransformations();
   },
 
-  // New methods for handling transformations
+  // Corner coordinates methods
+  setCornerCoordinates(coordinates) {
+    this.cornerCoordinates = coordinates;
+    localStorage.setItem('cornerCoordinates', JSON.stringify(coordinates));
+  },
+
+  getCornerCoordinates() {
+    if (this.cornerCoordinates.length > 0) {
+      return this.cornerCoordinates;
+    }
+    // Try to restore from localStorage
+    const savedCoordinates = localStorage.getItem('cornerCoordinates');
+    if (savedCoordinates) {
+      this.cornerCoordinates = JSON.parse(savedCoordinates);
+    }
+    return this.cornerCoordinates;
+  },
+
+  clearCornerCoordinates() {
+    this.cornerCoordinates = [];
+    localStorage.removeItem('cornerCoordinates');
+  },
+
+  // Transformation methods
   setRotation(degrees) {
     this.currentRotation = degrees;
     localStorage.setItem('currentRotation', degrees.toString());
@@ -57,6 +81,7 @@ export const AppState = {
   resetTransformations() {
     this.currentRotation = 0;
     this.isMirrored = false;
+    this.clearCornerCoordinates();
     localStorage.removeItem('currentRotation');
     localStorage.removeItem('isMirrored');
   },
@@ -72,6 +97,12 @@ export const AppState = {
     const savedMirror = localStorage.getItem('isMirrored');
     if (savedMirror !== null) {
       this.isMirrored = savedMirror === 'true';
+    }
+
+    // Restore corner coordinates
+    const savedCoordinates = localStorage.getItem('cornerCoordinates');
+    if (savedCoordinates !== null) {
+      this.cornerCoordinates = JSON.parse(savedCoordinates);
     }
   }
 };

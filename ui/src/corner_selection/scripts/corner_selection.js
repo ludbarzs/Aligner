@@ -1,56 +1,11 @@
 import { AppState } from "../../scripts/app_state.js";
+import { FrameSelector } from "./frame_selector.js";
 
 // Get DOM elements
-const imageElement = document.getElementById("edit-image");
-const editContainer = document.querySelector(".edit-container");
+const imageElement = document.getElementById("corner-image");
+const imageContainer = document.querySelector(".image-container");
 const noImageMessage = document.querySelector(".no-image-message");
-const buttons = document.querySelectorAll(".control-button");
-let rotateButton, mirrorButton, reuploadButton;
-
-// Create hidden file input for reupload
-const fileInput = document.createElement('input');
-fileInput.type = 'file';
-fileInput.accept = '.jpg,.jpeg,.png';
-fileInput.style.display = 'none';
-fileInput.id = 'reupload-input';
-document.body.appendChild(fileInput);
-
-// Find the rotate, mirror, and reupload buttons by their text content
-buttons.forEach((button) => {
-  const span = button.querySelector("span");
-  if (span) {
-    if (span.textContent === "Rotate") {
-      rotateButton = button;
-    } else if (span.textContent === "Mirror") {
-      mirrorButton = button;
-    } else if (span.textContent === "Reupload") {
-      reuploadButton = button;
-    }
-  }
-});
-
-// Handle file reupload
-function handleReupload(file) {
-  if (!file.type.startsWith('image/')) {
-    alert('Please upload an image file');
-    return;
-  }
-
-  const reader = new FileReader();
-  
-  reader.onload = function(e) {
-    // Save new image to app state
-    AppState.setCurrentImage(e.target.result);
-    // Refresh the page to reset the UI
-    window.location.reload();
-  };
-  
-  reader.onerror = function() {
-    alert('Error reading file');
-  };
-  
-  reader.readAsDataURL(file);
-}
+let frameSelector = null;
 
 // Function to load image from AppState
 function loadImageFromState() {
@@ -66,11 +21,6 @@ function loadImageFromState() {
         noImageMessage.style.display = "none";
       }
 
-      // Enable edit container if it exists
-      if (editContainer) {
-        editContainer.style.display = "block";
-      }
-
       // Add error handler for image loading failures
       imageElement.onerror = () => {
         console.error("Failed to load image data");
@@ -81,6 +31,8 @@ function loadImageFromState() {
       imageElement.onload = () => {
         // Apply any saved transformations
         applyTransformations();
+        // Initialize frame selector
+        initializeFrameSelector();
       };
     } catch (error) {
       console.error("Error setting up image:", error);
@@ -100,30 +52,11 @@ function handleNoImage(message) {
   if (imageElement) {
     imageElement.style.display = "none";
   }
-  if (editContainer) {
-    editContainer.style.display = "none";
-  }
 
   // Redirect back to upload page after a short delay
   setTimeout(() => {
     window.location.href = "../image_upload/image_upload.html";
   }, 2000);
-}
-
-// Function to rotate the image
-function rotateImage() {
-  const currentRotation = AppState.getTransformations().rotation;
-  // Add 90 degrees and normalize to 0-360
-  const newRotation = (currentRotation + 90) % 360;
-  AppState.setRotation(newRotation);
-  applyTransformations();
-}
-
-// Function to mirror the image
-function mirrorImage() {
-  const currentMirror = AppState.getTransformations().mirrored;
-  AppState.setMirrored(!currentMirror);
-  applyTransformations();
 }
 
 // Function to apply all transformations
@@ -134,8 +67,8 @@ function applyTransformations() {
   const isSwapped = rotation % 180 !== 0;
   
   // Get container dimensions with some padding
-  const containerWidth = editContainer.clientWidth * 0.9; // 90% of container width
-  const containerHeight = editContainer.clientHeight * 0.9; // 90% of container height
+  const containerWidth = imageContainer.clientWidth * 0.9; // 90% of container width
+  const containerHeight = imageContainer.clientHeight * 0.9; // 90% of container height
   
   // Reset any existing transforms and dimensions to get natural size
   imageElement.style.transform = 'translate(-50%, -50%)';
@@ -186,34 +119,23 @@ function applyTransformations() {
   }
 }
 
+// Function to initialize frame selector
+function initializeFrameSelector() {
+  if (frameSelector) {
+    frameSelector.hide();
+  }
+  frameSelector = new FrameSelector(imageElement);
+  
+  // Restore corner coordinates if they exist
+  const savedCoordinates = AppState.getCornerCoordinates();
+  if (savedCoordinates && savedCoordinates.length === 4) {
+    frameSelector.setCornerPositions(savedCoordinates);
+  }
+}
+
 // Event Listeners
 document.addEventListener("DOMContentLoaded", () => {
   loadImageFromState();
-
-  // Make buttons visible
-  buttons.forEach((button) => {
-    button.style.display = "flex";
-  });
-});
-
-if (rotateButton) {
-  rotateButton.addEventListener("click", rotateImage);
-}
-if (mirrorButton) {
-  mirrorButton.addEventListener("click", mirrorImage);
-}
-if (reuploadButton) {
-  reuploadButton.addEventListener("click", () => {
-    fileInput.click();
-  });
-}
-
-// Handle file selection
-fileInput.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    handleReupload(file);
-  }
 });
 
 // Add resize listener to handle responsive updates
@@ -221,16 +143,4 @@ window.addEventListener('resize', () => {
   if (imageElement.style.display !== 'none') {
     applyTransformations();
   }
-});
-
-// Get the continue button
-const continueButton = document.querySelector('.control-button.primary');
-
-// Add click event listener to continue button
-continueButton.addEventListener('click', () => {
-    // Save any necessary state if needed
-    // AppState.setSomeState(someValue);
-    
-    // Redirect to corner selection page
-    window.location.href = '../corner_selection/corner_selection.html';
 });
