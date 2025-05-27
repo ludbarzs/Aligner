@@ -100,49 +100,57 @@ function applyTransformations() {
   // Calculate if we need to swap dimensions (for 90/270 degree rotations)
   const isSwapped = rotation % 180 !== 0;
   
-  // Get container dimensions
-  const containerWidth = editContainer.clientWidth;
-  const containerHeight = editContainer.clientHeight;
+  // Get container dimensions with some padding
+  const containerWidth = editContainer.clientWidth * 0.9; // 90% of container width
+  const containerHeight = editContainer.clientHeight * 0.9; // 90% of container height
   
-  // Reset image dimensions
+  // Reset any existing transforms and dimensions to get natural size
+  imageElement.style.transform = '';
   imageElement.style.width = 'auto';
   imageElement.style.height = 'auto';
   
   // Wait for the natural dimensions to be available
   if (imageElement.naturalWidth > 0) {
-    const imgRatio = imageElement.naturalWidth / imageElement.naturalHeight;
-    const containerRatio = isSwapped ? 
-      containerHeight / containerWidth : 
-      containerWidth / containerHeight;
+    const imgWidth = imageElement.naturalWidth;
+    const imgHeight = imageElement.naturalHeight;
     
-    if (imgRatio > containerRatio) {
-      // Image is wider relative to container
-      if (isSwapped) {
-        imageElement.style.height = '90%';
-        imageElement.style.width = 'auto';
-      } else {
-        imageElement.style.width = '90%';
-        imageElement.style.height = 'auto';
-      }
+    // Calculate scaling factors for both normal and rotated states
+    const normalScaleX = containerWidth / imgWidth;
+    const normalScaleY = containerHeight / imgHeight;
+    const rotatedScaleX = containerWidth / imgHeight;
+    const rotatedScaleY = containerHeight / imgWidth;
+    
+    // Choose the appropriate scale based on rotation
+    let scale;
+    if (isSwapped) {
+      // Use the smaller scale factor to ensure image fits in both dimensions
+      scale = Math.min(rotatedScaleX, rotatedScaleY);
     } else {
-      // Image is taller relative to container
-      if (isSwapped) {
-        imageElement.style.width = '90%';
-        imageElement.style.height = 'auto';
-      } else {
-        imageElement.style.height = '90%';
-        imageElement.style.width = 'auto';
-      }
+      scale = Math.min(normalScaleX, normalScaleY);
     }
+    
+    // Calculate final dimensions
+    const finalWidth = imgWidth * scale;
+    const finalHeight = imgHeight * scale;
+    
+    // Set the dimensions
+    imageElement.style.width = `${finalWidth}px`;
+    imageElement.style.height = `${finalHeight}px`;
+    
+    // Center the image in its container
+    imageElement.style.position = 'absolute';
+    imageElement.style.left = '50%';
+    imageElement.style.top = '50%';
+    
+    // Apply transformations with centering translation
+    const transforms = [
+      'translate(-50%, -50%)', // Center the image
+      `rotate(${rotation}deg)`,
+      mirrored ? 'scaleX(-1)' : 'scaleX(1)'
+    ];
+    
+    imageElement.style.transform = transforms.join(' ');
   }
-  
-  // Apply transformations
-  const transforms = [
-    `rotate(${rotation}deg)`,
-    mirrored ? 'scaleX(-1)' : 'scaleX(1)'
-  ];
-  
-  imageElement.style.transform = transforms.join(' ');
 }
 
 // Event Listeners
