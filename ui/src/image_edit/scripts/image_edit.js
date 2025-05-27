@@ -138,7 +138,7 @@ function applyTransformations() {
   const containerHeight = editContainer.clientHeight * 0.9; // 90% of container height
   
   // Reset any existing transforms and dimensions to get natural size
-  imageElement.style.transform = '';
+  imageElement.style.transform = 'translate(-50%, -50%)';
   imageElement.style.width = 'auto';
   imageElement.style.height = 'auto';
   
@@ -170,11 +170,6 @@ function applyTransformations() {
     imageElement.style.width = `${finalWidth}px`;
     imageElement.style.height = `${finalHeight}px`;
     
-    // Center the image in its container
-    imageElement.style.position = 'absolute';
-    imageElement.style.left = '50%';
-    imageElement.style.top = '50%';
-    
     // Apply transformations with centering translation
     const transforms = [
       'translate(-50%, -50%)', // Center the image
@@ -183,6 +178,11 @@ function applyTransformations() {
     ];
     
     imageElement.style.transform = transforms.join(' ');
+    
+    // Add the loaded class to enable transitions after initial positioning
+    requestAnimationFrame(() => {
+      imageElement.classList.add('loaded');
+    });
   }
 }
 
