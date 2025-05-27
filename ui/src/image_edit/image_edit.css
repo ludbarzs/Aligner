@@ -1,22 +1,9 @@
-/* Root variables */
 :root {
   --neon-color: #8a43fc;
   --dark-bg: #121212;
   --card-bg: #1e1e1e;
   --text-color: #f5f5f5;
   --accent-color: #2a2a2a;
-}
-
-/* Base styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  color: white;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
-    Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  outline: none;
 }
 
 /* Progress bar */
@@ -32,7 +19,7 @@
 
 .progress-bar {
   height: 100%;
-  width: 0;
+  width: 0; /* Start at 0% width */
   background-color: var(--neon-color);
   box-shadow: 0 0 50px var(--neon-color);
   transition: width 0.5s ease;
@@ -50,24 +37,21 @@
   justify-content: center;
   align-items: center;
   gap: 20px;
-  /* position: relative; */
+  position: relative;
   background-color: #08010d;
   background-image: url("../assets/background.jpg");
   background-size: cover;
   background-position: center;
 }
 
-/* TODO: Experiment with opacity to make it look more sexy!*/
-/* Opacity change of background*/
 .container::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.55);
   z-index: 0;
 }
 
-/* Main content area */
 .main-content {
   display: flex;
   gap: 30px;
@@ -119,8 +103,8 @@
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-  display: none;
   z-index: 100;
+  display: flex;
 }
 
 .control-button.flex {
@@ -137,6 +121,62 @@
   transform: scale(1.05);
 }
 
+.control-icon {
+  width: 20px;
+  height: 20px;
+  fill: white;
+}
+
 .control-button span {
   margin-left: 5px;
+}
+
+/* Base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  color: white;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+    Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  outline: none;
+}
+
+/* Edit page specific styles */
+.edit-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+#edit-image {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.no-image-message {
+  text-align: center;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+}
+
+.no-image-message p {
+  font-size: 18px;
+  color: var(--text-color);
 }

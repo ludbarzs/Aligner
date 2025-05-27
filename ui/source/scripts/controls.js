@@ -1,9 +1,9 @@
-import { appState } from './state.js';
-import { renderer } from './renderer.js';
-import { sendToAPI } from './api.js';
-import { ImageTransformController } from './controllers/ImageTransformController.js';
-import { DimensionsController } from './controllers/DimensionsController.js';
-import { WORKFLOW_STEPS, BUTTON_TEXT, UI_ELEMENTS } from './constants.js';
+import { appState } from "./state.js";
+import { renderer } from "./renderer.js";
+import { sendToAPI } from "./api.js";
+import { ImageTransformController } from "./controllers/ImageTransformController.js";
+import { DimensionsController } from "./controllers/DimensionsController.js";
+import { WORKFLOW_STEPS, BUTTON_TEXT, UI_ELEMENTS } from "./constants.js";
 
 /**
  * Manages UI controls and workflow transitions
@@ -21,28 +21,28 @@ export class Controls {
   }
 
   initControls() {
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener("DOMContentLoaded", () => {
       // Rotation button
       document
-        .querySelector('.control-button:nth-child(1)')
-        .addEventListener('click', () => this.imageTransform.rotateImage());
+        .querySelector(".control-button:nth-child(1)")
+        .addEventListener("click", () => this.imageTransform.rotateImage());
 
       // Mirror button
       document
-        .querySelector('.control-button:nth-child(2)')
-        .addEventListener('click', () => this.imageTransform.mirrorImage());
+        .querySelector(".control-button:nth-child(2)")
+        .addEventListener("click", () => this.imageTransform.mirrorImage());
 
       // Reupload button
       document
-        .querySelector('.control-button:nth-child(3)')
-        .addEventListener('click', () => {
+        .querySelector(".control-button:nth-child(3)")
+        .addEventListener("click", () => {
           document.getElementById(UI_ELEMENTS.IMAGE_UPLOAD).click();
         });
 
       // Continue/Submit button
-      const continueButton = document.querySelector('.control-button.primary');
+      const continueButton = document.querySelector(".control-button.primary");
       if (continueButton) {
-        continueButton.addEventListener('click', () => this.handleContinue());
+        continueButton.addEventListener("click", () => this.handleContinue());
       }
     });
   }
@@ -68,16 +68,18 @@ export class Controls {
     appState.currentWorkflowStep = WORKFLOW_STEPS.UPLOAD;
     appState.allowDotPlacement = false;
     appState.resetCoordinates();
-    
+
     // Hide frame selector and dimensions
     renderer.hideFrameSelector();
     this.dimensions.hide();
 
     // Update UI controls
     this.updateControlButtons(WORKFLOW_STEPS.UPLOAD);
-    
+
     // Clean up instructions
-    const instructionElement = document.getElementById(UI_ELEMENTS.PLACEMENT_INSTRUCTION);
+    const instructionElement = document.getElementById(
+      UI_ELEMENTS.PLACEMENT_INSTRUCTION,
+    );
     if (instructionElement) instructionElement.remove();
 
     if (window.progressTracker) window.progressTracker.previousStep();
@@ -103,32 +105,34 @@ export class Controls {
   }
 
   updateControlButtons(step) {
-    const controls = document.querySelector('.controls');
-    const controlButtons = document.querySelectorAll('.control-button');
-    const continueButton = document.querySelector('.control-button.primary');
+    const controls = document.querySelector(".controls");
+    const controlButtons = document.querySelectorAll(".control-button");
+    const continueButton = document.querySelector(".control-button.primary");
 
     // Hide all buttons first
-    controlButtons.forEach(button => {
-      button.classList.remove('flex');
-      if (button.querySelector('span')?.textContent === BUTTON_TEXT.REUPLOAD) {
-        button.style.display = step === WORKFLOW_STEPS.UPLOAD ? '' : 'none';
+    controlButtons.forEach((button) => {
+      button.classList.remove("flex");
+      if (button.querySelector("span")?.textContent === BUTTON_TEXT.REUPLOAD) {
+        button.style.display = step === WORKFLOW_STEPS.UPLOAD ? "" : "none";
       }
     });
 
     // Add back button for steps after upload
     if (step > WORKFLOW_STEPS.UPLOAD) {
-      const backButton = document.createElement('button');
-      backButton.className = 'control-button flex';
+      const backButton = document.createElement("button");
+      backButton.className = "control-button flex";
       backButton.innerHTML = `<span>${BUTTON_TEXT.BACK}</span>`;
-      backButton.addEventListener('click', () => this.switchToStep1());
+      backButton.addEventListener("click", () => this.switchToStep1());
       controls.insertBefore(backButton, controls.firstChild);
     }
 
     // Update continue button
     if (continueButton) {
-      continueButton.querySelector('span').textContent = 
-        step === WORKFLOW_STEPS.FRAME_SELECTION ? BUTTON_TEXT.SUBMIT : BUTTON_TEXT.CONTINUE;
-      continueButton.classList.add('flex');
+      continueButton.querySelector("span").textContent =
+        step === WORKFLOW_STEPS.FRAME_SELECTION
+          ? BUTTON_TEXT.SUBMIT
+          : BUTTON_TEXT.CONTINUE;
+      continueButton.classList.add("flex");
     }
   }
 }

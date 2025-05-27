@@ -1,5 +1,5 @@
-import { appState } from '../state.js';
-import { UI_ELEMENTS, DEFAULT_VALUES } from '../constants.js';
+import { appState } from "../state.js";
+import { UI_ELEMENTS, DEFAULT_VALUES } from "../constants.js";
 
 /**
  * Handles image transformations like rotation and mirroring
@@ -12,7 +12,9 @@ export class ImageTransformController {
   rotateImage() {
     if (!this.imageElement.src || appState.currentWorkflowStep !== 1) return;
 
-    appState.currentRotation = (appState.currentRotation + DEFAULT_VALUES.ROTATION_STEP) % DEFAULT_VALUES.MAX_ROTATION;
+    appState.currentRotation =
+      (appState.currentRotation + DEFAULT_VALUES.ROTATION_STEP) %
+      DEFAULT_VALUES.MAX_ROTATION;
     this.applyTransformations();
   }
 
@@ -34,4 +36,5 @@ export class ImageTransformController {
       scale(${scale})
     `;
   }
-} 
+}
+

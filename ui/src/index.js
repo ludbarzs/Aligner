@@ -25,7 +25,7 @@ const createWindow = () => {
   });
 
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(__dirname, "processing.html"));
+  mainWindow.loadFile(path.join(__dirname, "image_upload/image_upload.html"));
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();

@@ -1,4 +1,3 @@
-/* Root variables */
 :root {
   --neon-color: #8a43fc;
   --dark-bg: #121212;
@@ -7,7 +6,6 @@
   --accent-color: #2a2a2a;
 }
 
-/* Base styles */
 * {
   margin: 0;
   padding: 0;
@@ -50,24 +48,21 @@
   justify-content: center;
   align-items: center;
   gap: 20px;
-  /* position: relative; */
+  position: relative;
   background-color: #08010d;
   background-image: url("../assets/background.jpg");
   background-size: cover;
   background-position: center;
 }
 
-/* TODO: Experiment with opacity to make it look more sexy!*/
-/* Opacity change of background*/
 .container::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.55);
   z-index: 0;
 }
 
-/* Main content area */
 .main-content {
   display: flex;
   gap: 30px;
@@ -93,6 +88,52 @@
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
   position: relative;
   z-index: 1;
+}
+
+/* Upload interface */
+#cloud-icon {
+  height: 100px;
+  width: 130px;
+  margin-bottom: 20px;
+  margin-top: 40px;
+}
+
+.upload-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-weight: 400;
+  width: 230px;
+  height: 48px;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 25px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+}
+
+#description {
+  font-size: 20px;
+  max-width: 284px;
+  text-align: center;
+  margin-bottom: 190px;
+}
+
+#supports {
+  font-size: 14px;
+  color: #888888;
+  margin-top: 13px;
+}
+
+#upload-interface {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hidden {
+  display: none;
 }
 
 /* Controls */
@@ -123,10 +164,6 @@
   z-index: 100;
 }
 
-.control-button.flex {
-  display: flex;
-}
-
 .control-button.primary {
   background-color: var(--neon-color);
   order: 3;
@@ -135,8 +172,4 @@
 .control-button:hover {
   background: var(--neon-color);
   transform: scale(1.05);
-}
-
-.control-button span {
-  margin-left: 5px;
 }
