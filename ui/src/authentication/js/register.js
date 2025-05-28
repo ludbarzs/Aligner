@@ -132,12 +132,12 @@ registerForm.addEventListener('submit', async (e) => {
 
 // Login button handler
 document.querySelector('.control-button:not(.primary):not(.guest)').addEventListener('click', () => {
-    window.location.href = 'login.html';
+    window.location.href = './login.html';
 });
 
 // Guest button handler
 document.querySelector('.control-button.guest').addEventListener('click', () => {
-    window.location.href = '../processing.html';
+    window.location.href = '../image_upload/image_upload.html';
 });
 
 // Backend integration function (to be implemented)
@@ -162,4 +162,38 @@ async function handleRegister(username, email, password) {
     localStorage.setItem('token', data.token);
     window.location.href = '/dashboard';
     */
-} 
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.querySelector('.login-form');
+    const backToLoginButton = form.querySelector('button:not([type="submit"]):not(.guest)');
+    const guestButton = form.querySelector('.guest');
+
+    // Handle back to login button
+    backToLoginButton.addEventListener('click', () => {
+        window.location.href = './login.html';
+    });
+
+    // Handle continue as guest button
+    guestButton.addEventListener('click', () => {
+        window.location.href = '../image_upload/image_upload.html';
+    });
+
+    // Handle form submission
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+
+        if (password !== confirmPassword) {
+            alert('Passwords do not match!');
+            return;
+        }
+
+        // TODO: Add actual registration logic here
+        // For now, just redirect to login page
+        window.location.href = './login.html';
+    });
+}); 

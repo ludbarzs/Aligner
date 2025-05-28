@@ -92,14 +92,14 @@ loginForm.addEventListener("submit", async (e) => {
 document
   .querySelector(".control-button:not(.primary):not(.guest)")
   .addEventListener("click", () => {
-    window.location.href = "register.html";
+    window.location.href = "./register.html";
   });
 
 // Guest button handler
 document
   .querySelector(".control-button.guest")
   .addEventListener("click", () => {
-    window.location.href = "../processing.html";
+    window.location.href = "../image_upload/image_upload.html";
   });
 
 // Backend integration function (to be implemented)
@@ -124,4 +124,31 @@ async function handleLogin(email, password) {
     localStorage.setItem('token', data.token);
     window.location.href = '/dashboard';
     */
-} 
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.querySelector('.login-form');
+    const registerButton = form.querySelector('button:not([type="submit"]):not(.guest)');
+    const guestButton = form.querySelector('.guest');
+
+    // Handle register button
+    registerButton.addEventListener('click', () => {
+        window.location.href = './register.html';
+    });
+
+    // Handle continue as guest button
+    guestButton.addEventListener('click', () => {
+        window.location.href = '../image_upload/image_upload.html';
+    });
+
+    // Handle form submission
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        // TODO: Add actual login logic here
+        // For now, just redirect to image upload page
+        window.location.href = '../image_upload/image_upload.html';
+    });
+}); 

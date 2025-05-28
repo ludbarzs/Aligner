@@ -168,7 +168,7 @@ export class FrameSelector {
       y: parseFloat(corner.style.top) * scaleY,
     }));
 
-    // Update the AppState with the new coordinates
+    // Update AppState with the new coordinates
     AppState.setCornerCoordinates(imageCoordinates);
   }
 
