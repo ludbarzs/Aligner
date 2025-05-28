@@ -17,11 +17,7 @@ export const appwriteService = {
                 password,
                 name
             );
-            
-            if (response) {
-                // Create session (login) after successful account creation
-                return await this.login(email, password);
-            }
+            return response;
         } catch (error) {
             throw new Error(error.message);
         }

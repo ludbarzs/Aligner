@@ -24,6 +24,7 @@
 .form-group {
   width: 100%;
   position: relative;
+  margin-bottom: 1rem;
 }
 
 .form-group input {
@@ -71,9 +72,6 @@ h2 {
   font-size: 0.875rem;
   margin-top: 0.25rem;
   padding-left: 1rem;
-  position: absolute;
-  bottom: -1.25rem;
-  left: 0;
   width: 100%;
   text-align: left;
   animation: fadeIn 0.2s ease-in;
@@ -92,7 +90,7 @@ h2 {
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-5px);
   }
   to {
     opacity: 1;
