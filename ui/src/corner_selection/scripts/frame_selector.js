@@ -16,12 +16,13 @@ export class FrameSelector {
     this.container.className = "frame-selector";
 
     // Position container over the image
-    const rect = this.imageElement.getBoundingClientRect();
-    this.container.style.width = `${rect.width}px`;
-    this.container.style.height = `${rect.height}px`;
+    const imageRect = this.imageElement.getBoundingClientRect();
+    this.container.style.width = `${imageRect.width}px`;
+    this.container.style.height = `${imageRect.height}px`;
     this.container.style.position = "absolute";
-    this.container.style.top = "0";
-    this.container.style.left = "0";
+    this.container.style.top = "50%";
+    this.container.style.left = "50%";
+    this.container.style.transform = "translate(-50%, -50%)";
 
     // Add container to the image's parent
     this.imageElement.parentElement.appendChild(this.container);
@@ -33,24 +34,19 @@ export class FrameSelector {
 
     // Update on window resize
     window.addEventListener("resize", () => {
-      const oldRect = this.container.getBoundingClientRect();
-      const newRect = this.imageElement.getBoundingClientRect();
-      
-      // Calculate scale factors for the resize
-      const scaleX = newRect.width / oldRect.width;
-      const scaleY = newRect.height / oldRect.height;
+      const imageRect = this.imageElement.getBoundingClientRect();
       
       // Update container dimensions
-      this.container.style.width = `${newRect.width}px`;
-      this.container.style.height = `${newRect.height}px`;
+      this.container.style.width = `${imageRect.width}px`;
+      this.container.style.height = `${imageRect.height}px`;
       
-      // Scale corner positions proportionally
+      // Recalculate corner positions
       this.corners.forEach(corner => {
-        const oldX = parseFloat(corner.style.left);
-        const oldY = parseFloat(corner.style.top);
+        const percentX = parseFloat(corner.style.left) / parseFloat(this.container.style.width);
+        const percentY = parseFloat(corner.style.top) / parseFloat(this.container.style.height);
         
-        corner.style.left = `${oldX * scaleX}px`;
-        corner.style.top = `${oldY * scaleY}px`;
+        corner.style.left = `${percentX * imageRect.width}px`;
+        corner.style.top = `${percentY * imageRect.height}px`;
       });
       
       this.updateLines();
@@ -112,12 +108,15 @@ export class FrameSelector {
     e.preventDefault();
     this.activeDragCorner = corner;
     corner.classList.add("dragging");
+    this.container.classList.add("dragging");
   }
 
   handleDrag(e) {
     if (!this.activeDragCorner) return;
 
     const rect = this.container.getBoundingClientRect();
+    
+    // Calculate position relative to the container
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
@@ -135,6 +134,7 @@ export class FrameSelector {
   stopDragging() {
     if (!this.activeDragCorner) return;
     this.activeDragCorner.classList.remove("dragging");
+    this.container.classList.remove("dragging");
     this.activeDragCorner = null;
   }
 

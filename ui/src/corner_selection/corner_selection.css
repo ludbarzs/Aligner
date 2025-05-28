@@ -57,10 +57,16 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  top: 0;
-  left: 0;
   pointer-events: all;
   z-index: 10;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  cursor: default;
+}
+
+.frame-selector.dragging {
+  cursor: crosshair;
 }
 
 .frame-corner {
@@ -70,10 +76,10 @@
   background: var(--neon-color);
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  cursor: move;
+  cursor: crosshair;
   z-index: 12;
   box-shadow: 0 0 10px var(--neon-color);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
 }
 
 .frame-corner:hover {
@@ -82,8 +88,7 @@
 }
 
 .frame-corner.dragging {
-  transform: translate(-50%, -50%) scale(1.3);
-  box-shadow: 0 0 20px var(--neon-color);
+  opacity: 0;
 }
 
 .frame-line {
