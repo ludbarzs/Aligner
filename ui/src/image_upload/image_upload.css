@@ -192,8 +192,11 @@
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-  display: none;
   z-index: 100;
+}
+
+.control-button:not(.auth-button) {
+  display: none;
 }
 
 .control-button.primary {

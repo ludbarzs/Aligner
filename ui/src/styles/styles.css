@@ -136,7 +136,6 @@
 
 .control-button.primary {
   background-color: var(--neon-color);
-  order: 3;
 }
 
 .control-button:hover {
@@ -146,4 +145,35 @@
 
 .control-button span {
   margin-left: 5px;
+}
+
+/* Auth buttons */
+.auth-buttons {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+}
+
+.auth-button {
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 25px;
+  font-size: 14px;
+  color: white;
+  padding: 8px 20px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.auth-button:hover {
+  background: var(--neon-color);
+  transform: scale(1.05);
 }

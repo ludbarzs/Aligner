@@ -1,3 +1,26 @@
+import { appwriteService } from '../services/appwrite-service.js';
+
+// Check if user is already logged in and redirect if true
+(async () => {
+    const user = await appwriteService.getCurrentUser();
+    if (user) {
+        console.log('User already logged in:', user);
+        window.location.href = '../image_upload/image_upload.html';
+    }
+})();
+
+// Check for registration success message
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('registration') === 'success') {
+    const successMessage = document.createElement('div');
+    successMessage.className = 'success-message';
+    successMessage.textContent = 'Account created successfully! Please log in.';
+    document.querySelector('.login-container').insertBefore(
+        successMessage,
+        document.querySelector('.login-form')
+    );
+}
+
 // Form elements
 const loginForm = document.querySelector(".login-form");
 const emailInput = document.getElementById("email");
@@ -49,58 +72,43 @@ const validatePassword = (password) => {
   return "";
 };
 
-// Real-time validation
-emailInput.addEventListener("input", () => {
-  const errorMessage = validateEmail(emailInput.value);
-  createErrorMessage(emailInput, errorMessage);
+document.addEventListener('DOMContentLoaded', () => {
+    // Get form elements
+    const form = document.querySelector('.login-form');
+    const registerButton = form.querySelector('button:not([type="submit"]):not(.guest)');
+    const guestButton = form.querySelector('.guest');
+
+    // Handle register button
+    registerButton.addEventListener('click', () => {
+        window.location.href = './register.html';
+    });
+
+    // Handle continue as guest button
+    guestButton.addEventListener('click', () => {
+        window.location.href = '../image_upload/image_upload.html';
+    });
+
+    // Form submission handler
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = emailInput.value;
+        const password = passwordInput.value;
+
+        // Remove any existing error messages
+        createErrorMessage(emailInput, "");
+        createErrorMessage(passwordInput, "");
+
+        try {
+            await appwriteService.login(email, password);
+            // Redirect to image upload page on success
+            window.location.href = '../image_upload/image_upload.html';
+        } catch (error) {
+            console.error("Login failed:", error);
+            createErrorMessage(emailInput, "Email or password is incorrect");
+        }
+    });
 });
-
-passwordInput.addEventListener("input", () => {
-  const errorMessage = validatePassword(passwordInput.value);
-  createErrorMessage(passwordInput, errorMessage);
-});
-
-// Form submission handler
-loginForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const email = emailInput.value;
-  const password = passwordInput.value;
-
-  // Validate both fields
-  const emailError = validateEmail(email);
-  const passwordError = validatePassword(password);
-
-  // Show error messages if any
-  createErrorMessage(emailInput, emailError);
-  createErrorMessage(passwordInput, passwordError);
-
-  // If there are no errors, prepare for backend submission
-  if (!emailError && !passwordError) {
-    try {
-      // This function will be implemented when backend is ready
-      await handleLogin(email, password);
-    } catch (error) {
-      console.error("Login failed:", error);
-      // Show generic error message
-      createErrorMessage(emailInput, "Login failed. Please try again.");
-    }
-  }
-});
-
-// Register button handler
-document
-  .querySelector(".control-button:not(.primary):not(.guest)")
-  .addEventListener("click", () => {
-    window.location.href = "./register.html";
-  });
-
-// Guest button handler
-document
-  .querySelector(".control-button.guest")
-  .addEventListener("click", () => {
-    window.location.href = "../image_upload/image_upload.html";
-  });
 
 // Backend integration function (to be implemented)
 async function handleLogin(email, password) {
@@ -124,31 +132,4 @@ async function handleLogin(email, password) {
     localStorage.setItem('token', data.token);
     window.location.href = '/dashboard';
     */
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.querySelector('.login-form');
-    const registerButton = form.querySelector('button:not([type="submit"]):not(.guest)');
-    const guestButton = form.querySelector('.guest');
-
-    // Handle register button
-    registerButton.addEventListener('click', () => {
-        window.location.href = './register.html';
-    });
-
-    // Handle continue as guest button
-    guestButton.addEventListener('click', () => {
-        window.location.href = '../image_upload/image_upload.html';
-    });
-
-    // Handle form submission
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-
-        // TODO: Add actual login logic here
-        // For now, just redirect to image upload page
-        window.location.href = '../image_upload/image_upload.html';
-    });
-}); 
+} 

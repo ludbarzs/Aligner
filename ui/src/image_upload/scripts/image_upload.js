@@ -1,5 +1,9 @@
 import { AppState } from '../../scripts/app_state.js';
 import { initializeDragAndDrop } from './drag_and_drop.js';
+import { AuthController } from '../../scripts/controllers/AuthController.js';
+
+// Initialize authentication
+const authController = new AuthController();
 
 // Get the file input element
 const fileInput = document.getElementById('image-upload');
