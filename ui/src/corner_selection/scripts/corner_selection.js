@@ -115,6 +115,8 @@ function applyTransformations() {
     // Add the loaded class to enable transitions after initial positioning
     requestAnimationFrame(() => {
       imageElement.classList.add('loaded');
+      // Reinitialize frame selector after transformations are complete
+      initializeFrameSelector();
     });
   }
 }

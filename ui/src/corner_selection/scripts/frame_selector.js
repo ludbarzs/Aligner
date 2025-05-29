@@ -16,13 +16,7 @@ export class FrameSelector {
     this.container.className = "frame-selector";
 
     // Position container over the image
-    const imageRect = this.imageElement.getBoundingClientRect();
-    this.container.style.width = `${imageRect.width}px`;
-    this.container.style.height = `${imageRect.height}px`;
-    this.container.style.position = "absolute";
-    this.container.style.top = "50%";
-    this.container.style.left = "50%";
-    this.container.style.transform = "translate(-50%, -50%)";
+    this.updateContainerPosition();
 
     // Add container to the image's parent
     this.imageElement.parentElement.appendChild(this.container);
@@ -32,26 +26,58 @@ export class FrameSelector {
     this.createLines();
     this.initializeCornerPositions();
 
-    // Update on window resize
+    // Update on window resize with debounce
+    let resizeTimeout;
     window.addEventListener("resize", () => {
-      const imageRect = this.imageElement.getBoundingClientRect();
-      
-      // Update container dimensions
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout);
+      }
+      resizeTimeout = setTimeout(() => {
+        this.updateContainerPosition();
+        this.updateCornerPositions();
+      }, 100);
+    });
+  }
+
+  updateContainerPosition() {
+    const imageRect = this.imageElement.getBoundingClientRect();
+    const { rotation } = AppState.getTransformations() || { rotation: 0 };
+    const isSwapped = rotation % 180 !== 0;
+    
+    // Update container dimensions based on rotation
+    if (isSwapped) {
+      this.container.style.width = `${imageRect.height}px`;
+      this.container.style.height = `${imageRect.width}px`;
+    } else {
       this.container.style.width = `${imageRect.width}px`;
       this.container.style.height = `${imageRect.height}px`;
+    }
+    
+    this.container.style.position = "absolute";
+    this.container.style.top = "50%";
+    this.container.style.left = "50%";
+    this.container.style.transform = this.imageElement.style.transform;
+  }
+
+  updateCornerPositions() {
+    const imageRect = this.imageElement.getBoundingClientRect();
+    const containerRect = this.container.getBoundingClientRect();
+
+    this.corners.forEach(corner => {
+      const left = parseFloat(corner.style.left) || 0;
+      const top = parseFloat(corner.style.top) || 0;
       
-      // Recalculate corner positions
-      this.corners.forEach(corner => {
-        const percentX = parseFloat(corner.style.left) / parseFloat(this.container.style.width);
-        const percentY = parseFloat(corner.style.top) / parseFloat(this.container.style.height);
-        
-        corner.style.left = `${percentX * imageRect.width}px`;
-        corner.style.top = `${percentY * imageRect.height}px`;
-      });
+      // Convert current positions to percentages
+      const percentX = left / parseFloat(this.container.style.width);
+      const percentY = top / parseFloat(this.container.style.height);
       
-      this.updateLines();
-      this.updateAppState();
+      // Apply new positions
+      corner.style.left = `${percentX * containerRect.width}px`;
+      corner.style.top = `${percentY * containerRect.height}px`;
     });
+    
+    this.updateLines();
+    this.updateAppState();
   }
 
   createCorners() {
