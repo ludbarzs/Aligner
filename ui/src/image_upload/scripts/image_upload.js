@@ -1,21 +1,16 @@
 import { AppState } from "../../scripts/app_state.js";
 import { initializeDragAndDrop } from "./drag_and_drop.js";
+import { authController } from "../../scripts/controllers/AuthController.js";
 
 // Get the file input element
 const fileInput = document.getElementById("image-upload");
 const uploadButton = document.querySelector(".upload-button");
 const container = document.querySelector(".container");
 
-// Initialize auth buttons
-const loginButton = document.querySelector(".login-button");
-const signupButton = document.querySelector(".signup-button");
-
-loginButton.addEventListener("click", () => {
-  window.location.href = "../authentication/login.html";
-});
-
-signupButton.addEventListener("click", () => {
-  window.location.href = "../authentication/register.html";
+// Initialize AuthController
+document.addEventListener("DOMContentLoaded", async () => {
+  // Initialize auth controller
+  await authController.init();
 });
 
 // Handle file selection
