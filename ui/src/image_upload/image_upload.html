@@ -4,16 +4,49 @@
     <title>Aligner</title>
     <link rel="stylesheet" href="../styles/styles.css" />
     <link rel="stylesheet" href="image_upload.css" />
-    <script defer type="module" src="scripts/image_upload.js"></script>
+    <script type="module" src="scripts/image_upload.js"></script>
+    <style>
+      .auth-buttons {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        display: flex;
+        gap: 10px;
+      }
+      
+      .auth-button {
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s;
+      }
+      
+      .login-button {
+        background-color: transparent;
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+      }
+      
+      .signup-button {
+        background-color: var(--primary-color);
+        border: none;
+        color: white;
+      }
+      
+      .auth-button:hover {
+        opacity: 0.9;
+      }
+    </style>
   </head>
   <body>
+    <div class="auth-buttons">
+      <button class="auth-button login-button">Login</button>
+      <button class="auth-button signup-button">Sign Up</button>
+    </div>
+    
     <div class="progress-container">
       <div class="progress-bar"></div>
-    </div>
-
-    <div class="auth-buttons">
-      <a href="../authentication/login.html" class="auth-button">Login</a>
-      <a href="../authentication/register.html" class="auth-button">Register</a>
     </div>
 
     <div class="container">
