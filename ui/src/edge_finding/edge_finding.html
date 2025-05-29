@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Aligner</title>
+    <link rel="stylesheet" href="../styles/styles.css" />
+    <link rel="stylesheet" href="edge_finding.css" />
+  </head>
+  <body>
+    <div class="progress-container">
+      <div class="progress-bar"></div>
+    </div>
+
+    <div class="container">
+      <div class="main-content">
+        <div class="box">
+          <!-- Add message for when no image is loaded -->
+          <div class="no-image-message" style="display: none;">
+            <p>No image found. Redirecting to upload page...</p>
+          </div>
+          
+          <!-- Add image container -->
+          <div class="image-container">
+            <img id="edge-image" style="display: none;" />
+          </div>
+        </div>
+      </div>
+
+      <div class="controls-container">
+        <button class="control-button" onclick="window.location.href='../corner_selection/corner_selection.html'">
+          <span>Back</span>
+        </button>
+        
+        <!-- Edge detection settings -->
+        <div id="edge-settings" class="edge-settings-container">
+          <div class="settings-inputs">
+            <div class="setting-input-group">
+              <span class="setting-label">Blur</span>
+              <input
+                type="range"
+                id="blur-setting"
+                min="1"
+                max="21"
+                step="2"
+                value="5"
+              />
+            </div>
+            <div class="setting-input-group">
+              <span class="setting-label">Edge Low</span>
+              <input
+                type="range"
+                id="edge-low"
+                min="0"
+                max="255"
+                value="30"
+              />
+            </div>
+            <div class="setting-input-group">
+              <span class="setting-label">Edge High</span>
+              <input
+                type="range"
+                id="edge-high"
+                min="0"
+                max="255"
+                value="130"
+              />
+            </div>
+          </div>
+        </div>
+
+        <button class="control-button primary">
+          <span>Export</span>
+        </button>
+      </div>
+    </div>
+    <script type="module" src="scripts/edge_finding.js"></script>
+  </body>
+</html> 

@@ -1,10 +1,12 @@
 import { AppState } from "../../scripts/app_state.js";
 import { FrameSelector } from "./frame_selector.js";
+import { ApiService } from "../../scripts/api.js";
 
 // Get DOM elements
 const imageElement = document.getElementById("corner-image");
 const imageContainer = document.querySelector(".image-container");
 const noImageMessage = document.querySelector(".no-image-message");
+const continueButton = document.querySelector(".control-button.primary");
 let frameSelector = null;
 
 // Function to load image from AppState
@@ -143,4 +145,17 @@ window.addEventListener('resize', () => {
   if (imageElement.style.display !== 'none') {
     applyTransformations();
   }
+});
+
+// Add continue button click handler
+continueButton.addEventListener('click', async () => {
+  // Get drawer dimensions
+  const drawerWidth = document.getElementById('drawer-width').value;
+  const drawerHeight = document.getElementById('drawer-height').value;
+  
+  // Store drawer dimensions in AppState (you'll need to add these properties to AppState)
+  AppState.setDrawerDimensions(drawerWidth, drawerHeight);
+  
+  // Send to API for processing
+  await ApiService.sendToAPI();
 });

@@ -1,0 +1,101 @@
+/* Edge settings styling */
+.edge-settings-container {
+  order: 2;
+}
+
+.settings-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.setting-input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 0 15px;
+  height: 45px;
+  width: 300px;
+}
+
+.setting-input-group .setting-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 16px;
+  min-width: 80px;
+}
+
+.setting-input-group input[type="range"] {
+  flex: 1;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.setting-input-group input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--neon-color);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 10px var(--neon-color);
+}
+
+.setting-input-group input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 15px var(--neon-color);
+}
+
+.setting-input-group:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.02);
+}
+
+/* Image container styles */
+.image-container {
+  width: 100%;
+  height: calc(100% - 70px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+#edge-image {
+  max-width: 90%;
+  max-height: calc(90vh - 90px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#edge-image.loaded {
+  opacity: 1;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* No image message styles */
+.no-image-message {
+  text-align: center;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+  color: var(--text-color);
+  font-size: 18px;
+} 
