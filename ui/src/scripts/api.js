@@ -12,10 +12,15 @@ export const ApiService = {
    * @returns {boolean} True if valid, false otherwise
    */
   validateRequest() {
-    const coordinates = AppState.getCornerCoordinates();
-    if (!coordinates || coordinates.length !== 4) {
-      this.showError("Please place 4 dots on the image");
-      return false;
+    // Skip corner coordinate validation if we're in edge finding view
+    const isEdgeFinding = window.location.href.includes('edge_finding');
+    
+    if (!isEdgeFinding) {
+      const coordinates = AppState.getCornerCoordinates();
+      if (!coordinates || coordinates.length !== 4) {
+        this.showError("Please place 4 dots on the image");
+        return false;
+      }
     }
     return true;
   },
@@ -55,25 +60,54 @@ export const ApiService = {
       this.updateProcessingUI(true);
       
       const { width: drawerWidth, height: drawerHeight } = AppState.getDrawerDimensions();
+      const isEdgeFinding = window.location.href.includes('edge_finding');
       
+      // Get the appropriate image data based on the current mode
+      let imageData;
+      if (isEdgeFinding) {
+        // In edge finding mode, use the processed image
+        imageData = AppState.getCurrentImage();
+        if (!imageData) {
+          throw new Error("No processed image available");
+        }
+      } else {
+        // In initial upload mode, use the uploaded image
+        imageData = AppState.getCurrentImage();
+        if (!imageData) {
+          throw new Error("No image uploaded");
+        }
+      }
+      
+      // Prepare request body
+      const requestBody = {
+        imageData: imageData,
+        transformations: {
+          rotation: AppState.currentRotation,
+          mirrored: AppState.isMirrored
+        },
+        realWidthMm: drawerWidth,
+        realHeightMm: drawerHeight,
+        edgeDetectionSettings: AppState.getEdgeDetectionSettings()
+      };
+
+      // Only include coordinates if not in edge finding mode
+      if (!isEdgeFinding) {
+        requestBody.coordinates = AppState.getCornerCoordinates();
+      }
+
+      // Log the request body for debugging (excluding image data)
+      const debugBody = { ...requestBody, imageData: 'data:image/...[truncated]' };
+      console.log('Sending request with:', debugBody);
+
       const response = await fetch(`${API_BASE_URL}/process-image`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          imageData: AppState.getCurrentImage(),
-          coordinates: AppState.getCornerCoordinates(),
-          transformations: {
-            rotation: AppState.currentRotation,
-            mirrored: AppState.isMirrored
-          },
-          realWidthMm: drawerWidth,
-          realHeightMm: drawerHeight,
-          edgeDetectionSettings: AppState.getEdgeDetectionSettings()
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
@@ -83,8 +117,10 @@ export const ApiService = {
         AppState.setCurrentImage(data.processedImage);
         AppState.setContouredImage(data.contouredImage);
         
-        // Redirect to edge finding view
-        window.location.href = '../edge_finding/edge_finding.html';
+        // Only redirect if not already in edge finding view
+        if (!isEdgeFinding) {
+          window.location.href = '../edge_finding/edge_finding.html';
+        }
       } else {
         throw new Error(data.error || "Unknown error occurred");
       }

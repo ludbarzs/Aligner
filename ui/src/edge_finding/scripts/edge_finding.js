@@ -71,19 +71,42 @@ document.addEventListener("DOMContentLoaded", () => {
   if (input) {
     input.addEventListener('change', async () => {
       // Get current settings
+      const blurValue = parseInt(blurSetting.value);
+      // Ensure blur value is odd
+      const adjustedBlurValue = blurValue % 2 === 0 ? blurValue + 1 : blurValue;
+      
       const settings = {
-        blurKernelSize: [parseInt(blurSetting.value), parseInt(blurSetting.value)],
+        blurKernelSize: [adjustedBlurValue, adjustedBlurValue],
         cannyLow: parseInt(edgeLow.value),
         cannyHigh: parseInt(edgeHigh.value),
-        morphKernelSize: [5, 5], // Keep this fixed for now
-        edgeThreshold: 80 // Keep this fixed for now
+        morphKernelSize: [5, 5]  // Keep this fixed as it works well with current implementation
       };
 
       // Update edge detection settings in AppState
       AppState.setEdgeDetectionSettings(settings);
 
-      // Send to API for processing
-      await ApiService.sendToAPI();
+      try {
+        // Show loading state
+        if (imageElement) {
+          imageElement.style.opacity = '0.5';
+        }
+
+        // Send to API for processing
+        await ApiService.sendToAPI();
+
+        // Update the image with the new contoured image
+        const contouredImage = AppState.getContouredImage();
+        if (contouredImage && imageElement) {
+          imageElement.src = contouredImage;
+          imageElement.style.opacity = '1';
+        }
+      } catch (error) {
+        console.error("Failed to update edge detection:", error);
+        // Reset opacity if there was an error
+        if (imageElement) {
+          imageElement.style.opacity = '1';
+        }
+      }
     });
   }
 }); 

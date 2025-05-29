@@ -38,7 +38,7 @@ class ImageProcessor:
     @staticmethod
     def validate_input(data: Dict) -> Tuple[bool, Optional[str]]:
         """Validate the input data structure"""
-        if not data or "imageData" not in data or "coordinates" not in data:
+        if not data or "imageData" not in data:
             return False, "Missing required data"
         return True, None
 
