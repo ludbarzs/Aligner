@@ -7,6 +7,7 @@ export class FrameSelector {
     this.corners = [];
     this.lines = [];
     this.activeDragCorner = null;
+    this.cornerPositions = []; // Store positions as percentages
     this.init();
   }
 
@@ -27,6 +28,14 @@ export class FrameSelector {
     // Add container to the image's parent
     this.imageElement.parentElement.appendChild(this.container);
 
+    // Initialize cornerPositions with default percentage values
+    this.cornerPositions = [
+      { x: 15, y: 15 },        // Top-left
+      { x: 85, y: 15 },        // Top-right
+      { x: 85, y: 85 },        // Bottom-right
+      { x: 15, y: 85 }         // Bottom-left
+    ];
+
     // Create corners and lines
     this.createCorners();
     this.createLines();
@@ -34,23 +43,25 @@ export class FrameSelector {
 
     // Update on window resize
     window.addEventListener("resize", () => {
-      const imageRect = this.imageElement.getBoundingClientRect();
-      
-      // Update container dimensions
-      this.container.style.width = `${imageRect.width}px`;
-      this.container.style.height = `${imageRect.height}px`;
-      
-      // Recalculate corner positions
-      this.corners.forEach(corner => {
-        const percentX = parseFloat(corner.style.left) / parseFloat(this.container.style.width);
-        const percentY = parseFloat(corner.style.top) / parseFloat(this.container.style.height);
-        
-        corner.style.left = `${percentX * imageRect.width}px`;
-        corner.style.top = `${percentY * imageRect.height}px`;
-      });
-      
+      this.updateContainerSize();
+      this.updateCornersFromPercentages();
       this.updateLines();
       this.updateAppState();
+    });
+  }
+
+  updateContainerSize() {
+    const imageRect = this.imageElement.getBoundingClientRect();
+    this.container.style.width = `${imageRect.width}px`;
+    this.container.style.height = `${imageRect.height}px`;
+  }
+
+  updateCornersFromPercentages() {
+    const rect = this.container.getBoundingClientRect();
+    this.corners.forEach((corner, i) => {
+      const pos = this.cornerPositions[i];
+      corner.style.left = `${(pos.x * rect.width) / 100}px`;
+      corner.style.top = `${(pos.y * rect.height) / 100}px`;
     });
   }
 
@@ -84,22 +95,8 @@ export class FrameSelector {
   }
 
   initializeCornerPositions() {
-    const rect = this.container.getBoundingClientRect();
-    const padding = Math.min(rect.width, rect.height) * 0.15;
-
-    const positions = [
-      { x: padding, y: padding }, // Top-left
-      { x: rect.width - padding, y: padding }, // Top-right
-      { x: rect.width - padding, y: rect.height - padding }, // Bottom-right
-      { x: padding, y: rect.height - padding }, // Bottom-left
-    ];
-
-    positions.forEach((pos, i) => {
-      const corner = this.corners[i];
-      corner.style.left = `${pos.x}px`;
-      corner.style.top = `${pos.y}px`;
-    });
-
+    this.updateContainerSize();
+    this.updateCornersFromPercentages();
     this.updateLines();
     this.updateAppState();
   }
@@ -120,12 +117,19 @@ export class FrameSelector {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    // Clamp to container bounds
+    // Clamp to container bounds and convert to percentages
     const clampedX = Math.max(0, Math.min(rect.width, x));
     const clampedY = Math.max(0, Math.min(rect.height, y));
+    
+    const percentX = (clampedX / rect.width) * 100;
+    const percentY = (clampedY / rect.height) * 100;
 
+    // Update both the visual position and stored percentage
     this.activeDragCorner.style.left = `${clampedX}px`;
     this.activeDragCorner.style.top = `${clampedY}px`;
+    
+    const cornerIndex = parseInt(this.activeDragCorner.dataset.index);
+    this.cornerPositions[cornerIndex] = { x: percentX, y: percentY };
 
     this.updateLines();
     this.updateAppState();
@@ -160,28 +164,31 @@ export class FrameSelector {
   }
 
   updateAppState() {
-    const scaleX = this.imageElement.naturalWidth / this.container.offsetWidth;
-    const scaleY = this.imageElement.naturalHeight / this.container.offsetHeight;
-
-    const imageCoordinates = this.corners.map((corner) => ({
-      x: parseFloat(corner.style.left) * scaleX,
-      y: parseFloat(corner.style.top) * scaleY,
+    const rect = this.container.getBoundingClientRect();
+    
+    const imageCoordinates = this.cornerPositions.map(pos => ({
+      x: (pos.x / 100) * this.imageElement.naturalWidth,
+      y: (pos.y / 100) * this.imageElement.naturalHeight,
     }));
 
-    // Update the AppState with the new coordinates
     AppState.setCornerCoordinates(imageCoordinates);
   }
 
   setCornerPositions(coordinates) {
     if (!coordinates || coordinates.length !== 4) return;
     
-    const scaleX = this.container.offsetWidth / this.imageElement.naturalWidth;
-    const scaleY = this.container.offsetHeight / this.imageElement.naturalHeight;
-
+    const rect = this.container.getBoundingClientRect();
+    
+    // Convert absolute coordinates to percentages and update both stored and visual positions
     coordinates.forEach((coord, i) => {
+      const percentX = (coord.x / this.imageElement.naturalWidth) * 100;
+      const percentY = (coord.y / this.imageElement.naturalHeight) * 100;
+      
+      this.cornerPositions[i] = { x: percentX, y: percentY };
+      
       const corner = this.corners[i];
-      corner.style.left = `${coord.x * scaleX}px`;
-      corner.style.top = `${coord.y * scaleY}px`;
+      corner.style.left = `${(percentX * rect.width) / 100}px`;
+      corner.style.top = `${(percentY * rect.height) / 100}px`;
     });
 
     this.updateLines();
