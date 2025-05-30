@@ -1,124 +1,81 @@
--- Image Processing Database Schema - Updated
+-- Image Processing Database Schema
+-- Created for storing user images with edge detection preferences
 
--- 1. Users table
+-- Create database (uncomment if needed)
+-- CREATE DATABASE image_processing_db;
+-- USE image_processing_db;
+
+-- Users table
+-- Stores basic user information and links to Appwrite authentication system
 CREATE TABLE users (
-    user_id VARCHAR(255) PRIMARY KEY,
-    aw_id VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    aw_id VARCHAR(255) UNIQUE NOT NULL COMMENT 'Appwrite user ID for authentication integration'
 );
 
--- 2. Image data table (separate for performance)
-CREATE TABLE image_data (
+-- Images data table  
+-- Stores actual image binary data in Base64 format with MIME types
+CREATE TABLE images_data (
     image_data_id INT PRIMARY KEY AUTO_INCREMENT,
-    base64_data LONGTEXT NOT NULL,
-    mime_type VARCHAR(50) NOT NULL DEFAULT 'image/jpeg',
-    file_size_bytes INT,
-    checksum VARCHAR(64),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    base64_data LONGTEXT NOT NULL COMMENT 'Image content encoded in Base64',
+    mime_type VARCHAR(100) NOT NULL COMMENT 'Image MIME type (e.g., image/jpeg, image/png)'
 );
 
--- 3. Images table (metadata only)
+-- Images table
+-- Stores image metadata including physical dimensions, coordinates, and edge detection parameters
 CREATE TABLE images (
     image_id INT PRIMARY KEY AUTO_INCREMENT,
-    project_id INT NULL,
-    id_user VARCHAR(255) NOT NULL,
+    id_user INT NOT NULL,
     id_image_data INT NOT NULL,
-    original_filename VARCHAR(255),
-    real_width_mm DECIMAL(10,2),
-    real_height_mm DECIMAL(10,2),
-    upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    corner_coordinates JSON,
-    transformations JSON,
-    x_ratio DECIMAL(10,6),
-    y_ratio DECIMAL(10,6),
-    gaussian_blur DECIMAL(5,2),
-    canny_threshold_1 INT,
-    canny_threshold_2 INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    real_width_mm DECIMAL(10,2) COMMENT 'Real width in millimeters',
+    real_height_mm DECIMAL(10,2) COMMENT 'Real height in millimeters', 
+    corner_coordinates JSON COMMENT 'Corner coordinates data',
+    transformations JSON COMMENT 'Image transformation data',
+    x_ratio DECIMAL(10,6) COMMENT 'X-axis scaling ratio',
+    y_ratio DECIMAL(10,6) COMMENT 'Y-axis scaling ratio',
+    gaussian_blur INT COMMENT 'Gaussian blur parameter for edge detection',
+    canny_threshold_1 INT COMMENT 'First Canny threshold value',
+    canny_threshold_2 INT COMMENT 'Second Canny threshold value',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
+    -- Foreign key constraints
     FOREIGN KEY (id_user) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (id_image_data) REFERENCES image_data(image_data_id) ON DELETE CASCADE,
-    INDEX idx_id_user (id_user),
-    INDEX idx_project_id (project_id)
+    FOREIGN KEY (id_image_data) REFERENCES images_data(image_data_id) ON DELETE CASCADE
 );
 
--- 4. Processed image data table (for processed images)
-CREATE TABLE processed_image_data (
-    processed_data_id INT PRIMARY KEY AUTO_INCREMENT,
-    base64_data LONGTEXT NOT NULL,
-    image_type ENUM('corrected', 'edge', 'contoured') NOT NULL,
-    mime_type VARCHAR(50) NOT NULL DEFAULT 'image/jpeg',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- 5. Image processing sessions table
-CREATE TABLE image_processing_sessions (
-    session_id INT PRIMARY KEY AUTO_INCREMENT,
-    image_id INT NOT NULL,
-    user_id VARCHAR(255) NOT NULL,
-    corner_coordinates JSON,
-    transformations JSON,
-    x_ratio DECIMAL(10,6),
-    y_ratio DECIMAL(10,6),
-    edge_detection_settings JSON,
-    corrected_image_data_id INT NULL,
-    edge_image_data_id INT NULL,
-    contoured_image_data_id INT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
-    FOREIGN KEY (image_id) REFERENCES images(image_id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (corrected_image_data_id) REFERENCES processed_image_data(processed_data_id) ON DELETE SET NULL,
-    FOREIGN KEY (edge_image_data_id) REFERENCES processed_image_data(processed_data_id) ON DELETE SET NULL,
-    FOREIGN KEY (contoured_image_data_id) REFERENCES processed_image_data(processed_data_id) ON DELETE SET NULL,
-    INDEX idx_image_id (image_id),
-    INDEX idx_user_id (user_id)
-);
-
--- 6. Edge detection presets table
+-- Edge detection preferences table
+-- Stores user's custom edge detection settings for quick reuse
 CREATE TABLE edge_detection_preferences (
     preset_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id VARCHAR(255) NOT NULL,
-    name VARCHAR(100) NOT NULL,
-    gaussian_blur DECIMAL(5,2) DEFAULT 1.0,
-    canny_threshold_1 INT DEFAULT 50,
-    canny_threshold_2 INT DEFAULT 150,
-    morph_kernel_size INT DEFAULT 3,
+    user_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL COMMENT 'User-defined preset name',
+    gaussian_blur INT NOT NULL COMMENT 'Gaussian blur value',
+    canny_threshold_1 INT NOT NULL COMMENT 'First Canny threshold',
+    canny_threshold_2 INT NOT NULL COMMENT 'Second Canny threshold', 
+    morph_kernel_size INT NOT NULL COMMENT 'Morphological operation kernel size',
     
+    -- Foreign key constraint
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    INDEX idx_user_id (user_id),
+    
+    -- Ensure unique preset names per user
     UNIQUE KEY unique_user_preset (user_id, name)
 );
 
--- 7. User preferences table
-CREATE TABLE user_preferences (
-    user_id VARCHAR(255) PRIMARY KEY,
-    default_edge_detection_settings JSON,
-    default_drawer_width_mm DECIMAL(8,2) DEFAULT 500.0,
-    default_drawer_height_mm DECIMAL(8,2) DEFAULT 300.0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
-);
+-- Create indexes for better performance
+CREATE INDEX idx_images_user ON images(id_user);
+CREATE INDEX idx_images_created_at ON images(created_at);
+CREATE INDEX idx_edge_preferences_user ON edge_detection_preferences(user_id);
 
--- Add some useful indexes for performance
-CREATE INDEX idx_images_upload_date ON images(upload_date);
-CREATE INDEX idx_sessions_created_at ON image_processing_sessions(created_at);
-CREATE INDEX idx_image_data_checksum ON image_data(checksum);
+-- Insert sample data (optional - uncomment if needed for testing)
+/*
+-- Sample users
+INSERT INTO users (aw_id) VALUES 
+('appwrite_user_123'),
+('appwrite_user_456');
 
--- Optional: Add some constraints for data integrity
-ALTER TABLE images 
-ADD CONSTRAINT chk_positive_dimensions 
-CHECK (real_width_mm > 0 AND real_height_mm > 0);
-
-ALTER TABLE edge_detection_preferences
-ADD CONSTRAINT chk_positive_thresholds
-CHECK (canny_threshold_1 > 0 AND canny_threshold_2 > 0 AND canny_threshold_1 < canny_threshold_2);
-
-ALTER TABLE user_preferences
-ADD CONSTRAINT chk_positive_drawer_dimensions
-CHECK (default_drawer_width_mm > 0 AND default_drawer_height_mm > 0);
+-- Sample edge detection presets
+INSERT INTO edge_detection_preferences (user_id, name, gaussian_blur, canny_threshold_1, canny_threshold_2, morph_kernel_size) VALUES
+(1, 'Default', 5, 50, 150, 3),
+(1, 'High Detail', 3, 30, 100, 2),
+(2, 'Smooth', 7, 70, 200, 4);
+*/
