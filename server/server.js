@@ -8,16 +8,24 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Add basic route for testing
+app.get('/', (req, res) => {
+    res.json({ message: 'Server is running' });
+});
+
 // Routes
 app.use('/api/users', userRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-    console.error(err.stack);
+    console.error('Error:', err.stack);
     res.status(500).json({ message: 'Something went wrong!' });
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log('Available routes:');
+    console.log('- GET  /');
+    console.log('- POST /api/users');
 }); 
