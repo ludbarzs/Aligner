@@ -186,9 +186,96 @@ const deleteImage = async (imageId, userId) => {
     }
 };
 
+/**
+ * Update an existing image and its associated data
+ * @param {number} imageId The ID of the image to update
+ * @param {Object} imageData Updated image data
+ * @returns {Promise<Object>} The updated image object
+ */
+const updateImage = async (imageId, imageData) => {
+    const connection = await pool.getConnection();
+    
+    try {
+        await connection.beginTransaction();
+
+        console.log('Updating image:', imageId, 'for user:', imageData.userId);
+
+        // First, verify the image exists and belongs to the user
+        const [images] = await connection.query(
+            'SELECT id_image_data FROM images WHERE image_id = ? AND id_user = ?',
+            [imageId, imageData.userId]
+        );
+
+        if (images.length === 0) {
+            console.error('Image not found or unauthorized. ID:', imageId, 'User:', imageData.userId);
+            throw new Error('Image not found or unauthorized');
+        }
+
+        const imageDataId = images[0].id_image_data;
+        console.log('Found image data ID:', imageDataId);
+
+        // Update the image data
+        await connection.query(
+            'UPDATE images_data SET base64_data = ?, mime_type = ? WHERE image_data_id = ?',
+            [imageData.base64Data, imageData.mimeType, imageDataId]
+        );
+        console.log('Updated image_data table');
+
+        // Update the image metadata
+        const updateResult = await connection.query(
+            `UPDATE images SET
+                real_width_mm = ?,
+                real_height_mm = ?,
+                corner_coordinates = ?,
+                transformations = ?,
+                gaussian_blur = ?,
+                canny_threshold_1 = ?,
+                canny_threshold_2 = ?
+            WHERE image_id = ?`,
+            [
+                imageData.realWidthMm || null,
+                imageData.realHeightMm || null,
+                imageData.cornerCoordinates ? JSON.stringify(imageData.cornerCoordinates) : null,
+                imageData.transformations ? JSON.stringify(imageData.transformations) : null,
+                imageData.gaussianBlur || null,
+                imageData.cannyThreshold1 || null,
+                imageData.cannyThreshold2 || null,
+                imageId
+            ]
+        );
+        console.log('Updated images table');
+
+        await connection.commit();
+        console.log('Transaction committed');
+
+        // Return the updated image data
+        const [updatedImage] = await connection.query(
+            `SELECT i.*, id.mime_type
+            FROM images i
+            JOIN images_data id ON i.id_image_data = id.image_data_id
+            WHERE i.image_id = ?`,
+            [imageId]
+        );
+
+        if (updatedImage.length === 0) {
+            throw new Error('Failed to retrieve updated image data');
+        }
+
+        return updatedImage[0];
+
+    } catch (error) {
+        console.error('Error in updateImage:', error);
+        await connection.rollback();
+        throw new Error('Error updating image: ' + error.message);
+    } finally {
+        connection.release();
+    }
+};
+
 module.exports = {
     addImage,
     getImageById,
     getUserImages,
-    deleteImage
+    deleteImage,
+    updateImage
 }; 

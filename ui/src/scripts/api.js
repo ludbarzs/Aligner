@@ -6,6 +6,14 @@ import { AppState } from "./app_state.js";
 const API_BASE_URL = "http://localhost:5000";
 const PROCESSING_TIMEOUT = 30000;
 
+// Default edge detection settings
+const DEFAULT_EDGE_DETECTION_SETTINGS = {
+  blurKernelSize: [5, 5],
+  cannyLow: 30,
+  cannyHigh: 130,
+  morphKernelSize: [5, 5]
+};
+
 export const ApiService = {
   /**
    * Validates if the request can be sent to the API
@@ -65,17 +73,23 @@ export const ApiService = {
       // Get the appropriate image data based on the current mode
       let imageData;
       if (isEdgeFinding) {
-        // In edge finding mode, use the processed image
         imageData = AppState.getProcessedImage();
         if (!imageData) {
           throw new Error("No processed image available");
         }
       } else {
-        // In initial upload mode, use the uploaded image
         imageData = AppState.getCurrentImage();
         if (!imageData) {
           throw new Error("No image uploaded");
         }
+      }
+      
+      // Get edge detection settings or use defaults if none exist
+      const edgeDetectionSettings = AppState.getEdgeDetectionSettings() || DEFAULT_EDGE_DETECTION_SETTINGS;
+      
+      // If we're not in edge finding mode and there are no settings saved, save the defaults
+      if (!isEdgeFinding && !AppState.getEdgeDetectionSettings()) {
+        AppState.setEdgeDetectionSettings(DEFAULT_EDGE_DETECTION_SETTINGS);
       }
       
       // Prepare request body
@@ -87,7 +101,7 @@ export const ApiService = {
         },
         realWidthMm: drawerWidth,
         realHeightMm: drawerHeight,
-        edgeDetectionSettings: AppState.getEdgeDetectionSettings()
+        edgeDetectionSettings: edgeDetectionSettings
       };
 
       // Only include coordinates if not in edge finding mode

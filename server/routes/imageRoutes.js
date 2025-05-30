@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { addImage, getImageById, getUserImages, deleteImage } = require('../controllers/imageController');
+const { addImage, getImageById, getUserImages, deleteImage, updateImage } = require('../controllers/imageController');
 
 // Route to add a new image
 router.post('/', async (req, res) => {
@@ -8,6 +8,18 @@ router.post('/', async (req, res) => {
         const imageData = req.body;
         const image = await addImage(imageData);
         res.status(201).json(image);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// Route to update an image
+router.put('/:imageId', async (req, res) => {
+    try {
+        const { imageId } = req.params;
+        const imageData = req.body;
+        const updatedImage = await updateImage(parseInt(imageId), imageData);
+        res.json(updatedImage);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

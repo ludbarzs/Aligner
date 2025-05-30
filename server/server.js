@@ -26,15 +26,21 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: "Something went wrong!" });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+// Function to print available routes
+function printRoutes() {
   console.log("Available routes:");
   console.log("- GET  /");
   console.log("- POST /api/users");
   console.log("- POST /api/images");
+  console.log("- PUT  /api/images/:imageId");
   console.log("- GET  /api/images/user/:userId");
   console.log("- GET  /api/images/:imageId");
   console.log("- DELETE /api/images/:imageId");
+}
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+  printRoutes();
 });
 

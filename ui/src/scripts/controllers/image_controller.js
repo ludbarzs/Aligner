@@ -1,163 +1,125 @@
-class ImageController {
-    constructor(baseUrl = 'http://localhost:3000/api') {
-        this.baseUrl = baseUrl;
+import { AppState } from '../app_state.js';
+
+export class ImageController {
+  static API_BASE_URL = 'http://localhost:3000/api';
+
+  /**
+   * Saves or updates the current app state as an image entry in the database
+   * @param {number} userId - The ID of the user saving the image
+   * @returns {Promise<Object>} The saved image data
+   */
+  static async saveCurrentState(userId) {
+    if (!userId) {
+      throw new Error('User ID is required');
     }
 
-    /**
-     * Save an image with its associated data
-     * @param {Object} imageData Object containing image information
-     * @param {string} imageData.base64Data Base64 encoded image data
-     * @param {string} imageData.mimeType Image MIME type
-     * @param {number} imageData.userId User ID who owns the image
-     * @param {number} [imageData.realWidthMm] Real width in millimeters
-     * @param {number} [imageData.realHeightMm] Real height in millimeters
-     * @param {Object} [imageData.cornerCoordinates] Corner coordinates data
-     * @param {Object} [imageData.transformations] Image transformation data
-     * @param {number} [imageData.xRatio] X-axis scaling ratio
-     * @param {number} [imageData.yRatio] Y-axis scaling ratio
-     * @param {number} [imageData.gaussianBlur] Gaussian blur parameter
-     * @param {number} [imageData.cannyThreshold1] First Canny threshold value
-     * @param {number} [imageData.cannyThreshold2] Second Canny threshold value
-     * @returns {Promise<Object>} The saved image data with ID
-     */
-    async saveImage(imageData) {
-        try {
-            const response = await fetch(`${this.baseUrl}/images`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(imageData)
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error('Error saving image:', error);
-            throw error;
-        }
+    const allValues = AppState.getAllValues();
+    const currentImage = allValues.currentImage;
+    const currentImageId = AppState.getCurrentImageId();
+    
+    if (!currentImage) {
+      throw new Error('No image data available to save');
     }
 
-    /**
-     * Get all images for a user
-     * @param {number} userId The ID of the user
-     * @returns {Promise<Array>} Array of image objects
-     */
-    async getUserImages(userId) {
-        try {
-            const response = await fetch(`${this.baseUrl}/images/user/${userId}`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+    console.log('Saving state with image ID:', currentImageId);
 
-            return await response.json();
-        } catch (error) {
-            console.error('Error getting user images:', error);
-            throw error;
-        }
+    // Prepare the image data object
+    const imageData = {
+      userId: userId,
+      base64Data: currentImage,
+      mimeType: 'image/png', // Assuming PNG format, adjust if needed
+      cornerCoordinates: allValues.coordinates,
+      transformations: allValues.transformations,
+      realWidthMm: allValues.drawerDimensions.width,
+      realHeightMm: allValues.drawerDimensions.height,
+      // Edge detection settings
+      ...(allValues.edgeDetectionSettings || {})
+    };
+
+    try {
+      let response;
+      let url = `${this.API_BASE_URL}/images`;
+      let method = 'POST';
+      
+      if (currentImageId) {
+        // Update existing image
+        url = `${this.API_BASE_URL}/images/${currentImageId}`;
+        method = 'PUT';
+        console.log('Updating existing image at:', url);
+      } else {
+        console.log('Creating new image at:', url);
+      }
+
+      response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(imageData)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Server response:', response.status, errorText);
+        throw new Error(`Server returned ${response.status}: ${errorText}`);
+      }
+
+      const savedImage = await response.json();
+      console.log('Save successful:', savedImage);
+      
+      // Store the image ID for future updates
+      if (!currentImageId && savedImage.imageId) {
+        console.log('Setting new image ID:', savedImage.imageId);
+        AppState.setCurrentImageId(savedImage.imageId);
+      }
+
+      return savedImage;
+    } catch (error) {
+      console.error('Error saving image:', error);
+      throw error;
     }
+  }
 
-    /**
-     * Get a single image by ID
-     * @param {number} imageId The ID of the image to retrieve
-     * @returns {Promise<Object>} The image object
-     */
-    async getImage(imageId) {
-        try {
-            const response = await fetch(`${this.baseUrl}/images/${imageId}`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error('Error getting image:', error);
-            throw error;
-        }
+  /**
+   * Retrieves all images for a specific user
+   * @param {number} userId - The ID of the user
+   * @returns {Promise<Array>} Array of user's images
+   */
+  static async getUserImages(userId) {
+    try {
+      const response = await fetch(`${this.API_BASE_URL}/images/user/${userId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch user images');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching user images:', error);
+      throw error;
     }
+  }
 
-    /**
-     * Delete an image
-     * @param {number} imageId The ID of the image to delete
-     * @param {number} userId The ID of the user (for authorization)
-     * @returns {Promise<boolean>} True if deletion was successful
-     */
-    async deleteImage(imageId, userId) {
-        try {
-            const response = await fetch(`${this.baseUrl}/images/${imageId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ userId })
-            });
+  /**
+   * Deletes an image
+   * @param {number} imageId - The ID of the image to delete
+   * @param {number} userId - The ID of the user
+   * @returns {Promise<void>}
+   */
+  static async deleteImage(imageId, userId) {
+    try {
+      const response = await fetch(`${this.API_BASE_URL}/images/${imageId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId })
+      });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error('Error deleting image:', error);
-            throw error;
-        }
+      if (!response.ok) {
+        throw new Error('Failed to delete image');
+      }
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      throw error;
     }
-
-    /**
-     * Export the processed image with all its data
-     * @param {Object} exportData Object containing final image data
-     * @param {string} exportData.imageDataUrl The processed image as a data URL (base64)
-     * @param {string} exportData.userId The ID of the logged-in user
-     * @param {Object} exportData.dimensions The real dimensions of the image
-     * @param {number} exportData.dimensions.width Real width in millimeters
-     * @param {number} exportData.dimensions.height Real height in millimeters
-     * @param {Object} exportData.cornerPoints The detected corner coordinates
-     * @param {Object} exportData.transformationMatrix The perspective transformation matrix
-     * @param {Object} exportData.edgeDetection Edge detection parameters used
-     * @param {number} exportData.edgeDetection.gaussianBlur Gaussian blur value
-     * @param {number} exportData.edgeDetection.cannyThreshold1 First Canny threshold
-     * @param {number} exportData.edgeDetection.cannyThreshold2 Second Canny threshold
-     * @param {Object} exportData.scaling The scaling ratios
-     * @param {number} exportData.scaling.xRatio X-axis scaling ratio
-     * @param {number} exportData.scaling.yRatio Y-axis scaling ratio
-     * @returns {Promise<Object>} The saved image data with generated IDs
-     */
-    async exportImage(exportData) {
-        // Extract the MIME type from the data URL
-        const mimeType = exportData.imageDataUrl.split(';')[0].split(':')[1];
-        
-        // Extract the base64 data without the data URL prefix
-        const base64Data = exportData.imageDataUrl.split(',')[1];
-
-        // Prepare the image data for the server
-        const imageData = {
-            base64Data: base64Data,
-            mimeType: mimeType,
-            userId: exportData.userId,
-            realWidthMm: exportData.dimensions.width,
-            realHeightMm: exportData.dimensions.height,
-            cornerCoordinates: exportData.cornerPoints,
-            transformations: exportData.transformationMatrix,
-            xRatio: exportData.scaling.xRatio,
-            yRatio: exportData.scaling.yRatio,
-            gaussianBlur: exportData.edgeDetection.gaussianBlur,
-            cannyThreshold1: exportData.edgeDetection.cannyThreshold1,
-            cannyThreshold2: exportData.edgeDetection.cannyThreshold2
-        };
-
-        try {
-            return await this.saveImage(imageData);
-        } catch (error) {
-            console.error('Error exporting image:', error);
-            throw new Error('Failed to export image: ' + error.message);
-        }
-    }
+  }
 }
-
-export default ImageController;
-

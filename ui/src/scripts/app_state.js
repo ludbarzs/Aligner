@@ -58,8 +58,18 @@ export class AppState {
     return localStorage.getItem("currentImage");
   }
 
+  static setCurrentImageId(imageId) {
+    localStorage.setItem("currentImageId", imageId.toString());
+  }
+
+  static getCurrentImageId() {
+    const id = localStorage.getItem("currentImageId");
+    return id ? parseInt(id, 10) : null;
+  }
+
   static clearCurrentImage() {
     localStorage.removeItem("currentImage");
+    localStorage.removeItem("currentImageId");
     AppState.resetTransformations();
   }
 
@@ -127,12 +137,27 @@ export class AppState {
     localStorage.removeItem("processedImage");
   }
 
+  // Get all stored values
+  static getAllValues() {
+    return {
+      coordinates: AppState.getCornerCoordinates(),
+      transformations: AppState.getTransformations(),
+      currentImage: AppState.getCurrentImage(),
+      drawerDimensions: AppState.getDrawerDimensions(),
+      edgeDetectionSettings: AppState.getEdgeDetectionSettings(),
+      contouredImage: AppState.getContouredImage(),
+      dxfData: AppState.getDxfData(),
+      processedImage: AppState.getProcessedImage()
+    };
+  }
+
   // Clear all stored data
   static clearCache() {
     localStorage.removeItem("coordinates");
     localStorage.removeItem("rotation");
     localStorage.removeItem("isMirrored");
     localStorage.removeItem("currentImage");
+    localStorage.removeItem("currentImageId");
     localStorage.removeItem("drawerWidth");
     localStorage.removeItem("drawerHeight");
     localStorage.removeItem("edgeDetectionSettings");
