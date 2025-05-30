@@ -66,7 +66,7 @@ export const ApiService = {
       let imageData;
       if (isEdgeFinding) {
         // In edge finding mode, use the processed image
-        imageData = AppState.getCurrentImage();
+        imageData = AppState.getProcessedImage();
         if (!imageData) {
           throw new Error("No processed image available");
         }
@@ -82,8 +82,8 @@ export const ApiService = {
       const requestBody = {
         imageData: imageData,
         transformations: {
-          rotation: AppState.currentRotation,
-          mirrored: AppState.isMirrored
+          rotation: AppState.getRotation(),
+          mirrored: AppState.getMirrored()
         },
         realWidthMm: drawerWidth,
         realHeightMm: drawerHeight,
@@ -114,7 +114,7 @@ export const ApiService = {
       
       if (data.success) {
         // Store the processed and contoured images in AppState
-        AppState.setCurrentImage(data.processedImage);
+        AppState.setProcessedImage(data.processedImage);
         AppState.setContouredImage(data.contouredImage);
         
         // Store DXF data if available
