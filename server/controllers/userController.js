@@ -24,6 +24,25 @@ const addUser = async (awId) => {
     }
 };
 
+/**
+ * Get a user by their Appwrite ID
+ * @param {string} awId - Appwrite user ID
+ * @returns {Promise<Object|null>} The user object or null if not found
+ */
+const getUserByAppwriteId = async (awId) => {
+    try {
+        const [rows] = await pool.query(
+            'SELECT user_id, aw_id FROM users WHERE aw_id = ?',
+            [awId]
+        );
+
+        return rows.length > 0 ? rows[0] : null;
+    } catch (error) {
+        throw new Error('Error getting user: ' + error.message);
+    }
+};
+
 module.exports = {
-    addUser
+    addUser,
+    getUserByAppwriteId
 };

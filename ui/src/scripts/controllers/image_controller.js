@@ -1,4 +1,5 @@
 import { AppState } from '../app_state.js';
+import { appwriteService } from '../../authentication/services/appwrite-service.js';
 
 export class ImageController {
   static API_BASE_URL = 'http://localhost:3000/api';
@@ -119,6 +120,34 @@ export class ImageController {
       }
     } catch (error) {
       console.error('Error deleting image:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Gets all images for the currently logged in user
+   * @returns {Promise<Array>} Array of user's images
+   * @throws {Error} If user is not logged in or if fetching images fails
+   */
+  static async getCurrentUserImages() {
+    try {
+      // Get the current user from Appwrite
+      const user = await appwriteService.getCurrentUser();
+      if (!user) {
+        throw new Error('No user is currently logged in');
+      }
+
+      // Get the user's local database ID
+      const response = await fetch(`${this.API_BASE_URL}/users/appwrite/${user.$id}`);
+      if (!response.ok) {
+        throw new Error('Failed to get user ID from local database');
+      }
+      const userData = await response.json();
+
+      // Get all images for this user
+      return await this.getUserImages(userData.user_id);
+    } catch (error) {
+      console.error('Error fetching current user images:', error);
       throw error;
     }
   }
