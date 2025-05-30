@@ -89,8 +89,6 @@ const validateConfirmPassword = (password, confirmPassword) => {
 // Register user in local database
 const registerInLocalDb = async (awId) => {
     try {
-        console.log("Attempting to register user with awId:", awId); // Debug log
-
         const response = await fetch("http://localhost:3000/api/users", {
             method: "POST",
             headers: {
