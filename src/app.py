@@ -55,7 +55,8 @@ def process_image():
         "transformations": {                            # Applied transformations
             "mirrored": boolean,
             "rotation": int
-        }
+        },
+        "dxf_data": string                             # Base64 encoded DXF file data (only when coordinates are provided)
     }
 
     Error Response:
@@ -98,6 +99,7 @@ def process_image():
             "yRatio": result.get("y_ratio"),
             "coordinates": result.get("coordinates"),
             "transformations": result.get("transformations"),
+            "dxf_data": result.get("dxf_data"),
         }
 
         return jsonify(response)

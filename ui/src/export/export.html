@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Aligner</title>
+    <link rel="stylesheet" href="../styles/styles.css"/>
+    <link rel="stylesheet" href="export.css"/>
+  </head>
+  <body>
+    <div class="progress-container">
+      <div class="progress-bar"></div>
+    </div>
+
+    <div class="container">
+      <div class="main-content">
+        <div class="box">
+          <div class="export-container">
+            <h2>Export DXF File</h2>
+            <p>Your image has been processed. Click the button below to download the DXF file.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls-container">
+        <button class="control-button" onclick="window.location.href='../edge_finding/edge_finding.html'">
+          <span>Back</span>
+        </button>
+        
+        <button id="export-button" class="control-button primary">
+          <span>Download DXF</span>
+        </button>
+      </div>
+    </div>
+    <script type="module" src="scripts/export.js"></script>
+  </body>
+</html>

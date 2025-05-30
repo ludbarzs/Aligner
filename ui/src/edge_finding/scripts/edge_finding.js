@@ -109,4 +109,23 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-}); 
+});
+
+// Add export button click handler
+if (exportButton) {
+  exportButton.addEventListener('click', async () => {
+    try {
+      // Send final data to API for processing
+      const response = await ApiService.sendToAPI();
+      
+      // Store the processed data in sessionStorage
+      sessionStorage.setItem('processedData', JSON.stringify(response));
+      
+      // Navigate to export page
+      window.location.href = '../export/export.html';
+    } catch (error) {
+      console.error("Failed to process data for export:", error);
+      alert("Failed to prepare data for export. Please try again.");
+    }
+  });
+} 

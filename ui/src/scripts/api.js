@@ -113,9 +113,14 @@ export const ApiService = {
       const data = await response.json();
       
       if (data.success) {
-        // Store both the processed and contoured images in AppState
+        // Store the processed and contoured images in AppState
         AppState.setCurrentImage(data.processedImage);
         AppState.setContouredImage(data.contouredImage);
+        
+        // Store DXF data if available
+        if (data.dxf_data) {
+          AppState.setDxfData(data.dxf_data);
+        }
         
         // Only redirect if not already in edge finding view
         if (!isEdgeFinding) {

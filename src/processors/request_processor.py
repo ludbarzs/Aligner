@@ -3,6 +3,10 @@ from detection.edge_detecttor import EdgeDetector
 import numpy as np
 from processors.image_processor import ImageProcessor
 from detection.drawer_detector import DrawerDetector
+from processors.dxf_processor import contours_to_dxf
+import tempfile
+import base64
+import os
 
 
 class RequestProcessor:
@@ -73,6 +77,25 @@ class RequestProcessor:
             morph_kernel_size=morph_kernel_size,
         )
 
+        # Generate DXF file if we have valid ratios and dimensions
+        dxf_data = None
+        if x_ratio is not None and y_ratio is not None:
+            # Create temporary file for DXF
+            with tempfile.NamedTemporaryFile(suffix='.dxf', delete=False) as tmp_file:
+                dxf_path = contours_to_dxf(
+                    edge_results["contours"],
+                    tmp_file.name,
+                    x_ratio,
+                    y_ratio,
+                    float(data["realWidthMm"]),
+                    float(data["realHeightMm"])
+                )
+                # Read the DXF file and encode it as base64
+                with open(dxf_path, 'rb') as dxf_file:
+                    dxf_data = base64.b64encode(dxf_file.read()).decode('utf-8')
+                # Clean up the temporary file
+                os.unlink(dxf_path)
+
         result = {
             "image": corrected_image,
             "contoured_image": edge_results["contoured_image"],
@@ -80,12 +103,13 @@ class RequestProcessor:
             "transformations": transformations,
         }
 
-        # Only include coordinates and ratios if they were processed
+        # Only include coordinates, ratios and DXF if they were processed
         if "coordinates" in data:
             result.update({
                 "coordinates": data["coordinates"],
                 "x_ratio": x_ratio,
                 "y_ratio": y_ratio,
+                "dxf_data": dxf_data
             })
 
         return result

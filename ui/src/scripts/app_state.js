@@ -16,6 +16,7 @@ export const AppState = {
     edgeThreshold: 80
   },
   contouredImage: null,
+  dxfData: null,
   
   setCurrentImage(imageData) {
     this.currentImage = imageData;
@@ -170,5 +171,28 @@ export const AppState = {
   clearContouredImage() {
     this.contouredImage = null;
     localStorage.removeItem('contouredImage');
+  },
+
+  // DXF data methods
+  setDxfData(data) {
+    this.dxfData = data;
+    localStorage.setItem('dxfData', data);
+  },
+
+  getDxfData() {
+    if (this.dxfData) {
+      return this.dxfData;
+    }
+    // Try to restore from localStorage
+    const savedData = localStorage.getItem('dxfData');
+    if (savedData) {
+      this.dxfData = savedData;
+    }
+    return this.dxfData;
+  },
+
+  clearDxfData() {
+    this.dxfData = null;
+    localStorage.removeItem('dxfData');
   },
 };
