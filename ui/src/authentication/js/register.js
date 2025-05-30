@@ -85,6 +85,29 @@ const validateConfirmPassword = (password, confirmPassword) => {
     return '';
 };
 
+// Register user in local database
+const registerInLocalDb = async (awId) => {
+    try {
+        const response = await fetch('http://localhost:3000/api/users', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ awId })  // Match the parameter name expected by our userController
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to register in local database');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error registering in local database:', error);
+        throw error;
+    }
+};
+
 // Form submission handler
 registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -109,8 +132,11 @@ registerForm.addEventListener('submit', async (e) => {
     // If there are no errors, attempt registration
     if (!usernameError && !emailError && !passwordError && !confirmPasswordError) {
         try {
-            // Create account only
-            await appwriteService.createAccount(email, password, username);
+            // Create account in Appwrite
+            const appwriteUser = await appwriteService.createAccount(email, password, username);
+            
+            // Register in local database using Appwrite user ID
+            await registerInLocalDb(appwriteUser.$id);
             
             // Redirect to login page with success message
             window.location.href = './login.html?registration=success';
