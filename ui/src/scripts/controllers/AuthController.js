@@ -79,22 +79,43 @@ export class AuthController {
     const userInfo = document.createElement("div");
     userInfo.className = "user-info";
     userInfo.innerHTML = `
-            <span class="user-name">Welcome, ${this.currentUser.name || this.currentUser.email}</span>
-        `;
+        <span class="user-name">Welcome, ${this.currentUser.name || this.currentUser.email}</span>
+    `;
 
     const logoutButton = document.createElement("button");
     logoutButton.className = "auth-button logout-button";
     logoutButton.textContent = "Logout";
     logoutButton.addEventListener("click", () => this.handleLogout());
 
+    // Create user icon button
+    const userIconButton = document.createElement("button");
+    userIconButton.className = "user-icon-button";
+    userIconButton.innerHTML = `
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+        </svg>
+    `;
+    userIconButton.addEventListener("click", () => {
+        window.location.href = "../user_profile/user_profile.html";
+    });
+
     this.authButtons.appendChild(userInfo);
     this.authButtons.appendChild(logoutButton);
+
+    // Add user icon button to the document body since it's positioned absolutely
+    document.body.appendChild(userIconButton);
   }
 
   /**
    * Render UI for logged-out users
    */
   renderLoggedOutUI() {
+    // Remove user icon button if it exists
+    const existingUserIcon = document.querySelector('.user-icon-button');
+    if (existingUserIcon) {
+        existingUserIcon.remove();
+    }
+
     const loginButton = document.createElement("button");
     loginButton.className = "auth-button login-button";
     loginButton.textContent = "Login";

@@ -332,3 +332,32 @@
     max-width: none;
   }
 }
+
+/* User icon button styles */
+.user-icon-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--neon-color);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.user-icon-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(138, 67, 252, 0.5);
+}
+
+.user-icon-button svg {
+  width: 20px;
+  height: 20px;
+  fill: white;
+}
