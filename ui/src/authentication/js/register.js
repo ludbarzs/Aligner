@@ -88,32 +88,34 @@ const validateConfirmPassword = (password, confirmPassword) => {
 
 // Register user in local database
 const registerInLocalDb = async (awId) => {
-    try {
-        console.log("Attempting to register user with awId:", awId); // Debug log
+  try {
+    console.log("Attempting to register user with awId:", awId); // Debug log
 
-        const response = await fetch("http://localhost:3000/api/users", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ awId })
-        });
+    const response = await fetch("http://localhost:3000/api/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ awId }),
+    });
 
-        console.log("Response status:", response.status); // Debug log
+    console.log("Response status:", response.status); // Debug log
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error("Server error:", errorData); // Debug log
-            throw new Error(errorData.message || "Failed to register in local database");
-        }
-
-        const result = await response.json();
-        console.log("Registration successful:", result); // Debug log
-        return result;
-    } catch (error) {
-        console.error("Error registering in local database:", error);
-        throw error;
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Server error:", errorData); // Debug log
+      throw new Error(
+        errorData.message || "Failed to register in local database",
+      );
     }
+
+    const result = await response.json();
+    console.log("Registration successful:", result); // Debug log
+    return result;
+  } catch (error) {
+    console.error("Error registering in local database:", error);
+    throw error;
+  }
 };
 
 // Form submission handler
@@ -190,4 +192,3 @@ document
   .addEventListener("click", () => {
     window.location.href = "../image_upload/image_upload.html";
   });
-

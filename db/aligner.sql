@@ -48,7 +48,6 @@ CREATE TABLE images (
 CREATE TABLE edge_detection_preferences (
     preset_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
-    name VARCHAR(255) NOT NULL COMMENT 'User-defined preset name',
     gaussian_blur INT NOT NULL COMMENT 'Gaussian blur value',
     canny_threshold_1 INT NOT NULL COMMENT 'First Canny threshold',
     canny_threshold_2 INT NOT NULL COMMENT 'Second Canny threshold', 
@@ -57,8 +56,8 @@ CREATE TABLE edge_detection_preferences (
     -- Foreign key constraint
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     
-    -- Ensure unique preset names per user
-    UNIQUE KEY unique_user_preset (user_id, name)
+    -- Ensure unique preset per user
+    UNIQUE KEY unique_user_preset (user_id)
 );
 
 -- Create indexes for better performance
