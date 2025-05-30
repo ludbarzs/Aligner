@@ -1,5 +1,18 @@
 import { AppState } from "../../scripts/app_state.js";
 
+// Function to print the current state of AppState
+function printState() {
+    console.log('=== Current AppState ===');
+    console.log('Current Image:', AppState.getCurrentImage() ? 'Present' : 'None');
+    console.log('Transformations:', AppState.getTransformations());
+    console.log('Corner Coordinates:', AppState.getCornerCoordinates());
+    console.log('Drawer Dimensions:', AppState.getDrawerDimensions());
+    console.log('Edge Detection Settings:', AppState.getEdgeDetectionSettings());
+    console.log('Contoured Image:', AppState.getContouredImage() ? 'Present' : 'None');
+    console.log('DXF Data:', AppState.getDxfData() ? 'Present' : 'None');
+    console.log('=====================');
+}
+
 // Function to download the DXF file
 function downloadDxf() {
     const dxfData = AppState.getDxfData();
@@ -30,6 +43,9 @@ function downloadDxf() {
 
 // Add click event listener to the export button
 document.getElementById('export-button').addEventListener('click', downloadDxf);
+
+// Print state when the page loads
+document.addEventListener('DOMContentLoaded', printState);
 
 // Check if we have processed data
 if (!AppState.getDxfData()) {
