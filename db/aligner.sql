@@ -1,6 +1,14 @@
--- Image Processing Database Schema
+-- Image Processing Database Schema - Updated
 
--- 1. Image data table (separate for performance)
+-- 1. Users table
+CREATE TABLE users (
+    user_id VARCHAR(255) PRIMARY KEY,
+    aw_id VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 2. Image data table (separate for performance)
 CREATE TABLE image_data (
     image_data_id INT PRIMARY KEY AUTO_INCREMENT,
     base64_data LONGTEXT NOT NULL,
@@ -10,13 +18,13 @@ CREATE TABLE image_data (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 2. Images table (metadata only)
+-- 3. Images table (metadata only)
 CREATE TABLE images (
     image_id INT PRIMARY KEY AUTO_INCREMENT,
     project_id INT NULL,
-    user_id VARCHAR(255) NOT NULL,
+    id_user VARCHAR(255) NOT NULL,
+    id_image_data INT NOT NULL,
     original_filename VARCHAR(255),
-    image_data_id INT NOT NULL,
     real_width_mm DECIMAL(10,2),
     real_height_mm DECIMAL(10,2),
     upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -30,12 +38,13 @@ CREATE TABLE images (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    FOREIGN KEY (image_data_id) REFERENCES image_data(image_data_id) ON DELETE CASCADE,
-    INDEX idx_user_id (user_id),
+    FOREIGN KEY (id_user) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (id_image_data) REFERENCES image_data(image_data_id) ON DELETE CASCADE,
+    INDEX idx_id_user (id_user),
     INDEX idx_project_id (project_id)
 );
 
--- 3. Processed image data table (for processed images)
+-- 4. Processed image data table (for processed images)
 CREATE TABLE processed_image_data (
     processed_data_id INT PRIMARY KEY AUTO_INCREMENT,
     base64_data LONGTEXT NOT NULL,
@@ -44,7 +53,7 @@ CREATE TABLE processed_image_data (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 4. Image processing sessions table
+-- 5. Image processing sessions table
 CREATE TABLE image_processing_sessions (
     session_id INT PRIMARY KEY AUTO_INCREMENT,
     image_id INT NOT NULL,
@@ -61,6 +70,7 @@ CREATE TABLE image_processing_sessions (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     FOREIGN KEY (image_id) REFERENCES images(image_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (corrected_image_data_id) REFERENCES processed_image_data(processed_data_id) ON DELETE SET NULL,
     FOREIGN KEY (edge_image_data_id) REFERENCES processed_image_data(processed_data_id) ON DELETE SET NULL,
     FOREIGN KEY (contoured_image_data_id) REFERENCES processed_image_data(processed_data_id) ON DELETE SET NULL,
@@ -68,7 +78,7 @@ CREATE TABLE image_processing_sessions (
     INDEX idx_user_id (user_id)
 );
 
--- 5. Edge detection presets table
+-- 6. Edge detection presets table
 CREATE TABLE edge_detection_preferences (
     preset_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id VARCHAR(255) NOT NULL,
@@ -78,18 +88,21 @@ CREATE TABLE edge_detection_preferences (
     canny_threshold_2 INT DEFAULT 150,
     morph_kernel_size INT DEFAULT 3,
     
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     INDEX idx_user_id (user_id),
     UNIQUE KEY unique_user_preset (user_id, name)
 );
 
--- 6. User preferences table
+-- 7. User preferences table
 CREATE TABLE user_preferences (
     user_id VARCHAR(255) PRIMARY KEY,
     default_edge_detection_settings JSON,
     default_drawer_width_mm DECIMAL(8,2) DEFAULT 500.0,
     default_drawer_height_mm DECIMAL(8,2) DEFAULT 300.0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 -- Add some useful indexes for performance
