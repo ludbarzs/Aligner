@@ -72,6 +72,36 @@ const validatePassword = (password) => {
   return "";
 };
 
+// Function to ensure user exists in local database
+async function ensureLocalUser(appwriteUserId) {
+    try {
+        // First try to get the user
+        let response = await fetch(`http://localhost:3000/api/users/appwrite/${appwriteUserId}`);
+        
+        if (response.status === 404) {
+            // User doesn't exist in local DB, create them
+            response = await fetch("http://localhost:3000/api/users", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ awId: appwriteUserId }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to create local user');
+            }
+        } else if (!response.ok) {
+            throw new Error('Failed to check local user');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Error ensuring local user:", error);
+        throw error;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Get form elements
     const form = document.querySelector('.login-form');
@@ -100,7 +130,18 @@ document.addEventListener('DOMContentLoaded', () => {
         createErrorMessage(passwordInput, "");
 
         try {
+            // First login with Appwrite
             await appwriteService.login(email, password);
+            
+            // Get the current user
+            const user = await appwriteService.getCurrentUser();
+            if (!user) {
+                throw new Error('Failed to get user after login');
+            }
+
+            // Ensure user exists in local database
+            await ensureLocalUser(user.$id);
+
             // Redirect to image upload page on success
             window.location.href = '../image_upload/image_upload.html';
         } catch (error) {
