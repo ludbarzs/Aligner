@@ -11,13 +11,43 @@ const drawerWidthInput = document.getElementById('drawer-width');
 const drawerHeightInput = document.getElementById('drawer-height');
 let frameSelector = null;
 
+// Function to validate drawer dimensions
+function validateDrawerDimensions() {
+  const width = drawerWidthInput.value;
+  const height = drawerHeightInput.value;
+  
+  // Check if both values are present and within valid range
+  const isValid = width && height && 
+                 width >= 1 && width <= 2000 &&
+                 height >= 1 && height <= 2000;
+  
+  // Enable/disable continue button based on validation
+  continueButton.disabled = !isValid;
+  
+  // Add/remove visual feedback classes
+  if (isValid) {
+    continueButton.classList.remove('disabled');
+  } else {
+    continueButton.classList.add('disabled');
+  }
+  
+  return isValid;
+}
+
 // Function to load drawer dimensions from AppState
 function loadDrawerDimensions() {
   const dimensions = AppState.getDrawerDimensions();
   if (dimensions && dimensions.width && dimensions.height) {
-    drawerWidthInput.value = dimensions.width;
-    drawerHeightInput.value = dimensions.height;
+    // Only set values if they are valid numbers
+    if (dimensions.width >= 1 && dimensions.width <= 2000) {
+      drawerWidthInput.value = dimensions.width;
+    }
+    if (dimensions.height >= 1 && dimensions.height <= 2000) {
+      drawerHeightInput.value = dimensions.height;
+    }
   }
+  // Initial validation of the continue button
+  validateDrawerDimensions();
 }
 
 // Function to load image from AppState
@@ -150,6 +180,10 @@ function initializeFrameSelector() {
 document.addEventListener("DOMContentLoaded", () => {
   loadImageFromState();
   loadDrawerDimensions();
+  
+  // Add input validation listeners
+  drawerWidthInput.addEventListener('input', validateDrawerDimensions);
+  drawerHeightInput.addEventListener('input', validateDrawerDimensions);
 });
 
 // Add resize listener to handle responsive updates
@@ -161,11 +195,16 @@ window.addEventListener('resize', () => {
 
 // Add continue button click handler
 continueButton.addEventListener('click', async () => {
-  // Get drawer dimensions
-  const drawerWidth = document.getElementById('drawer-width').value;
-  const drawerHeight = document.getElementById('drawer-height').value;
+  // Validate dimensions before proceeding
+  if (!validateDrawerDimensions()) {
+    return; // Don't proceed if validation fails
+  }
   
-  // Store drawer dimensions in AppState (you'll need to add these properties to AppState)
+  // Get drawer dimensions
+  const drawerWidth = drawerWidthInput.value;
+  const drawerHeight = drawerHeightInput.value;
+  
+  // Store drawer dimensions in AppState
   AppState.setDrawerDimensions(drawerWidth, drawerHeight);
   
   // Send to API for processing

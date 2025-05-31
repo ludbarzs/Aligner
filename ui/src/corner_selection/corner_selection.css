@@ -143,4 +143,17 @@
   backdrop-filter: blur(5px);
   color: var(--text-color);
   font-size: 18px;
+}
+
+.control-button.disabled,
+.control-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #666;
+}
+
+.control-button.disabled:hover,
+.control-button:disabled:hover {
+  transform: none;
+  box-shadow: none;
 } 
