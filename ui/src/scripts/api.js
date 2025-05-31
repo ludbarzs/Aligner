@@ -9,7 +9,7 @@ const PROCESSING_TIMEOUT = 30000;
 // Default edge detection settings
 const DEFAULT_EDGE_DETECTION_SETTINGS = {
   blurKernelSize: [5, 5],
-  cannyLow: 30,
+  cannyLow: 43,  // About 1/3 of 130
   cannyHigh: 130,
   morphKernelSize: [5, 5]
 };

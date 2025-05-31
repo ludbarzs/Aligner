@@ -10,8 +10,23 @@ const exportButton = document.querySelector(".control-button.primary");
 
 // Get edge detection settings elements
 const blurSetting = document.getElementById("blur-setting");
-const edgeLow = document.getElementById("edge-low");
-const edgeHigh = document.getElementById("edge-high");
+const edgeSensitivity = document.getElementById("edge-sensitivity");
+const edgeClosing = document.getElementById("edge-closing");
+
+// Get value display elements
+const blurValue = document.getElementById("blur-value");
+const sensitivityValue = document.getElementById("sensitivity-value");
+const closingValue = document.getElementById("closing-value");
+
+// Define closing steps for snapping
+const closingSteps = [1, 3, 5, 8, 11, 13, 16];
+
+// Function to find nearest step value
+function findNearestStep(value, steps) {
+  return steps.reduce((prev, curr) => 
+    Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev
+  );
+}
 
 // Function to load image from AppState
 function loadImageFromState() {
@@ -68,19 +83,42 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Add edge detection settings change handlers
-[blurSetting, edgeLow, edgeHigh].forEach(input => {
+[blurSetting, edgeSensitivity, edgeClosing].forEach(input => {
   if (input) {
+    // Update value display on input (while sliding)
+    input.addEventListener('input', () => {
+      const value = parseInt(input.value);
+      
+      switch(input.id) {
+        case 'blur-setting':
+          blurValue.textContent = value;
+          break;
+        case 'edge-sensitivity':
+          sensitivityValue.textContent = value;
+          break;
+        case 'edge-closing':
+          const snappedValue = findNearestStep(value, closingSteps);
+          closingValue.textContent = snappedValue;
+          break;
+      }
+    });
+
+    // Handle actual value change
     input.addEventListener('change', async () => {
-      // Get current settings
-      const blurValue = parseInt(blurSetting.value);
-      // Ensure blur value is odd
-      const adjustedBlurValue = blurValue % 2 === 0 ? blurValue + 1 : blurValue;
+      let blurVal = parseInt(blurSetting.value);
+      let sensitivityVal = parseInt(edgeSensitivity.value);
+      let closingVal = parseInt(edgeClosing.value);
+      
+      // Snap closing value to nearest step
+      closingVal = findNearestStep(closingVal, closingSteps);
+      edgeClosing.value = closingVal;
+      closingValue.textContent = closingVal;
       
       const settings = {
-        blurKernelSize: [adjustedBlurValue, adjustedBlurValue],
-        cannyLow: parseInt(edgeLow.value),
-        cannyHigh: parseInt(edgeHigh.value),
-        morphKernelSize: [5, 5]  // Keep this fixed as it works well with current implementation
+        blurKernelSize: [blurVal, blurVal],
+        cannyLow: Math.floor(sensitivityVal / 3),  // Low threshold is 1/3 of high threshold
+        cannyHigh: sensitivityVal,
+        morphKernelSize: [closingVal, closingVal]
       };
 
       // Update edge detection settings in AppState
