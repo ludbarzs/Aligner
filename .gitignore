@@ -23,3 +23,5 @@ __pycache__/
 node_modules/
 .eslintrc.js
 eslint.config.mjs
+
+lazygit*
