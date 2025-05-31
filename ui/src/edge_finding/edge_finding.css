@@ -1,6 +1,25 @@
+/* Controls container layout */
+.controls-container {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 20px;
+  width: 100%;
+  padding: 20px;
+  align-items: start;
+}
+
+.controls-left {
+  justify-self: start;
+}
+
+.controls-right {
+  justify-self: end;
+}
+
 /* Edge settings styling */
 .edge-settings-container {
-  order: 2;
+  order: 0;
+  justify-self: center;
 }
 
 .settings-inputs {
