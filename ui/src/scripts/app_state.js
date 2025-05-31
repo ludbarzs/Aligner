@@ -151,6 +151,38 @@ export class AppState {
     };
   }
 
+  // Set all stored values
+  static setAllValues(values) {
+    if (values.coordinates) {
+      AppState.setCornerCoordinates(values.coordinates);
+    }
+    if (values.transformations) {
+      AppState.setRotation(values.transformations.rotation);
+      AppState.setMirrored(values.transformations.mirrored);
+    }
+    if (values.currentImage) {
+      AppState.setCurrentImage(values.currentImage);
+    }
+    if (values.drawerDimensions) {
+      AppState.setDrawerDimensions(
+        values.drawerDimensions.width,
+        values.drawerDimensions.height
+      );
+    }
+    if (values.edgeDetectionSettings) {
+      AppState.setEdgeDetectionSettings(values.edgeDetectionSettings);
+    }
+    if (values.contouredImage) {
+      AppState.setContouredImage(values.contouredImage);
+    }
+    if (values.dxfData) {
+      AppState.setDxfData(values.dxfData);
+    }
+    if (values.processedImage) {
+      AppState.setProcessedImage(values.processedImage);
+    }
+  }
+
   // Clear all stored data
   static clearCache() {
     localStorage.removeItem("coordinates");
