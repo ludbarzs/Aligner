@@ -32,8 +32,12 @@ function handleImageUpload(file) {
   const reader = new FileReader();
 
   reader.onload = function (e) {
-    // Save image to app state
+    // Clear all existing state before setting new image
+    AppState.clearCache();
+    
+    // Save new image to app state
     AppState.setCurrentImage(e.target.result);
+    
     // Redirect to edit page
     window.location.href = "../image_edit/image_edit.html";
   };

@@ -1,5 +1,6 @@
 import { AppState } from "../../scripts/app_state.js";
 import { ApiService } from "../../scripts/api.js";
+import { ImageController } from "../../scripts/controllers/image_controller.js";
 
 // Get DOM elements
 const imageElement = document.getElementById("edge-image");
@@ -115,17 +116,19 @@ document.addEventListener("DOMContentLoaded", () => {
 if (exportButton) {
   exportButton.addEventListener('click', async () => {
     try {
-      // Send final data to API for processing
-      const response = await ApiService.sendToAPI();
+      // First send final data to API for processing
+      await ApiService.sendToAPI();
       
-      // Store the processed data in sessionStorage
-      sessionStorage.setItem('processedData', JSON.stringify(response));
+      // Save all current state to the database
+      // TODO: Replace 1 with actual user ID from authentication system
+      const savedImage = await ImageController.saveCurrentState(1);
+      console.log('Image state saved successfully:', savedImage);
       
       // Navigate to export page
       window.location.href = '../export/export.html';
     } catch (error) {
-      console.error("Failed to process data for export:", error);
-      alert("Failed to prepare data for export. Please try again.");
+      console.error("Failed to save or process data:", error);
+      alert("Failed to save data. Please try again.");
     }
   });
 } 

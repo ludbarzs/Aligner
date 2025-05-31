@@ -1,0 +1,151 @@
+.box {
+  overflow: auto;
+  padding: 20px;
+  height: calc(100vh - 100px); /* Adjust for top padding and buttons */
+  position: relative;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  margin: 0;
+}
+
+.project-heading {
+  font-size: 24px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+  padding: 0;
+  font-family:
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  letter-spacing: 0.5px;
+  text-align: left;
+  align-self: flex-start;
+  margin-bottom: 30px;
+}
+
+.top-buttons {
+  position: fixed;
+  top: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 10;
+}
+
+.upload-button {
+  background-color: var(--neon-color);
+}
+
+.logout-button {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Override container styles from styles.css */
+.container {
+  padding-top: 80px !important;
+  min-height: 100vh;
+  height: 100vh !important;
+  display: flex;
+  flex-direction: column;
+  padding: 80px 20px 20px 20px !important;
+}
+
+/* Make the main content area responsive */
+.main-content {
+  display: none; /* Since we're not using it */
+}
+
+/* Projects Grid Styles */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  width: 100%;
+  padding: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.project-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  aspect-ratio: 1;
+  position: relative;
+}
+
+.project-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(138, 67, 252, 0.2);
+}
+
+.project-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.project-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  padding: 20px;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.project-item:hover .project-overlay {
+  opacity: 1;
+}
+
+.project-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+  color: white;
+}
+
+.project-date {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 5px;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .container {
+    padding: 100px 10px 10px 10px !important;
+  }
+
+  .top-buttons {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px 20px;
+  }
+
+  .box {
+    padding: 15px;
+    height: calc(100vh - 120px); /* Adjust for larger top padding on mobile */
+  }
+
+  .projects-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+  }
+}

@@ -1,198 +1,168 @@
 /**
  * Manages application state and provides methods to interact with it
  */
-export const AppState = {
-  currentImage: null,
-  currentRotation: 0,
-  isMirrored: false,
-  cornerCoordinates: [],
-  drawerWidth: 530, // Default width in mm
-  drawerHeight: 330, // Default height in mm
-  edgeDetectionSettings: {
-    blurKernelSize: [5, 5],
-    cannyLow: 30,
-    cannyHigh: 130,
-    morphKernelSize: [5, 5],
-    edgeThreshold: 80
-  },
-  contouredImage: null,
-  dxfData: null,
-  
-  setCurrentImage(imageData) {
-    this.currentImage = imageData;
-    // Persist to localStorage
-    localStorage.setItem('currentImage', imageData);
-    // Reset transformations when setting new image
-    this.resetTransformations();
-  },
-  
-  getCurrentImage() {
-    // Try to get from memory first, then localStorage
-    if (this.currentImage) {
-      return this.currentImage;
-    }
-    // Try to restore from localStorage
-    const savedImage = localStorage.getItem('currentImage');
-    if (savedImage) {
-      this.currentImage = savedImage;
-      // Also restore transformations
-      this.restoreTransformations();
-    }
-    return this.currentImage;
-  },
-  
-  clearCurrentImage() {
-    this.currentImage = null;
-    // Clear from localStorage too
-    localStorage.removeItem('currentImage');
-    this.resetTransformations();
-  },
+export class AppState {
+  // Coordinates methods
+  static setCornerCoordinates(coordinates) {
+    localStorage.setItem("coordinates", JSON.stringify(coordinates));
+  }
 
-  // Corner coordinates methods
-  setCornerCoordinates(coordinates) {
-    this.cornerCoordinates = coordinates;
-    localStorage.setItem('cornerCoordinates', JSON.stringify(coordinates));
-  },
+  static getCornerCoordinates() {
+    const saved = localStorage.getItem("coordinates");
+    return saved ? JSON.parse(saved) : [];
+  }
 
-  getCornerCoordinates() {
-    if (this.cornerCoordinates.length > 0) {
-      return this.cornerCoordinates;
-    }
-    // Try to restore from localStorage
-    const savedCoordinates = localStorage.getItem('cornerCoordinates');
-    if (savedCoordinates) {
-      this.cornerCoordinates = JSON.parse(savedCoordinates);
-    }
-    return this.cornerCoordinates;
-  },
-
-  clearCornerCoordinates() {
-    this.cornerCoordinates = [];
-    localStorage.removeItem('cornerCoordinates');
-  },
+  static clearCornerCoordinates() {
+    localStorage.removeItem("coordinates");
+  }
 
   // Transformation methods
-  setRotation(degrees) {
-    this.currentRotation = degrees;
-    localStorage.setItem('currentRotation', degrees.toString());
-  },
+  static setRotation(degrees) {
+    localStorage.setItem("rotation", degrees.toString());
+  }
 
-  setMirrored(isMirrored) {
-    this.isMirrored = isMirrored;
-    localStorage.setItem('isMirrored', isMirrored.toString());
-  },
+  static getRotation() {
+    const saved = localStorage.getItem("rotation");
+    return saved ? parseInt(saved, 10) : 0;
+  }
 
-  getTransformations() {
+  static setMirrored(isMirrored) {
+    localStorage.setItem("isMirrored", isMirrored.toString());
+  }
+
+  static getMirrored() {
+    const saved = localStorage.getItem("isMirrored");
+    return saved ? saved === "true" : false;
+  }
+
+  static getTransformations() {
     return {
-      rotation: this.currentRotation,
-      mirrored: this.isMirrored
+      rotation: AppState.getRotation(),
+      mirrored: AppState.getMirrored(),
     };
-  },
+  }
 
-  resetTransformations() {
-    this.currentRotation = 0;
-    this.isMirrored = false;
-    this.clearCornerCoordinates();
-    localStorage.removeItem('currentRotation');
-    localStorage.removeItem('isMirrored');
-  },
+  static resetTransformations() {
+    localStorage.removeItem("rotation");
+    localStorage.removeItem("isMirrored");
+    AppState.clearCornerCoordinates();
+  }
 
-  restoreTransformations() {
-    // Restore rotation
-    const savedRotation = localStorage.getItem('currentRotation');
-    if (savedRotation !== null) {
-      this.currentRotation = parseInt(savedRotation, 10);
-    }
+  // Image methods
+  static setCurrentImage(imageData) {
+    localStorage.setItem("currentImage", imageData);
+    AppState.resetTransformations();
+  }
 
-    // Restore mirror state
-    const savedMirror = localStorage.getItem('isMirrored');
-    if (savedMirror !== null) {
-      this.isMirrored = savedMirror === 'true';
-    }
+  static getCurrentImage() {
+    return localStorage.getItem("currentImage");
+  }
 
-    // Restore corner coordinates
-    const savedCoordinates = localStorage.getItem('cornerCoordinates');
-    if (savedCoordinates !== null) {
-      this.cornerCoordinates = JSON.parse(savedCoordinates);
-    }
-  },
+  static setCurrentImageId(imageId) {
+    localStorage.setItem("currentImageId", imageId.toString());
+  }
+
+  static getCurrentImageId() {
+    const id = localStorage.getItem("currentImageId");
+    return id ? parseInt(id, 10) : null;
+  }
+
+  static clearCurrentImage() {
+    localStorage.removeItem("currentImage");
+    localStorage.removeItem("currentImageId");
+    AppState.resetTransformations();
+  }
 
   // Drawer dimensions methods
-  setDrawerDimensions(width, height) {
-    this.drawerWidth = parseInt(width);
-    this.drawerHeight = parseInt(height);
-    localStorage.setItem('drawerWidth', width);
-    localStorage.setItem('drawerHeight', height);
-  },
+  static setDrawerDimensions(width, height) {
+    localStorage.setItem("drawerWidth", width.toString());
+    localStorage.setItem("drawerHeight", height.toString());
+  }
 
-  getDrawerDimensions() {
+  static getDrawerDimensions() {
+    const savedWidth = localStorage.getItem("drawerWidth");
+    const savedHeight = localStorage.getItem("drawerHeight");
     return {
-      width: this.drawerWidth,
-      height: this.drawerHeight
+      width: savedWidth ? parseInt(savedWidth) : null,
+      height: savedHeight ? parseInt(savedHeight) : null,
     };
-  },
+  }
 
   // Edge detection settings methods
-  setEdgeDetectionSettings(settings) {
-    this.edgeDetectionSettings = settings;
-    localStorage.setItem('edgeDetectionSettings', JSON.stringify(settings));
-  },
+  static setEdgeDetectionSettings(settings) {
+    localStorage.setItem("edgeDetectionSettings", JSON.stringify(settings));
+  }
 
-  getEdgeDetectionSettings() {
-    if (this.edgeDetectionSettings) {
-      return this.edgeDetectionSettings;
-    }
-    // Try to restore from localStorage
-    const savedSettings = localStorage.getItem('edgeDetectionSettings');
-    if (savedSettings) {
-      this.edgeDetectionSettings = JSON.parse(savedSettings);
-    }
-    return this.edgeDetectionSettings;
-  },
+  static getEdgeDetectionSettings() {
+    const saved = localStorage.getItem("edgeDetectionSettings");
+    return saved ? JSON.parse(saved) : null;
+  }
 
   // Contoured image methods
-  setContouredImage(imageData) {
-    this.contouredImage = imageData;
-    localStorage.setItem('contouredImage', imageData);
-  },
+  static setContouredImage(imageData) {
+    localStorage.setItem("contouredImage", imageData);
+  }
 
-  getContouredImage() {
-    if (this.contouredImage) {
-      return this.contouredImage;
-    }
-    // Try to restore from localStorage
-    const savedImage = localStorage.getItem('contouredImage');
-    if (savedImage) {
-      this.contouredImage = savedImage;
-    }
-    return this.contouredImage;
-  },
+  static getContouredImage() {
+    return localStorage.getItem("contouredImage");
+  }
 
-  clearContouredImage() {
-    this.contouredImage = null;
-    localStorage.removeItem('contouredImage');
-  },
+  static clearContouredImage() {
+    localStorage.removeItem("contouredImage");
+  }
 
   // DXF data methods
-  setDxfData(data) {
-    this.dxfData = data;
-    localStorage.setItem('dxfData', data);
-  },
+  static setDxfData(data) {
+    localStorage.setItem("dxfData", data);
+  }
 
-  getDxfData() {
-    if (this.dxfData) {
-      return this.dxfData;
-    }
-    // Try to restore from localStorage
-    const savedData = localStorage.getItem('dxfData');
-    if (savedData) {
-      this.dxfData = savedData;
-    }
-    return this.dxfData;
-  },
+  static getDxfData() {
+    return localStorage.getItem("dxfData");
+  }
 
-  clearDxfData() {
-    this.dxfData = null;
-    localStorage.removeItem('dxfData');
-  },
-};
+  static clearDxfData() {
+    localStorage.removeItem("dxfData");
+  }
+
+  // Processed image methods
+  static setProcessedImage(imageData) {
+    localStorage.setItem("processedImage", imageData);
+  }
+
+  static getProcessedImage() {
+    return localStorage.getItem("processedImage");
+  }
+
+  static clearProcessedImage() {
+    localStorage.removeItem("processedImage");
+  }
+
+  // Get all stored values
+  static getAllValues() {
+    return {
+      coordinates: AppState.getCornerCoordinates(),
+      transformations: AppState.getTransformations(),
+      currentImage: AppState.getCurrentImage(),
+      drawerDimensions: AppState.getDrawerDimensions(),
+      edgeDetectionSettings: AppState.getEdgeDetectionSettings(),
+      contouredImage: AppState.getContouredImage(),
+      dxfData: AppState.getDxfData(),
+      processedImage: AppState.getProcessedImage()
+    };
+  }
+
+  // Clear all stored data
+  static clearCache() {
+    localStorage.removeItem("coordinates");
+    localStorage.removeItem("rotation");
+    localStorage.removeItem("isMirrored");
+    localStorage.removeItem("currentImage");
+    localStorage.removeItem("currentImageId");
+    localStorage.removeItem("drawerWidth");
+    localStorage.removeItem("drawerHeight");
+    localStorage.removeItem("edgeDetectionSettings");
+    localStorage.removeItem("contouredImage");
+    localStorage.removeItem("dxfData");
+    localStorage.removeItem("processedImage");
+  }
+}

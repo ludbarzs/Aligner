@@ -60,15 +60,14 @@ export class AuthController {
   updateAuthUI() {
     if (!this.authButtons) return;
 
-    // Clear existing buttons
-    this.authButtons.innerHTML = "";
-
     if (this.currentUser) {
-      // User is logged in - show logout button and user info
-      this.renderLoggedInUI();
+        // User is logged in - hide auth buttons and show user icon
+        this.authButtons.style.display = 'none';
+        this.renderLoggedInUI();
     } else {
-      // User is not logged in - show login and signup buttons
-      this.renderLoggedOutUI();
+        // User is not logged in - show auth buttons and remove user icon
+        this.authButtons.style.display = 'flex';
+        this.renderLoggedOutUI();
     }
   }
 
@@ -76,25 +75,65 @@ export class AuthController {
    * Render UI for logged-in users
    */
   renderLoggedInUI() {
-    const userInfo = document.createElement("div");
-    userInfo.className = "user-info";
-    userInfo.innerHTML = `
-            <span class="user-name">Welcome, ${this.currentUser.name || this.currentUser.email}</span>
-        `;
+    // Create user icon container with hover menu
+    const userIconContainer = document.createElement("div");
+    userIconContainer.className = "user-icon-container";
 
-    const logoutButton = document.createElement("button");
-    logoutButton.className = "auth-button logout-button";
-    logoutButton.textContent = "Logout";
-    logoutButton.addEventListener("click", () => this.handleLogout());
+    // Create user icon button
+    const userIconButton = document.createElement("button");
+    userIconButton.className = "user-icon-button";
+    userIconButton.innerHTML = `
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+        </svg>
+    `;
 
-    this.authButtons.appendChild(userInfo);
-    this.authButtons.appendChild(logoutButton);
+    // Create hover menu
+    const hoverMenu = document.createElement("div");
+    hoverMenu.className = "hover-menu";
+
+    // Create View Profile button
+    const viewProfileButton = document.createElement("button");
+    viewProfileButton.className = "hover-menu-button";
+    viewProfileButton.textContent = "View Profile";
+    viewProfileButton.addEventListener("click", () => {
+        window.location.href = "../user_profile/user_profile.html";
+    });
+
+    // Create Logout button in hover menu
+    const hoverMenuLogoutButton = document.createElement("button");
+    hoverMenuLogoutButton.className = "hover-menu-button logout";
+    hoverMenuLogoutButton.textContent = "Logout";
+    hoverMenuLogoutButton.addEventListener("click", async () => {
+        await this.handleLogout();
+        window.location.href = "../image_upload/image_upload.html";
+    });
+
+    // Assemble the hover menu
+    hoverMenu.appendChild(viewProfileButton);
+    hoverMenu.appendChild(hoverMenuLogoutButton);
+
+    // Assemble the user icon container
+    userIconContainer.appendChild(userIconButton);
+    userIconContainer.appendChild(hoverMenu);
+
+    // Add user icon container to the document body since it's positioned absolutely
+    document.body.appendChild(userIconContainer);
   }
 
   /**
    * Render UI for logged-out users
    */
   renderLoggedOutUI() {
+    // Remove user icon container if it exists
+    const existingUserIcon = document.querySelector('.user-icon-container');
+    if (existingUserIcon) {
+        existingUserIcon.remove();
+    }
+
+    // Clear existing buttons
+    this.authButtons.innerHTML = "";
+
     const loginButton = document.createElement("button");
     loginButton.className = "auth-button login-button";
     loginButton.textContent = "Login";
