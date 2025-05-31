@@ -36,6 +36,7 @@
         <div id="edge-settings" class="edge-settings-container">
           <div class="settings-inputs">
             <div class="setting-input-group">
+              <span class="info-icon">i<span class="tooltip">Applies Gaussian blur to reduce noise in the image before edge detection. Higher values create smoother edges but may miss details.</span></span>
               <span class="setting-label">Blur</span>
               <input
                 type="range"
@@ -48,6 +49,7 @@
               <span class="setting-value" id="blur-value">5</span>
             </div>
             <div class="setting-input-group">
+              <span class="info-icon">i<span class="tooltip">Controls how easily edges are detected. Lower values detect only strong edges, higher values include more subtle edges.</span></span>
               <span class="setting-label">Edge Sensitivity</span>
               <input
                 type="range"
@@ -60,6 +62,7 @@
               <span class="setting-value" id="sensitivity-value">130</span>
             </div>
             <div class="setting-input-group">
+              <span class="info-icon">i<span class="tooltip">Connects nearby edges to form continuous lines. Higher values bridge larger gaps but may connect unrelated edges.</span></span>
               <span class="setting-label">Edge Closing</span>
               <input
                 type="range"
