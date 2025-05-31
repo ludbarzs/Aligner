@@ -1,4 +1,5 @@
 import { authController } from "../../scripts/controllers/AuthController.js";
+import { ImageController } from "../../scripts/controllers/image_controller.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   // Logout button handler
@@ -12,18 +13,24 @@ document.addEventListener("DOMContentLoaded", () => {
   initProjectsGrid();
 });
 
-function initProjectsGrid() {
+async function initProjectsGrid() {
   const projectsGrid = document.getElementById("projects-grid");
 
   // Function to add a new project
-  window.addProject = function (imageUrl, title, date) {
+  function addProject(imageData) {
     const projectItem = document.createElement("div");
     projectItem.className = "project-item";
 
+    const date = new Date(imageData.createdAt || new Date()).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
     projectItem.innerHTML = `
-            <img src="${imageUrl}" alt="${title}" class="project-image">
+            <img src="data:${imageData.mimeType};base64,${imageData.base64Data}" alt="Project Image" class="project-image">
             <div class="project-overlay">
-              <h3 class="project-title">${title}</h3>
+              <h3 class="project-title">Project ${imageData.imageId}</h3>
               <div class="project-date">${date}</div>
             </div>
           `;
@@ -31,78 +38,35 @@ function initProjectsGrid() {
     // Add click event listener
     projectItem.addEventListener("click", () => {
       // Handle project click - you can add navigation or preview functionality here
-      console.log("Project clicked:", title);
+      console.log("Project clicked:", imageData.imageId);
     });
 
     projectsGrid.appendChild(projectItem);
-  };
+  }
 
-  // Add placeholder projects
-  const placeholders = [
-    {
-      imageUrl: "https://source.unsplash.com/random/800x800?landscape",
-      title: "Landscape Project",
-      date: "March 15, 2024",
-    },
-    {
-      imageUrl: "https://source.unsplash.com/random/800x800?portrait",
-      title: "Portrait Study",
-      date: "March 14, 2024",
-    },
-    {
-      imageUrl: "https://source.unsplash.com/random/800x800?architecture",
-      title: "Architecture Series",
-      date: "March 13, 2024",
-    },
-    {
-      imageUrl: "https://source.unsplash.com/random/800x800?nature",
-      title: "Nature Collection",
-      date: "March 12, 2024",
-    },
-    {
-      imageUrl: "https://source.unsplash.com/random/800x800?abstract",
-      title: "Abstract Art",
-      date: "March 11, 2024",
-    },
-    {
-      imageUrl: "https://source.unsplash.com/random/800x800?minimal",
-      title: "Minimalist Design",
-      date: "March 10, 2024",
-    },
-    {
-      imageUrl: "https://source.unsplash.com/random/800x800?landscape",
-      title: "Landscape Project",
-      date: "March 15, 2024",
-    },
-    {
-      imageUrl: "https://source.unsplash.com/random/800x800?portrait",
-      title: "Portrait Study",
-      date: "March 14, 2024",
-    },
-    {
-      imageUrl: "https://source.unsplash.com/random/800x800?architecture",
-      title: "Architecture Series",
-      date: "March 13, 2024",
-    },
-    {
-      imageUrl: "https://source.unsplash.com/random/800x800?nature",
-      title: "Nature Collection",
-      date: "March 12, 2024",
-    },
-    {
-      imageUrl: "https://source.unsplash.com/random/800x800?abstract",
-      title: "Abstract Art",
-      date: "March 11, 2024",
-    },
-    {
-      imageUrl: "https://source.unsplash.com/random/800x800?minimal",
-      title: "Minimalist Design",
-      date: "March 10, 2024",
-    },
-  ];
+  try {
+    // Clear existing content
+    projectsGrid.innerHTML = '';
+    
+    // Show loading state
+    projectsGrid.innerHTML = '<div class="loading">Loading your projects...</div>';
 
-  // Add all placeholder projects
-  placeholders.forEach((project) => {
-    window.addProject(project.imageUrl, project.title, project.date);
-  });
+    // Fetch user's images from the database
+    const userImages = await ImageController.getCurrentUserImages();
+
+    // Clear loading state
+    projectsGrid.innerHTML = '';
+
+    if (userImages && userImages.length > 0) {
+      // Add all user projects
+      userImages.forEach((image) => {
+        addProject(image);
+      });
+    } else {
+      projectsGrid.innerHTML = '<div class="no-projects">No projects found. Start by uploading an image!</div>';
+    }
+  } catch (error) {
+    console.error('Error loading projects:', error);
+    projectsGrid.innerHTML = '<div class="error">Error loading projects. Please try again later.</div>';
+  }
 }
