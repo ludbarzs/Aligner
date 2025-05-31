@@ -61,6 +61,33 @@ function loadImageFromState() {
   }
 }
 
+// Function to load saved edge detection settings
+function loadSavedSettings() {
+  const settings = AppState.getEdgeDetectionSettings();
+  if (settings) {
+    // Update blur setting
+    if (settings.blurKernelSize && settings.blurKernelSize[0]) {
+      const blurVal = settings.blurKernelSize[0];
+      blurSetting.value = blurVal;
+      blurValue.textContent = blurVal;
+    }
+
+    // Update edge sensitivity
+    if (settings.cannyHigh) {
+      const sensitivityVal = settings.cannyHigh;
+      edgeSensitivity.value = sensitivityVal;
+      sensitivityValue.textContent = sensitivityVal;
+    }
+
+    // Update edge closing
+    if (settings.morphKernelSize && settings.morphKernelSize[0]) {
+      const closingVal = findNearestStep(settings.morphKernelSize[0], closingSteps);
+      edgeClosing.value = closingVal;
+      closingValue.textContent = closingVal;
+    }
+  }
+}
+
 // Handle case where no image is available
 function handleNoImage(message) {
   if (noImageMessage) {
@@ -80,6 +107,7 @@ function handleNoImage(message) {
 // Event Listeners
 document.addEventListener("DOMContentLoaded", () => {
   loadImageFromState();
+  loadSavedSettings();
 });
 
 // Add edge detection settings change handlers
