@@ -36,7 +36,10 @@
         <div id="edge-settings" class="edge-settings-container">
           <div class="settings-inputs">
             <div class="setting-input-group">
-              <span class="setting-label">Blur</span>
+              <div class="setting-label-group">
+                <span class="setting-label">Blur</span>
+                <div class="info-button" title="Adjusts how much the image is smoothed before edge detection. Higher values reduce noise but may lose detail.">i</div>
+              </div>
               <input
                 type="range"
                 id="blur-setting"
@@ -48,7 +51,10 @@
               <span class="setting-value" id="blur-value">5</span>
             </div>
             <div class="setting-input-group">
-              <span class="setting-label">Edge Sensitivity</span>
+              <div class="setting-label-group">
+                <span class="setting-label">Edge Sensitivity</span>
+                <div class="info-button" title="Controls how easily edges are detected. Higher values detect only stronger edges, lower values include more subtle edges.">i</div>
+              </div>
               <input
                 type="range"
                 id="edge-sensitivity"
@@ -60,7 +66,10 @@
               <span class="setting-value" id="sensitivity-value">130</span>
             </div>
             <div class="setting-input-group">
-              <span class="setting-label">Edge Closing</span>
+              <div class="setting-label-group">
+                <span class="setting-label">Edge Closing</span>
+                <div class="info-button" title="Connects nearby edges. Higher values bridge larger gaps between edges, helping to close incomplete shapes.">i</div>
+              </div>
               <input
                 type="range"
                 id="edge-closing"

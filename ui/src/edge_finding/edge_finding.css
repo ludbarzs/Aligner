@@ -62,6 +62,8 @@
   outline: none;
   -webkit-appearance: none;
   margin: 0 10px;
+  position: relative;
+  top: 0;
 }
 
 .setting-input-group input[type="range"]::-webkit-slider-thumb {
@@ -73,9 +75,50 @@
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 0 10px var(--neon-color);
+  margin-top: -7px; /* Centers the thumb on the track */
+}
+
+/* Firefox specific styles */
+.setting-input-group input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--neon-color);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 10px var(--neon-color);
+  border: none; /* Removes default border */
+}
+
+.setting-input-group input[type="range"]::-moz-range-track {
+  height: 2px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+/* Edge specific styles */
+.setting-input-group input[type="range"]::-ms-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--neon-color);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 10px var(--neon-color);
+  margin-top: 0;
 }
 
 .setting-input-group input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 15px var(--neon-color);
+}
+
+.setting-input-group input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 15px var(--neon-color);
+}
+
+.setting-input-group input[type="range"]::-ms-thumb:hover {
   transform: scale(1.2);
   box-shadow: 0 0 15px var(--neon-color);
 }
@@ -126,4 +169,73 @@
   backdrop-filter: blur(5px);
   color: var(--text-color);
   font-size: 18px;
+}
+
+.setting-label-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 80px;
+}
+
+.setting-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 16px;
+}
+
+.info-button {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--neon-color);
+  font-size: 12px;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.info-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+/* Tooltip styles */
+.info-button[title] {
+  position: relative;
+}
+
+.info-button[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(100% + 10px);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-style: normal;
+  white-space: nowrap;
+  z-index: 1000;
+  width: max-content;
+  max-width: 250px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(5px);
+}
+
+.info-button[title]:hover::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(100% + 4px);
+  border: 6px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
 } 
