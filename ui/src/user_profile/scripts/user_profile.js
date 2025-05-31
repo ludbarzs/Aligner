@@ -1,5 +1,6 @@
 import { authController } from "../../scripts/controllers/AuthController.js";
 import { ImageController } from "../../scripts/controllers/image_controller.js";
+import { AppState } from "../../scripts/app_state.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   // Logout button handler
@@ -40,8 +41,27 @@ async function initProjectsGrid() {
 
     // Add click event listener
     projectItem.addEventListener("click", () => {
-      // Handle project click - you can add navigation or preview functionality here
-      console.log("Project clicked:", imageData.image_id);
+      // Set all the state values for the image
+      const stateValues = {
+        currentImage: imageData.base64_data,
+        currentImageId: imageData.image_id,
+        coordinates: imageData.corner_coordinates || [],
+        transformations: {
+          rotation: imageData.rotation || 0,
+          mirrored: imageData.is_mirrored || false
+        },
+        drawerDimensions: imageData.drawer_dimensions || null,
+        edgeDetectionSettings: imageData.edge_detection_settings || null,
+        contouredImage: imageData.contoured_image || null,
+        dxfData: imageData.dxf_data || null,
+        processedImage: imageData.processed_image || null
+      };
+
+      // Set all the values in AppState
+      AppState.setAllValues(stateValues);
+
+      // Redirect to image edit view
+      window.location.href = "../image_edit/image_edit.html";
     });
 
     projectsGrid.appendChild(projectItem);
