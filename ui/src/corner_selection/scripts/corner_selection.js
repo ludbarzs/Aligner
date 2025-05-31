@@ -7,7 +7,18 @@ const imageElement = document.getElementById("corner-image");
 const imageContainer = document.querySelector(".image-container");
 const noImageMessage = document.querySelector(".no-image-message");
 const continueButton = document.querySelector(".control-button.primary");
+const drawerWidthInput = document.getElementById('drawer-width');
+const drawerHeightInput = document.getElementById('drawer-height');
 let frameSelector = null;
+
+// Function to load drawer dimensions from AppState
+function loadDrawerDimensions() {
+  const dimensions = AppState.getDrawerDimensions();
+  if (dimensions && dimensions.width && dimensions.height) {
+    drawerWidthInput.value = dimensions.width;
+    drawerHeightInput.value = dimensions.height;
+  }
+}
 
 // Function to load image from AppState
 function loadImageFromState() {
@@ -138,6 +149,7 @@ function initializeFrameSelector() {
 // Event Listeners
 document.addEventListener("DOMContentLoaded", () => {
   loadImageFromState();
+  loadDrawerDimensions();
 });
 
 // Add resize listener to handle responsive updates
