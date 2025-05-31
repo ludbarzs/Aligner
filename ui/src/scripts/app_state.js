@@ -45,13 +45,11 @@ export class AppState {
   static resetTransformations() {
     localStorage.removeItem("rotation");
     localStorage.removeItem("isMirrored");
-    AppState.clearCornerCoordinates();
   }
 
   // Image methods
   static setCurrentImage(imageData) {
     localStorage.setItem("currentImage", imageData);
-    AppState.resetTransformations();
   }
 
   static getCurrentImage() {
