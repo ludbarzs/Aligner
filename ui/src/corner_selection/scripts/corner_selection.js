@@ -178,6 +178,9 @@ function initializeFrameSelector() {
 
 // Event Listeners
 document.addEventListener("DOMContentLoaded", () => {
+  // Print entire AppState to console
+  console.log('Current AppState:', AppState.getAllValues());
+  
   loadImageFromState();
   loadDrawerDimensions();
   
