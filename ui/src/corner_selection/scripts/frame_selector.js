@@ -28,13 +28,23 @@ export class FrameSelector {
     // Add container to the image's parent
     this.imageElement.parentElement.appendChild(this.container);
 
-    // Initialize cornerPositions with default percentage values
-    this.cornerPositions = [
-      { x: 15, y: 15 },        // Top-left
-      { x: 85, y: 15 },        // Top-right
-      { x: 85, y: 85 },        // Bottom-right
-      { x: 15, y: 85 }         // Bottom-left
-    ];
+    // Check for saved coordinates in AppState
+    const savedCoordinates = AppState.getCornerCoordinates();
+    if (savedCoordinates && savedCoordinates.length === 4) {
+      // Convert saved absolute coordinates to percentages
+      this.cornerPositions = savedCoordinates.map(coord => ({
+        x: (coord.x / this.imageElement.naturalWidth) * 100,
+        y: (coord.y / this.imageElement.naturalHeight) * 100
+      }));
+    } else {
+      // Initialize cornerPositions with default percentage values only if no saved coordinates
+      this.cornerPositions = [
+        { x: 15, y: 15 },        // Top-left
+        { x: 85, y: 15 },        // Top-right
+        { x: 85, y: 85 },        // Bottom-right
+        { x: 15, y: 85 }         // Bottom-left
+      ];
+    }
 
     // Create corners and lines
     this.createCorners();
