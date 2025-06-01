@@ -155,9 +155,7 @@
   gap: 10px;
   align-items: center;
   z-index: 100;
-  padding: 10px;
   border-radius: 25px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .auth-button {
@@ -404,7 +402,6 @@
   gap: 10px;
   z-index: 100;
   border-radius: 25px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   align-items: center;
 }
 
@@ -442,4 +439,3 @@
     font-size: 12px;
   }
 }
-
