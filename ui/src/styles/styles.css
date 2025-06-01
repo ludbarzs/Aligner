@@ -397,3 +397,30 @@
     max-width: none;
   }
 }
+
+/* Top buttons container */
+.top-buttons {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  border-radius: 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.upload-button {
+  background-color: var(--neon-color);
+  color: white;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.upload-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(138, 67, 252, 0.5);
+}
