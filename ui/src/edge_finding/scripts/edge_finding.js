@@ -192,12 +192,19 @@ document.addEventListener("DOMContentLoaded", () => {
 if (exportButton) {
   exportButton.addEventListener("click", async () => {
     try {
+      // Check if user is authenticated
+      if (!authController.isAuthenticated()) {
+        // Redirect to login page if not authenticated
+        window.location.href = "../authentication/login.html";
+        return;
+      }
+
       // First send final data to API for processing
       await ApiService.sendToAPI();
 
       // Save all current state to the database
-      // TODO: Replace 1 with actual user ID from authentication system
-      const savedImage = await ImageController.saveCurrentState(1);
+      const currentUser = authController.getCurrentUser();
+      const savedImage = await ImageController.saveCurrentState(currentUser.$id);
       console.log("Image state saved successfully:", savedImage);
 
       // Navigate to export page
