@@ -63,7 +63,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.55);
   z-index: 0;
 }
 
@@ -149,7 +149,6 @@
 
 /* Enhanced auth buttons positioning and appearance */
 .auth-buttons {
-  position: fixed;
   top: 20px;
   left: 20px;
   display: flex;
@@ -352,7 +351,7 @@
 }
 
 .hover-menu::after {
-  content: '';
+  content: "";
   position: absolute;
   right: -6px;
   top: 14px;
@@ -402,13 +401,10 @@
 .top-buttons {
   position: fixed;
   top: 20px;
-  right: 20px;
+  left: 20px;
   display: flex;
   gap: 10px;
   z-index: 100;
-  backdrop-filter: blur(10px);
-  background: rgba(0, 0, 0, 0.2);
-  padding: 10px;
   border-radius: 25px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
@@ -424,3 +420,4 @@
   transform: scale(1.05);
   box-shadow: 0 0 15px rgba(138, 67, 252, 0.5);
 }
+

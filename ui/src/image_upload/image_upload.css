@@ -55,14 +55,6 @@
   background-position: center;
 }
 
-.container::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  z-index: 0;
-}
-
 .main-content {
   display: flex;
   gap: 30px;
