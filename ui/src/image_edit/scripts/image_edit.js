@@ -1,4 +1,6 @@
 import { AppState } from "../../scripts/app_state.js";
+import { authController } from "../../scripts/controllers/AuthController.js";
+
 
 // Get DOM elements
 const imageElement = document.getElementById("edit-image");
@@ -14,6 +16,13 @@ fileInput.accept = '.jpg,.jpeg,.png';
 fileInput.style.display = 'none';
 fileInput.id = 'reupload-input';
 document.body.appendChild(fileInput);
+
+// Initialize AuthController
+document.addEventListener("DOMContentLoaded", async () => {
+  // Initialize auth controller
+  await authController.init();
+});
+
 
 // Find the rotate, mirror, and reupload buttons by their text content
 buttons.forEach((button) => {

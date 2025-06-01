@@ -177,3 +177,35 @@
   background: var(--neon-color);
   transform: scale(1.05);
 }
+
+.auth-buttons {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.auth-button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.login-button {
+  background-color: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.signup-button {
+  background-color: var(--primary-color);
+  border: none;
+  color: white;
+}
+
+.auth-button:hover {
+  opacity: 0.9;
+}
