@@ -405,6 +405,7 @@
   z-index: 100;
   border-radius: 25px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  align-items: center;
 }
 
 .upload-button {
@@ -412,10 +413,33 @@
   color: white;
   font-weight: 500;
   transition: all 0.3s ease;
+  height: 36px;
+  padding: 8px 16px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .upload-button:hover {
   transform: scale(1.05);
   box-shadow: 0 0 15px rgba(138, 67, 252, 0.5);
+}
+
+/* Update responsive styles */
+@media (max-width: 768px) {
+  .top-buttons {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    padding: 8px 12px;
+  }
+
+  .upload-button {
+    height: 32px;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
 }
 
