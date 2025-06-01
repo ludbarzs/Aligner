@@ -1,36 +1,46 @@
 import { AppState } from "../../scripts/app_state.js";
 import { FrameSelector } from "./frame_selector.js";
 import { ApiService } from "../../scripts/api.js";
-
+import { authController } from "../../scripts/controllers/AuthController.js";
 // Get DOM elements
 const imageElement = document.getElementById("corner-image");
 const imageContainer = document.querySelector(".image-container");
 const noImageMessage = document.querySelector(".no-image-message");
 const continueButton = document.querySelector(".control-button.primary");
-const drawerWidthInput = document.getElementById('drawer-width');
-const drawerHeightInput = document.getElementById('drawer-height');
+const drawerWidthInput = document.getElementById("drawer-width");
+const drawerHeightInput = document.getElementById("drawer-height");
 let frameSelector = null;
+
+// Initialize AuthController
+document.addEventListener("DOMContentLoaded", async () => {
+  // Initialize auth controller
+  await authController.init();
+});
 
 // Function to validate drawer dimensions
 function validateDrawerDimensions() {
   const width = drawerWidthInput.value;
   const height = drawerHeightInput.value;
-  
+
   // Check if both values are present and within valid range
-  const isValid = width && height && 
-                 width >= 1 && width <= 2000 &&
-                 height >= 1 && height <= 2000;
-  
+  const isValid =
+    width &&
+    height &&
+    width >= 1 &&
+    width <= 2000 &&
+    height >= 1 &&
+    height <= 2000;
+
   // Enable/disable continue button based on validation
   continueButton.disabled = !isValid;
-  
+
   // Add/remove visual feedback classes
   if (isValid) {
-    continueButton.classList.remove('disabled');
+    continueButton.classList.remove("disabled");
   } else {
-    continueButton.classList.add('disabled');
+    continueButton.classList.add("disabled");
   }
-  
+
   return isValid;
 }
 
@@ -105,30 +115,30 @@ function handleNoImage(message) {
 // Function to apply all transformations
 function applyTransformations() {
   const { rotation, mirrored } = AppState.getTransformations();
-  
+
   // Calculate if we need to swap dimensions (for 90/270 degree rotations)
   const isSwapped = rotation % 180 !== 0;
-  
+
   // Get container dimensions with some padding
   const containerWidth = imageContainer.clientWidth * 0.9; // 90% of container width
   const containerHeight = imageContainer.clientHeight * 0.9; // 90% of container height
-  
+
   // Reset any existing transforms and dimensions to get natural size
-  imageElement.style.transform = 'translate(-50%, -50%)';
-  imageElement.style.width = 'auto';
-  imageElement.style.height = 'auto';
-  
+  imageElement.style.transform = "translate(-50%, -50%)";
+  imageElement.style.width = "auto";
+  imageElement.style.height = "auto";
+
   // Wait for the natural dimensions to be available
   if (imageElement.naturalWidth > 0) {
     const imgWidth = imageElement.naturalWidth;
     const imgHeight = imageElement.naturalHeight;
-    
+
     // Calculate scaling factors for both normal and rotated states
     const normalScaleX = containerWidth / imgWidth;
     const normalScaleY = containerHeight / imgHeight;
     const rotatedScaleX = containerWidth / imgHeight;
     const rotatedScaleY = containerHeight / imgWidth;
-    
+
     // Choose the appropriate scale based on rotation
     let scale;
     if (isSwapped) {
@@ -137,27 +147,27 @@ function applyTransformations() {
     } else {
       scale = Math.min(normalScaleX, normalScaleY);
     }
-    
+
     // Calculate final dimensions
     const finalWidth = imgWidth * scale;
     const finalHeight = imgHeight * scale;
-    
+
     // Set the dimensions
     imageElement.style.width = `${finalWidth}px`;
     imageElement.style.height = `${finalHeight}px`;
-    
+
     // Apply transformations with centering translation
     const transforms = [
-      'translate(-50%, -50%)', // Center the image
+      "translate(-50%, -50%)", // Center the image
       `rotate(${rotation}deg)`,
-      mirrored ? 'scaleX(-1)' : 'scaleX(1)'
+      mirrored ? "scaleX(-1)" : "scaleX(1)",
     ];
-    
-    imageElement.style.transform = transforms.join(' ');
-    
+
+    imageElement.style.transform = transforms.join(" ");
+
     // Add the loaded class to enable transitions after initial positioning
     requestAnimationFrame(() => {
-      imageElement.classList.add('loaded');
+      imageElement.classList.add("loaded");
     });
   }
 }
@@ -168,7 +178,7 @@ function initializeFrameSelector() {
     frameSelector.hide();
   }
   frameSelector = new FrameSelector(imageElement);
-  
+
   // Restore corner coordinates if they exist
   const savedCoordinates = AppState.getCornerCoordinates();
   if (savedCoordinates && savedCoordinates.length === 4) {
@@ -179,37 +189,37 @@ function initializeFrameSelector() {
 // Event Listeners
 document.addEventListener("DOMContentLoaded", () => {
   // Print entire AppState to console
-  console.log('Current AppState:', AppState.getAllValues());
-  
+  console.log("Current AppState:", AppState.getAllValues());
+
   loadImageFromState();
   loadDrawerDimensions();
-  
+
   // Add input validation listeners
-  drawerWidthInput.addEventListener('input', validateDrawerDimensions);
-  drawerHeightInput.addEventListener('input', validateDrawerDimensions);
+  drawerWidthInput.addEventListener("input", validateDrawerDimensions);
+  drawerHeightInput.addEventListener("input", validateDrawerDimensions);
 });
 
 // Add resize listener to handle responsive updates
-window.addEventListener('resize', () => {
-  if (imageElement.style.display !== 'none') {
+window.addEventListener("resize", () => {
+  if (imageElement.style.display !== "none") {
     applyTransformations();
   }
 });
 
 // Add continue button click handler
-continueButton.addEventListener('click', async () => {
+continueButton.addEventListener("click", async () => {
   // Validate dimensions before proceeding
   if (!validateDrawerDimensions()) {
     return; // Don't proceed if validation fails
   }
-  
+
   // Get drawer dimensions
   const drawerWidth = drawerWidthInput.value;
   const drawerHeight = drawerHeightInput.value;
-  
+
   // Store drawer dimensions in AppState
   AppState.setDrawerDimensions(drawerWidth, drawerHeight);
-  
+
   // Send to API for processing
   await ApiService.sendToAPI();
 });

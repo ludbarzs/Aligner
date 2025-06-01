@@ -1,4 +1,5 @@
 import { AppState } from "../../scripts/app_state.js";
+import { authController } from "../../scripts/controllers/AuthController.js";
 
 // Function to print the current state of AppState
 function printState() {
@@ -18,6 +19,12 @@ function printState() {
   console.log("DXF Data:", AppState.getDxfData() ? "Present" : "None");
   console.log("=====================");
 }
+
+// Initialize AuthController
+document.addEventListener("DOMContentLoaded", async () => {
+  // Initialize auth controller
+  await authController.init();
+});
 
 // Function to download the DXF file
 function downloadDxf() {
@@ -58,4 +65,3 @@ if (!AppState.getDxfData()) {
   alert("No processed data found. Redirecting to upload page...");
   window.location.href = "../image_upload/image_upload.html";
 }
-

@@ -1,6 +1,7 @@
 import { AppState } from "../../scripts/app_state.js";
 import { ApiService } from "../../scripts/api.js";
 import { ImageController } from "../../scripts/controllers/image_controller.js";
+import { authController } from "../../scripts/controllers/AuthController.js";
 
 // Get DOM elements
 const imageElement = document.getElementById("edge-image");
@@ -21,10 +22,16 @@ const closingValue = document.getElementById("closing-value");
 // Define closing steps for snapping
 const closingSteps = [1, 3, 5, 8, 11, 13, 16];
 
+// Initialize AuthController
+document.addEventListener("DOMContentLoaded", async () => {
+  // Initialize auth controller
+  await authController.init();
+});
+
 // Function to find nearest step value
 function findNearestStep(value, steps) {
-  return steps.reduce((prev, curr) => 
-    Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev
+  return steps.reduce((prev, curr) =>
+    Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev,
   );
 }
 
@@ -50,7 +57,7 @@ function loadImageFromState() {
 
       // Initialize image once loaded
       imageElement.onload = () => {
-        imageElement.classList.add('loaded');
+        imageElement.classList.add("loaded");
       };
     } catch (error) {
       console.error("Error setting up image:", error);
@@ -81,7 +88,10 @@ function loadSavedSettings() {
 
     // Update edge closing
     if (settings.morphKernelSize && settings.morphKernelSize[0]) {
-      const closingVal = findNearestStep(settings.morphKernelSize[0], closingSteps);
+      const closingVal = findNearestStep(
+        settings.morphKernelSize[0],
+        closingSteps,
+      );
       edgeClosing.value = closingVal;
       closingValue.textContent = closingVal;
     }
@@ -111,20 +121,20 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Add edge detection settings change handlers
-[blurSetting, edgeSensitivity, edgeClosing].forEach(input => {
+[blurSetting, edgeSensitivity, edgeClosing].forEach((input) => {
   if (input) {
     // Update value display on input (while sliding)
-    input.addEventListener('input', () => {
+    input.addEventListener("input", () => {
       const value = parseInt(input.value);
-      
-      switch(input.id) {
-        case 'blur-setting':
+
+      switch (input.id) {
+        case "blur-setting":
           blurValue.textContent = value;
           break;
-        case 'edge-sensitivity':
+        case "edge-sensitivity":
           sensitivityValue.textContent = value;
           break;
-        case 'edge-closing':
+        case "edge-closing":
           const snappedValue = findNearestStep(value, closingSteps);
           closingValue.textContent = snappedValue;
           break;
@@ -132,21 +142,21 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Handle actual value change
-    input.addEventListener('change', async () => {
+    input.addEventListener("change", async () => {
       let blurVal = parseInt(blurSetting.value);
       let sensitivityVal = parseInt(edgeSensitivity.value);
       let closingVal = parseInt(edgeClosing.value);
-      
+
       // Snap closing value to nearest step
       closingVal = findNearestStep(closingVal, closingSteps);
       edgeClosing.value = closingVal;
       closingValue.textContent = closingVal;
-      
+
       const settings = {
         blurKernelSize: [blurVal, blurVal],
-        cannyLow: Math.floor(sensitivityVal / 3),  // Low threshold is 1/3 of high threshold
+        cannyLow: Math.floor(sensitivityVal / 3), // Low threshold is 1/3 of high threshold
         cannyHigh: sensitivityVal,
-        morphKernelSize: [closingVal, closingVal]
+        morphKernelSize: [closingVal, closingVal],
       };
 
       // Update edge detection settings in AppState
@@ -155,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         // Show loading state
         if (imageElement) {
-          imageElement.style.opacity = '0.5';
+          imageElement.style.opacity = "0.5";
         }
 
         // Send to API for processing
@@ -165,13 +175,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const contouredImage = AppState.getContouredImage();
         if (contouredImage && imageElement) {
           imageElement.src = contouredImage;
-          imageElement.style.opacity = '1';
+          imageElement.style.opacity = "1";
         }
       } catch (error) {
         console.error("Failed to update edge detection:", error);
         // Reset opacity if there was an error
         if (imageElement) {
-          imageElement.style.opacity = '1';
+          imageElement.style.opacity = "1";
         }
       }
     });
@@ -180,21 +190,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Add export button click handler
 if (exportButton) {
-  exportButton.addEventListener('click', async () => {
+  exportButton.addEventListener("click", async () => {
     try {
       // First send final data to API for processing
       await ApiService.sendToAPI();
-      
+
       // Save all current state to the database
       // TODO: Replace 1 with actual user ID from authentication system
       const savedImage = await ImageController.saveCurrentState(1);
-      console.log('Image state saved successfully:', savedImage);
-      
+      console.log("Image state saved successfully:", savedImage);
+
       // Navigate to export page
-      window.location.href = '../export/export.html';
+      window.location.href = "../export/export.html";
     } catch (error) {
       console.error("Failed to save or process data:", error);
       alert("Failed to save data. Please try again.");
     }
   });
-} 
+}
+
