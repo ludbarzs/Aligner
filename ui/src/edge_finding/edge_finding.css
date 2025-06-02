@@ -8,35 +8,44 @@
   width: 100%;
   padding: 20px;
   flex-wrap: wrap;
-  min-height: 200px; /* Ensure enough height for all controls */
+  min-height: 180px; /* Fixed height for controls */
   flex-shrink: 0;
+  background: rgba(20, 20, 20, 0.3);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .controls-left {
   order: 1;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
 }
 
 .controls-right {
   order: 3;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
 }
 
-/* Edge settings styling - now more flexible */
+/* Edge settings styling - centered and flexible */
 .edge-settings-container {
   order: 2;
   flex: 1;
   display: flex;
   justify-content: center;
-  min-width: 300px;
+  align-items: center;
+  min-width: 350px;
+  max-width: 600px;
 }
 
 .settings-inputs {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 12px;
   width: 100%;
-  max-width: 320px;
+  max-width: 500px;
 }
 
 .setting-input-group {
@@ -47,79 +56,92 @@
   background: rgba(255, 255, 255, 0.1);
   border-radius: 24px;
   padding: 0 15px;
-  height: 45px;
+  height: 42px;
   width: 100%;
-  min-width: 280px;
+  min-width: 320px;
+  transition: all 0.2s ease;
 }
 
 .setting-input-group .setting-label {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 16px;
-  min-width: 80px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 15px;
+  font-weight: 500;
+  min-width: 100px;
   white-space: nowrap;
 }
 
 .setting-input-group .setting-value {
   color: var(--neon-color);
   font-size: 14px;
+  font-weight: 600;
   min-width: 35px;
-  text-align: right;
+  text-align: center;
+  background: rgba(138, 67, 252, 0.15);
+  padding: 4px 8px;
+  border-radius: 6px;
   margin-left: 10px;
 }
 
 .setting-input-group input[type="range"] {
   flex: 1;
-  height: 2px;
+  height: 3px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 2px;
   outline: none;
   -webkit-appearance: none;
-  margin: 0 10px;
+  margin: 0 12px;
+  cursor: pointer;
 }
 
 .setting-input-group input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   background: var(--neon-color);
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 0 10px var(--neon-color);
+  box-shadow: 0 0 12px rgba(138, 67, 252, 0.5);
 }
 
 .setting-input-group input[type="range"]::-webkit-slider-thumb:hover {
   transform: scale(1.2);
-  box-shadow: 0 0 15px var(--neon-color);
+  box-shadow: 0 0 18px rgba(138, 67, 252, 0.7);
 }
 
 .setting-input-group:hover {
   background: rgba(255, 255, 255, 0.15);
-  transform: scale(1.02);
+  transform: translateY(-1px);
 }
 
-/* Responsive image container - significantly reduced height for controls */
+/* Maximized image container */
 .image-container {
   width: 100%;
-  height: calc(100% - 320px); /* Much more space for controls */
-  max-height: 400px; /* Cap the image height */
+  height: calc(100vh - 270px); /* Full height minus header space and controls */
+  min-height: 300px; /* Minimum height to ensure visibility */
+  max-height: none; /* Remove height restriction */
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
   position: relative;
   flex-shrink: 0;
-  padding: 10px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 #edge-image {
-  max-width: 85%;
+  max-width: 100%;
   max-height: 100%;
   width: auto;
   height: auto;
   object-fit: contain;
   opacity: 0;
   transition: opacity 0.3s ease;
+  border-radius: 8px;
 }
 
 #edge-image.loaded {
@@ -132,14 +154,16 @@
 /* No image message styles */
 .no-image-message {
   text-align: center;
-  padding: 20px;
+  padding: 40px;
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
+  border-radius: 12px;
   backdrop-filter: blur(5px);
   color: var(--text-color);
   font-size: 18px;
+  line-height: 1.5;
 }
 
+/* Info icon and tooltip styles */
 .info-icon {
   display: flex;
   align-items: center;
@@ -150,9 +174,9 @@
   background: rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.4);
   color: white;
-  font-size: 12px;
+  font-size: 11px;
   font-style: italic;
-  margin-right: 8px;
+  margin-right: 10px;
   cursor: help;
   position: relative;
   transition: background-color 0.2s;
@@ -171,35 +195,90 @@
 .tooltip {
   visibility: hidden;
   position: absolute;
-  left: -8px;
-  top: -45px;
-  background: rgba(0, 0, 0, 0.9);
+  left: 50%;
+  bottom: 130%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.95);
   color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
+  padding: 10px 14px;
+  border-radius: 8px;
   font-size: 12px;
-  width: 220px;
+  width: 240px;
   opacity: 0;
   transition:
     opacity 0.2s,
     visibility 0.2s;
-  z-index: 100;
+  z-index: 1000;
   font-style: normal;
   line-height: 1.4;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .tooltip::after {
   content: "";
   position: absolute;
   top: 100%;
-  left: 12px;
+  left: 50%;
+  transform: translateX(-50%);
   border-width: 6px;
   border-style: solid;
-  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+  border-color: rgba(0, 0, 0, 0.95) transparent transparent transparent;
+}
+
+/* Loading state */
+.image-container .loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.image-container .loading-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid var(--neon-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Responsive breakpoints */
+@media (max-width: 1400px) {
+  .controls-container {
+    gap: 15px;
+    padding: 18px;
+  }
+
+  .edge-settings-container {
+    min-width: 320px;
+  }
+
+  .setting-input-group {
+    min-width: 300px;
+  }
+}
+
 @media (max-width: 1200px) {
   .controls-container {
     gap: 15px;
@@ -207,21 +286,28 @@
   }
 
   .edge-settings-container {
-    min-width: 280px;
+    min-width: 300px;
   }
 
   .setting-input-group {
-    min-width: 260px;
+    min-width: 280px;
+    height: 40px;
+  }
+
+  .image-container {
+    height: calc(100vh - 260px);
+    padding: 15px;
   }
 }
 
+/* Stack vertically on medium screens */
 @media (max-width: 992px) {
   .controls-container {
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
     gap: 20px;
     padding: 20px 15px;
-    min-height: 280px; /* More height for vertical layout */
+    min-height: 220px;
   }
 
   .controls-left,
@@ -229,12 +315,14 @@
     order: unset;
     display: flex;
     justify-content: center;
+    width: 100%;
   }
 
   .edge-settings-container {
     order: unset;
     min-width: unset;
     width: 100%;
+    max-width: 500px;
   }
 
   .settings-inputs {
@@ -245,13 +333,13 @@
   .setting-input-group {
     min-width: unset;
     width: 100%;
-    max-width: 400px;
+    max-width: 450px;
     margin: 0 auto;
   }
 
   .image-container {
-    height: calc(100% - 350px); /* Even more space for vertical controls */
-    max-height: 300px;
+    height: calc(100vh - 290px);
+    min-height: 250px;
   }
 }
 
@@ -259,75 +347,163 @@
   .controls-container {
     padding: 15px 10px;
     gap: 15px;
-    min-height: 300px; /* Ensure all controls are visible */
+    min-height: 240px;
   }
 
   .setting-input-group {
-    height: 40px;
+    height: 38px;
     padding: 0 12px;
     max-width: 100%;
   }
 
   .setting-input-group .setting-label {
     font-size: 14px;
-    min-width: 70px;
+    min-width: 90px;
   }
 
   .setting-input-group .setting-value {
-    font-size: 12px;
-    min-width: 30px;
+    font-size: 13px;
+    min-width: 32px;
   }
 
   .setting-input-group input[type="range"] {
-    margin: 0 8px;
+    margin: 0 10px;
   }
 
   .image-container {
-    height: calc(100% - 380px);
-    max-height: 250px;
-    padding: 5px;
+    height: calc(100vh - 310px);
+    min-height: 200px;
+    padding: 10px;
   }
 
   #edge-image {
-    max-width: 95%;
+    max-width: 98%;
   }
 
   .tooltip {
-    width: 180px;
+    width: 200px;
     font-size: 11px;
   }
 }
 
 @media (max-width: 480px) {
   .controls-container {
-    min-height: 320px; /* Extra space for mobile */
+    min-height: 260px;
+    padding: 12px 8px;
   }
 
   .setting-input-group {
-    height: 38px;
+    height: 36px;
     padding: 0 10px;
   }
 
   .setting-input-group .setting-label {
     font-size: 13px;
-    min-width: 60px;
+    min-width: 80px;
   }
 
   .setting-input-group .setting-value {
-    font-size: 11px;
-    min-width: 25px;
+    font-size: 12px;
+    min-width: 28px;
   }
 
   .info-icon {
     width: 16px;
     height: 16px;
     font-size: 10px;
-    margin-right: 6px;
+    margin-right: 8px;
   }
 
   .image-container {
-    height: calc(100% - 400px);
-    max-height: 200px;
+    height: calc(100vh - 330px);
+    min-height: 180px;
+    padding: 8px;
+  }
+
+  .tooltip {
+    width: 180px;
+    font-size: 10px;
   }
 }
 
+/* Enable horizontal scroll for very narrow screens */
+@media (max-width: 400px) {
+  body {
+    overflow-x: auto;
+  }
+
+  .container {
+    min-width: 400px;
+  }
+
+  .controls-container {
+    min-width: 400px;
+  }
+}
+
+/* Ensure proper height calculation for different screen heights */
+@media (max-height: 600px) {
+  .controls-container {
+    min-height: 160px;
+  }
+
+  .image-container {
+    height: calc(100vh - 230px);
+    min-height: 150px;
+  }
+
+  .settings-inputs {
+    gap: 8px;
+  }
+
+  .setting-input-group {
+    height: 34px;
+  }
+}
+
+@media (max-height: 500px) {
+  .controls-container {
+    min-height: 140px;
+    padding: 10px;
+  }
+
+  .image-container {
+    height: calc(100vh - 210px);
+    min-height: 120px;
+  }
+}
+
+/* Landscape mobile optimization */
+@media (max-width: 768px) and (orientation: landscape) {
+  .controls-container {
+    flex-direction: row;
+    min-height: 120px;
+    padding: 10px;
+  }
+
+  .controls-left,
+  .controls-right {
+    order: initial;
+    width: auto;
+  }
+
+  .edge-settings-container {
+    order: 2;
+    flex: 1;
+    max-width: 400px;
+  }
+
+  .settings-inputs {
+    gap: 6px;
+  }
+
+  .setting-input-group {
+    height: 32px;
+    min-width: 250px;
+  }
+
+  .image-container {
+    height: calc(100vh - 190px);
+    min-height: 200px;
+  }
+}
