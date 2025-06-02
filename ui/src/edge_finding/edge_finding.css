@@ -20,7 +20,9 @@
 /* Image container styling */
 .image-container {
   width: 100%;
-  height: calc(100vh - 330px);
+  height: calc(
+    100vh - 330px
+  ); /* Adjusted to account for top padding and controls */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -44,19 +46,24 @@
 }
 
 #edge-image {
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 90%;
+  max-height: calc(90vh - 90px);
   width: auto;
   height: auto;
   object-fit: contain;
-  position: relative;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
 #edge-image.loaded {
   opacity: 1;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
 }
 
 /* No image message styles */
