@@ -1,6 +1,7 @@
 import { authController } from "../../scripts/controllers/AuthController.js";
 import { ImageController } from "../../scripts/controllers/image_controller.js";
 import { AppState } from "../../scripts/app_state.js";
+import { appwriteService } from "../../authentication/services/appwrite-service.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   // Logout button handler
@@ -106,19 +107,23 @@ async function initProjectsGrid() {
     }
 
     try {
-      const response = await fetch(`/api/images/${imageId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: authController.getCurrentUser().id
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete project');
+      // Get the current user from Appwrite
+      const user = await appwriteService.getCurrentUser();
+      if (!user) {
+        throw new Error("No user is currently logged in");
       }
+
+      // Get the user's local database ID
+      const response = await fetch(
+        `${ImageController.API_BASE_URL}/users/appwrite/${user.$id}`,
+      );
+      if (!response.ok) {
+        throw new Error("Failed to get user ID from local database");
+      }
+      const userData = await response.json();
+
+      // Delete the image using the local database user ID
+      await ImageController.deleteImage(imageId, userData.user_id);
 
       // Remove the project from the UI
       const projectItem = document.querySelector(`[data-image-id="${imageId}"]`).closest('.project-item');
