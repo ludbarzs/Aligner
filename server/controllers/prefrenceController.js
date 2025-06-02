@@ -1,9 +1,31 @@
 const pool = require("../config/database");
 
 /**
+ * Get internal user_id from Appwrite ID
+ * @param {string} appwriteId Appwrite user ID
+ * @returns {Promise<number>} Internal user_id
+ */
+async function getInternalUserId(appwriteId) {
+    try {
+        const [rows] = await pool.query(
+            "SELECT user_id FROM users WHERE aw_id = ?",
+            [appwriteId]
+        );
+        
+        if (rows.length === 0) {
+            throw new Error(`No user found with Appwrite ID: ${appwriteId}`);
+        }
+        
+        return rows[0].user_id;
+    } catch (error) {
+        throw new Error(`Error getting internal user ID: ${error.message}`);
+    }
+}
+
+/**
  * Save or update user's edge detection preferences
  * @param {Object} preferences Object containing user preferences
- * @param {number} preferences.userId User ID
+ * @param {string} preferences.userId Appwrite user ID
  * @param {number} preferences.gaussianBlur Gaussian blur value
  * @param {number} preferences.cannyThreshold1 First Canny threshold
  * @param {number} preferences.cannyThreshold2 Second Canny threshold
@@ -18,11 +40,15 @@ const savePreferences = async (preferences) => {
         await connection.beginTransaction();
         console.log('Started transaction');
 
+        // Get internal user_id from Appwrite ID
+        const internalUserId = await getInternalUserId(preferences.userId);
+        console.log('Got internal user_id:', internalUserId);
+
         // Check if user already has preferences
-        console.log('Checking for existing preferences for user:', preferences.userId);
+        console.log('Checking for existing preferences for user:', internalUserId);
         const [existing] = await connection.query(
             "SELECT preset_id FROM edge_detection_preferences WHERE user_id = ?",
-            [preferences.userId]
+            [internalUserId]
         );
         console.log('Existing preferences check result:', existing);
 
@@ -42,7 +68,7 @@ const savePreferences = async (preferences) => {
                     preferences.cannyThreshold1,
                     preferences.cannyThreshold2,
                     preferences.morphKernelSize,
-                    preferences.userId
+                    internalUserId
                 ]
             );
         } else {
@@ -53,7 +79,7 @@ const savePreferences = async (preferences) => {
                 (user_id, gaussian_blur, canny_threshold_1, canny_threshold_2, morph_kernel_size)
                 VALUES (?, ?, ?, ?, ?)`,
                 [
-                    preferences.userId,
+                    internalUserId,
                     preferences.gaussianBlur,
                     preferences.cannyThreshold1,
                     preferences.cannyThreshold2,
@@ -66,7 +92,11 @@ const savePreferences = async (preferences) => {
         await connection.commit();
         console.log('Transaction committed');
         
-        return { ...preferences, presetId: result.insertId || existing[0]?.preset_id };
+        return { 
+            ...preferences, 
+            internalUserId,
+            presetId: result.insertId || existing[0]?.preset_id 
+        };
     } catch (error) {
         console.error('Error in savePreferences:', error);
         await connection.rollback();
@@ -80,15 +110,20 @@ const savePreferences = async (preferences) => {
 
 /**
  * Get user's edge detection preferences
- * @param {number} userId The ID of the user
+ * @param {string} appwriteId Appwrite user ID
  * @returns {Promise<Object>} User's preferences object
  */
-const getUserPreferences = async (userId) => {
+const getUserPreferences = async (appwriteId) => {
     try {
-        console.log('Getting preferences for user:', userId);
+        console.log('Getting preferences for Appwrite user:', appwriteId);
+        
+        // Get internal user_id first
+        const internalUserId = await getInternalUserId(appwriteId);
+        console.log('Got internal user_id:', internalUserId);
+
         const [rows] = await pool.query(
             `SELECT * FROM edge_detection_preferences WHERE user_id = ?`,
-            [userId]
+            [internalUserId]
         );
         console.log('Query result:', rows);
 
@@ -106,15 +141,20 @@ const getUserPreferences = async (userId) => {
 
 /**
  * Delete user's edge detection preferences
- * @param {number} userId The ID of the user
+ * @param {string} appwriteId Appwrite user ID
  * @returns {Promise<boolean>} True if deletion was successful
  */
-const deletePreferences = async (userId) => {
+const deletePreferences = async (appwriteId) => {
     try {
-        console.log('Deleting preferences for user:', userId);
+        console.log('Deleting preferences for Appwrite user:', appwriteId);
+        
+        // Get internal user_id first
+        const internalUserId = await getInternalUserId(appwriteId);
+        console.log('Got internal user_id:', internalUserId);
+
         const [result] = await pool.query(
             "DELETE FROM edge_detection_preferences WHERE user_id = ?",
-            [userId]
+            [internalUserId]
         );
         console.log('Delete result:', result);
         return result.affectedRows > 0;
