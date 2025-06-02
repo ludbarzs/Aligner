@@ -29,7 +29,7 @@
   letter-spacing: 0.5px;
   text-align: left;
   align-self: flex-start;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
 }
 
 .top-buttons {
@@ -100,7 +100,6 @@
 }
 
 .project-item:hover {
-  transform: translateY(-5px);
   box-shadow: 0 5px 15px rgba(138, 67, 252, 0.2);
 }
 
@@ -141,11 +140,10 @@
 }
 
 #continue-section .projects-grid {
-  grid-template-columns: repeat(auto-fill, minmax(125px, 1fr)); /* Half the original size */
-}
-
-#continue-section .project-item {
-  padding-top: 50%; /* Half the original aspect ratio */
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(125px, 1fr)
+  ); /* Half the original size */
 }
 
 /* Responsive adjustments */
