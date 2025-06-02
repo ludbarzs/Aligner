@@ -195,4 +195,13 @@ export class AppState {
     localStorage.removeItem("dxfData");
     localStorage.removeItem("processedImage");
   }
+
+  // Check if there's an unfinished project (saved data but no current image ID)
+  static hasUnfinishedProject() {
+    // Check if there's a current image but no ID (meaning not saved to DB)
+    const hasCurrentImage = AppState.getCurrentImage() !== null;
+    const hasCurrentImageId = AppState.getCurrentImageId() !== null;
+    
+    return hasCurrentImage && !hasCurrentImageId;
+  }
 }

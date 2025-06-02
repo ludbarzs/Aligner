@@ -10,9 +10,29 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "../image_upload/image_upload.html";
   });
 
-  // Initialize projects grid
+  // Initialize continue section and projects grid
+  initContinueSection();
   initProjectsGrid();
 });
+
+function initContinueSection() {
+  const continueSection = document.getElementById("continue-section");
+  const continueImage = document.getElementById("continue-image");
+
+  if (AppState.hasUnfinishedProject()) {
+    const currentImage = AppState.getCurrentImage();
+    if (currentImage) {
+      continueImage.src = currentImage;
+      continueSection.style.display = "block";
+
+      // Add click handler to continue the project
+      const projectCard = continueSection.querySelector(".project-card");
+      projectCard.addEventListener("click", () => {
+        window.location.href = "../image_edit/image_edit.html";
+      });
+    }
+  }
+}
 
 async function initProjectsGrid() {
   const projectsGrid = document.getElementById("projects-grid");
