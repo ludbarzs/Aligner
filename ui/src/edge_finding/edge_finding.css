@@ -46,11 +46,11 @@
 }
 
 #edge-image {
-  max-width: 90%;
-  max-height: calc(90vh - 90px);
   width: auto;
   height: auto;
   object-fit: contain;
+  max-width: calc(100vw - 80px);
+  max-height: calc(100vh - 400px);
   position: absolute;
   left: 50%;
   top: 50%;
