@@ -54,13 +54,22 @@ async function initProjectsGrid() {
     projectItem.innerHTML = `
             <img src="${imageData.base64_data}" />
             <div class="project-overlay">
+              <i class="fas fa-trash delete-icon" data-image-id="${imageData.image_id}"></i>
               <div class="project-date">${date}</div>
             </div>
           `;
 
-    // Add click event listener
-    projectItem.addEventListener("click", () => {
-      // Set all the state values for the image
+    // Add click event listener for the project
+    const projectOverlay = projectItem.querySelector(".project-overlay");
+    projectOverlay.addEventListener("click", (e) => {
+      // If clicking the delete icon, handle delete
+      if (e.target.classList.contains("delete-icon")) {
+        e.stopPropagation(); // Prevent project opening
+        handleDeleteProject(imageData.image_id);
+        return;
+      }
+
+      // Otherwise handle project opening
       const stateValues = {
         currentImage: imageData.base64_data,
         currentImageId: imageData.image_id,
@@ -84,6 +93,35 @@ async function initProjectsGrid() {
     });
 
     projectsGrid.appendChild(projectItem);
+  }
+
+  async function handleDeleteProject(imageId) {
+    if (!confirm("Are you sure you want to delete this project?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/images/${imageId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: authController.getCurrentUser().id
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete project');
+      }
+
+      // Remove the project from the UI
+      const projectItem = document.querySelector(`[data-image-id="${imageId}"]`).closest('.project-item');
+      projectItem.remove();
+    } catch (error) {
+      console.error('Error deleting project:', error);
+      alert('Failed to delete project. Please try again.');
+    }
   }
 
   try {

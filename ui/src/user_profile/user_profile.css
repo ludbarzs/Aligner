@@ -105,14 +105,19 @@
 
 .project-overlay {
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
-  right: 0;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-  padding: 20px;
-  color: white;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
   opacity: 0;
   transition: opacity 0.3s ease;
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
 .project-item:hover .project-overlay {
@@ -127,10 +132,27 @@
 }
 
 .project-date {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.7);
-  margin-top: 5px;
+  color: white;
+  font-size: 0.9rem;
+  margin-top: 1rem;
 }
+
+.delete-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #ff4444;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: transform 0.2s ease;
+}
+
+.delete-icon:hover {
+  transform: scale(1.2);
+}
+
+/* Add Font Awesome for the trash icon */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
 
 /* Continue section specific styles */
 #continue-section {
