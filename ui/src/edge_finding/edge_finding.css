@@ -20,7 +20,9 @@
 /* Image container styling */
 .image-container {
   width: 100%;
-  height: calc(100vh - 330px); /* Adjusted to account for top padding and controls */
+  height: calc(
+    100vh - 330px
+  ); /* Adjusted to account for top padding and controls */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -31,8 +33,6 @@
   padding: 20px;
   background: rgba(255, 255, 255, 0.02);
   border-radius: 12px;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
   margin: 20px;
 }
 
@@ -61,7 +61,9 @@
 
 #edge-image.loaded {
   opacity: 1;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
 }
 
 /* No image message styles */
