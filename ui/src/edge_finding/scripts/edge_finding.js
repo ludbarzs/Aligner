@@ -27,6 +27,9 @@ const saveSettingsContainer = document.querySelector(
   ".save-settings-container",
 );
 
+// Add API base URL constant at the top of the file
+const API_BASE_URL = 'http://localhost:3000';
+
 // Initialize AuthController
 document.addEventListener("DOMContentLoaded", async () => {
   // Initialize auth controller
@@ -279,7 +282,7 @@ async function saveUserSettings() {
       morphKernelSize: parseInt(document.getElementById("edge-closing").value)
     };
 
-    const response = await fetch('/api/preferences', {
+    const response = await fetch(`${API_BASE_URL}/api/preferences`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -311,7 +314,7 @@ async function loadUserSettings() {
       return;
     }
 
-    const response = await fetch(`/api/preferences/user/${currentUser.$id}`);
+    const response = await fetch(`${API_BASE_URL}/api/preferences/user/${currentUser.$id}`);
     if (!response.ok) {
       if (response.status !== 404) { // 404 is expected when no settings exist
         throw new Error('Failed to load preferences');
