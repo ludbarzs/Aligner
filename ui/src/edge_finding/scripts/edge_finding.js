@@ -41,6 +41,11 @@ function loadImageFromState() {
 
   if (imageData) {
     try {
+      // Show the image container first
+      if (imageContainer) {
+        imageContainer.style.display = "flex";
+      }
+
       // Display the image
       imageElement.src = imageData;
       imageElement.style.display = "block";
@@ -106,6 +111,9 @@ function handleNoImage(message) {
   }
   if (imageElement) {
     imageElement.style.display = "none";
+  }
+  if (imageContainer) {
+    imageContainer.style.display = "none";
   }
 
   // Redirect back to upload page after a short delay
