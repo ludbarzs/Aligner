@@ -52,44 +52,49 @@ async function initProjectsGrid() {
     );
 
     projectItem.innerHTML = `
-            <img src="${imageData.base64_data}" />
+            <img src="${imageData.base64_data}" alt="Project thumbnail" />
             <div class="project-overlay">
-              <i class="fas fa-trash delete-icon" data-image-id="${imageData.image_id}"></i>
               <div class="project-date">${date}</div>
+              <i class="fas fa-trash delete-icon" data-image-id="${imageData.image_id || ''}" title="Delete project"></i>
             </div>
           `;
 
     // Add click event listener for the project
     const projectOverlay = projectItem.querySelector(".project-overlay");
+    const deleteIcon = projectItem.querySelector(".delete-icon");
+
+    // Add specific click handler for delete icon
+    deleteIcon.addEventListener("click", (e) => {
+      e.stopPropagation(); // Prevent project opening
+      handleDeleteProject(imageData.image_id);
+    });
+
+    // Add click handler for the rest of the overlay
     projectOverlay.addEventListener("click", (e) => {
-      // If clicking the delete icon, handle delete
-      if (e.target.classList.contains("delete-icon")) {
-        e.stopPropagation(); // Prevent project opening
-        handleDeleteProject(imageData.image_id);
-        return;
+      // Only proceed if we didn't click the delete icon
+      if (!e.target.classList.contains("delete-icon")) {
+        // Set all the state values for the image
+        const stateValues = {
+          currentImage: imageData.base64_data,
+          currentImageId: imageData.image_id,
+          coordinates: imageData.corner_coordinates || [],
+          transformations: {
+            rotation: imageData.rotation || 0,
+            mirrored: imageData.is_mirrored || false
+          },
+          drawerDimensions: imageData.drawer_dimensions || null,
+          edgeDetectionSettings: imageData.edge_detection_settings || null,
+          contouredImage: imageData.contoured_image || null,
+          dxfData: imageData.dxf_data || null,
+          processedImage: imageData.processed_image || null
+        };
+
+        // Set all the values in AppState
+        AppState.setAllValues(stateValues);
+
+        // Redirect to image edit view
+        window.location.href = "../image_edit/image_edit.html";
       }
-
-      // Otherwise handle project opening
-      const stateValues = {
-        currentImage: imageData.base64_data,
-        currentImageId: imageData.image_id,
-        coordinates: imageData.corner_coordinates || [],
-        transformations: {
-          rotation: imageData.rotation || 0,
-          mirrored: imageData.is_mirrored || false
-        },
-        drawerDimensions: imageData.drawer_dimensions || null,
-        edgeDetectionSettings: imageData.edge_detection_settings || null,
-        contouredImage: imageData.contoured_image || null,
-        dxfData: imageData.dxf_data || null,
-        processedImage: imageData.processed_image || null
-      };
-
-      // Set all the values in AppState
-      AppState.setAllValues(stateValues);
-
-      // Redirect to image edit view
-      window.location.href = "../image_edit/image_edit.html";
     });
 
     projectsGrid.appendChild(projectItem);
