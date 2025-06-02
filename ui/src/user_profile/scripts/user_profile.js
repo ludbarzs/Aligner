@@ -54,7 +54,6 @@ async function initProjectsGrid() {
     projectItem.innerHTML = `
             <img src="${imageData.base64_data}" />
             <div class="project-overlay">
-              <h3 class="project-title">Project ${imageData.image_id}</h3>
               <div class="project-date">${date}</div>
             </div>
           `;
