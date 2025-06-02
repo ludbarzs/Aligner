@@ -537,8 +537,48 @@
   }
 }
 
+.settings-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.reset-settings-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.reset-settings-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.reset-settings-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.reset-settings-button .undo-icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.9;
+}
+
 .save-settings-container {
-  margin-left: 20px;
+  margin: 0;
   padding: 10px;
   display: flex;
   align-items: center;
@@ -566,26 +606,4 @@
 .edge-settings-container {
   display: flex;
   align-items: flex-start;
-}
-
-.reset-settings-container {
-  display: flex;
-  justify-content: center;
-  margin: 15px 0;
-}
-
-.reset-settings-button {
-  padding: 8px 16px;
-  font-size: 14px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.reset-settings-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-1px);
 }
