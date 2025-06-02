@@ -536,3 +536,28 @@
     min-height: 200px;
   }
 }
+
+.save-settings-container {
+  margin-left: 20px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.save-settings-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.save-settings-label input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.edge-settings-container {
+  display: flex;
+  align-items: flex-start;
+}

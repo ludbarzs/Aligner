@@ -22,6 +22,9 @@ const closingValue = document.getElementById("closing-value");
 // Define closing steps for snapping
 const closingSteps = [1, 3, 5, 8, 11, 13, 16];
 
+// Handle save settings visibility
+const saveSettingsContainer = document.querySelector('.save-settings-container');
+
 // Initialize AuthController
 document.addEventListener("DOMContentLoaded", async () => {
   // Initialize auth controller
@@ -218,4 +221,35 @@ if (exportButton) {
     }
   });
 }
+
+// Function to check if user is logged in and show/hide save settings
+function updateSaveSettingsVisibility() {
+    // You'll need to implement or use your actual auth check here
+    const isLoggedIn = checkUserLoggedIn(); // Replace with your actual auth check
+    saveSettingsContainer.style.display = isLoggedIn ? 'flex' : 'none';
+}
+
+// Handle save settings checkbox changes
+const saveSettingsCheckbox = document.getElementById('save-settings-checkbox');
+saveSettingsCheckbox.addEventListener('change', (e) => {
+    if (e.target.checked) {
+        saveUserSettings();
+    }
+});
+
+// Function to save user settings
+function saveUserSettings() {
+    const settings = {
+        blur: document.getElementById('blur-setting').value,
+        sensitivity: document.getElementById('edge-sensitivity').value,
+        closing: document.getElementById('edge-closing').value
+    };
+    
+    // You'll need to implement the actual API call to save settings
+    // This is just a placeholder
+    console.log('Saving settings:', settings);
+}
+
+// Call this when the page loads and when auth state changes
+updateSaveSettingsVisibility();
 
