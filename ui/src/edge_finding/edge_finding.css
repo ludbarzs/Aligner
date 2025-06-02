@@ -567,3 +567,23 @@
   display: flex;
   align-items: flex-start;
 }
+
+.reset-settings-container {
+  display: flex;
+  justify-content: center;
+  margin: 15px 0;
+}
+
+.reset-settings-button {
+  padding: 8px 16px;
+  font-size: 14px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.reset-settings-button:hover {
+  background-color: #e0e0e0;
+}

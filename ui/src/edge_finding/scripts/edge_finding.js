@@ -30,6 +30,13 @@ const saveSettingsContainer = document.querySelector(
 // Add API base URL constant at the top of the file
 const API_BASE_URL = 'http://localhost:3000';
 
+// Default settings values
+const DEFAULT_SETTINGS = {
+  blur: 5,
+  sensitivity: 130,
+  closing: 5
+};
+
 // Initialize AuthController
 document.addEventListener("DOMContentLoaded", async () => {
   // Initialize auth controller
@@ -346,3 +353,28 @@ async function loadUserSettings() {
     console.error('Error loading settings:', error);
   }
 }
+
+// Add reset button functionality
+const resetButton = document.querySelector('.reset-settings-button');
+resetButton.addEventListener('click', () => {
+  // Reset blur setting
+  const blurInput = document.getElementById('blur-setting');
+  const blurValue = document.getElementById('blur-value');
+  blurInput.value = DEFAULT_SETTINGS.blur;
+  blurValue.textContent = DEFAULT_SETTINGS.blur;
+
+  // Reset edge sensitivity setting
+  const sensitivityInput = document.getElementById('edge-sensitivity');
+  const sensitivityValue = document.getElementById('sensitivity-value');
+  sensitivityInput.value = DEFAULT_SETTINGS.sensitivity;
+  sensitivityValue.textContent = DEFAULT_SETTINGS.sensitivity;
+
+  // Reset edge closing setting
+  const closingInput = document.getElementById('edge-closing');
+  const closingValue = document.getElementById('closing-value');
+  closingInput.value = DEFAULT_SETTINGS.closing;
+  closingValue.textContent = DEFAULT_SETTINGS.closing;
+
+  // Trigger edge detection with new settings
+  updateEdgeDetection();
+});
