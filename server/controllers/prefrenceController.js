@@ -12,18 +12,23 @@ const pool = require("../config/database");
  */
 const savePreferences = async (preferences) => {
     const connection = await pool.getConnection();
+    console.log('Got database connection');
     
     try {
         await connection.beginTransaction();
+        console.log('Started transaction');
 
         // Check if user already has preferences
+        console.log('Checking for existing preferences for user:', preferences.userId);
         const [existing] = await connection.query(
             "SELECT preset_id FROM edge_detection_preferences WHERE user_id = ?",
             [preferences.userId]
         );
+        console.log('Existing preferences check result:', existing);
 
         let result;
         if (existing.length > 0) {
+            console.log('Updating existing preferences');
             // Update existing preferences
             [result] = await connection.query(
                 `UPDATE edge_detection_preferences 
@@ -41,6 +46,7 @@ const savePreferences = async (preferences) => {
                 ]
             );
         } else {
+            console.log('Inserting new preferences');
             // Insert new preferences
             [result] = await connection.query(
                 `INSERT INTO edge_detection_preferences 
@@ -55,14 +61,20 @@ const savePreferences = async (preferences) => {
                 ]
             );
         }
+        console.log('Query result:', result);
 
         await connection.commit();
-        return { ...preferences, presetId: result.insertId || existing[0].preset_id };
+        console.log('Transaction committed');
+        
+        return { ...preferences, presetId: result.insertId || existing[0]?.preset_id };
     } catch (error) {
+        console.error('Error in savePreferences:', error);
         await connection.rollback();
+        console.log('Transaction rolled back');
         throw new Error("Error saving preferences: " + error.message);
     } finally {
         connection.release();
+        console.log('Connection released');
     }
 };
 
@@ -73,17 +85,21 @@ const savePreferences = async (preferences) => {
  */
 const getUserPreferences = async (userId) => {
     try {
+        console.log('Getting preferences for user:', userId);
         const [rows] = await pool.query(
             `SELECT * FROM edge_detection_preferences WHERE user_id = ?`,
             [userId]
         );
+        console.log('Query result:', rows);
 
         if (rows.length === 0) {
+            console.log('No preferences found');
             return null;
         }
 
         return rows[0];
     } catch (error) {
+        console.error('Error in getUserPreferences:', error);
         throw new Error("Error retrieving preferences: " + error.message);
     }
 };
@@ -95,12 +111,15 @@ const getUserPreferences = async (userId) => {
  */
 const deletePreferences = async (userId) => {
     try {
+        console.log('Deleting preferences for user:', userId);
         const [result] = await pool.query(
             "DELETE FROM edge_detection_preferences WHERE user_id = ?",
             [userId]
         );
+        console.log('Delete result:', result);
         return result.affectedRows > 0;
     } catch (error) {
+        console.error('Error in deletePreferences:', error);
         throw new Error("Error deleting preferences: " + error.message);
     }
 };
