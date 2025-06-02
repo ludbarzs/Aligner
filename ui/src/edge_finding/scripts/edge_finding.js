@@ -31,6 +31,13 @@ const saveSettingsContainer = document.querySelector(
 document.addEventListener("DOMContentLoaded", async () => {
   // Initialize auth controller
   await authController.init();
+  // Check visibility after auth is initialized
+  updateSaveSettingsVisibility();
+});
+
+// Listen for auth state changes
+window.addEventListener("authStateChanged", () => {
+  updateSaveSettingsVisibility();
 });
 
 // Function to find nearest step value
@@ -228,18 +235,21 @@ if (exportButton) {
 
 // Function to check if user is logged in and show/hide save settings
 function updateSaveSettingsVisibility() {
+  if (!saveSettingsContainer) return; // Guard against null
+  
   const isLoggedIn = authController.isAuthenticated();
-  console.log(authController.isAuthenticated());
   saveSettingsContainer.style.display = isLoggedIn ? "flex" : "none";
 }
 
 // Handle save settings checkbox changes
 const saveSettingsCheckbox = document.getElementById("save-settings-checkbox");
-saveSettingsCheckbox.addEventListener("change", (e) => {
-  if (e.target.checked) {
-    saveUserSettings();
-  }
-});
+if (saveSettingsCheckbox) {
+  saveSettingsCheckbox.addEventListener("change", (e) => {
+    if (e.target.checked) {
+      saveUserSettings();
+    }
+  });
+}
 
 // Function to save user settings
 function saveUserSettings() {
@@ -253,6 +263,3 @@ function saveUserSettings() {
   // This is just a placeholder
   console.log("Saving settings:", settings);
 }
-
-// Call this when the page loads and when auth state changes
-updateSaveSettingsVisibility();
