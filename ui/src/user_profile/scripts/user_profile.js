@@ -26,8 +26,8 @@ function initContinueSection() {
       continueSection.style.display = "block";
 
       // Add click handler to continue the project
-      const projectCard = continueSection.querySelector(".project-card");
-      projectCard.addEventListener("click", () => {
+      const projectItem = continueSection.querySelector(".project-item");
+      projectItem.addEventListener("click", () => {
         window.location.href = "../image_edit/image_edit.html";
       });
     }
