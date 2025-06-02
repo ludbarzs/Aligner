@@ -135,9 +135,14 @@ function handleNoImage(message) {
 }
 
 // Event Listeners
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   loadImageFromState();
   loadSavedSettings();
+  
+  // Load user settings if authenticated
+  if (authController.isAuthenticated()) {
+    await loadUserSettings();
+  }
 });
 
 // Add edge detection settings change handlers
@@ -204,6 +209,12 @@ document.addEventListener("DOMContentLoaded", () => {
           imageElement.style.opacity = "1";
         }
       }
+
+      // Save settings if checkbox is checked
+      const checkbox = document.getElementById("save-settings-checkbox");
+      if (checkbox && checkbox.checked) {
+        await saveUserSettings();
+      }
     });
   }
 });
@@ -244,22 +255,91 @@ function updateSaveSettingsVisibility() {
 // Handle save settings checkbox changes
 const saveSettingsCheckbox = document.getElementById("save-settings-checkbox");
 if (saveSettingsCheckbox) {
-  saveSettingsCheckbox.addEventListener("change", (e) => {
+  saveSettingsCheckbox.addEventListener("change", async (e) => {
     if (e.target.checked) {
-      saveUserSettings();
+      await saveUserSettings();
     }
   });
 }
 
 // Function to save user settings
-function saveUserSettings() {
-  const settings = {
-    blur: document.getElementById("blur-setting").value,
-    sensitivity: document.getElementById("edge-sensitivity").value,
-    closing: document.getElementById("edge-closing").value,
-  };
+async function saveUserSettings() {
+  try {
+    const currentUser = authController.getCurrentUser();
+    if (!currentUser) {
+      console.error('No user logged in');
+      return;
+    }
 
-  // You'll need to implement the actual API call to save settings
-  // This is just a placeholder
-  console.log("Saving settings:", settings);
+    const settings = {
+      userId: currentUser.$id,
+      gaussianBlur: parseInt(document.getElementById("blur-setting").value),
+      cannyThreshold1: Math.floor(parseInt(document.getElementById("edge-sensitivity").value) / 3),
+      cannyThreshold2: parseInt(document.getElementById("edge-sensitivity").value),
+      morphKernelSize: parseInt(document.getElementById("edge-closing").value)
+    };
+
+    const response = await fetch('/api/preferences', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(settings)
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to save preferences');
+    }
+
+    const savedSettings = await response.json();
+    console.log('Settings saved successfully:', savedSettings);
+  } catch (error) {
+    console.error('Error saving settings:', error);
+    // Uncheck the checkbox if save failed
+    const checkbox = document.getElementById("save-settings-checkbox");
+    if (checkbox) {
+      checkbox.checked = false;
+    }
+  }
+}
+
+// Function to load user settings
+async function loadUserSettings() {
+  try {
+    const currentUser = authController.getCurrentUser();
+    if (!currentUser) {
+      return;
+    }
+
+    const response = await fetch(`/api/preferences/user/${currentUser.$id}`);
+    if (!response.ok) {
+      if (response.status !== 404) { // 404 is expected when no settings exist
+        throw new Error('Failed to load preferences');
+      }
+      return;
+    }
+
+    const settings = await response.json();
+    
+    // Update the UI with loaded settings
+    document.getElementById("blur-setting").value = settings.gaussian_blur;
+    document.getElementById("blur-value").textContent = settings.gaussian_blur;
+    
+    document.getElementById("edge-sensitivity").value = settings.canny_threshold_2;
+    document.getElementById("sensitivity-value").textContent = settings.canny_threshold_2;
+    
+    document.getElementById("edge-closing").value = settings.morph_kernel_size;
+    document.getElementById("closing-value").textContent = settings.morph_kernel_size;
+
+    // Check the save settings checkbox
+    const checkbox = document.getElementById("save-settings-checkbox");
+    if (checkbox) {
+      checkbox.checked = true;
+    }
+
+    // Update edge detection with loaded settings
+    await updateEdgeDetection();
+  } catch (error) {
+    console.error('Error loading settings:', error);
+  }
 }

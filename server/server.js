@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const userRoutes = require("./routes/userRoutes");
 const imageRoutes = require("./routes/imageRoutes");
+const preferenceRoutes = require("./routes/prefrenceRoutes");
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.get("/", (req, res) => {
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/images", imageRoutes);
+app.use("/api/preferences", preferenceRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -36,6 +38,9 @@ function printRoutes() {
   console.log("- GET  /api/images/user/:userId");
   console.log("- GET  /api/images/:imageId");
   console.log("- DELETE /api/images/:imageId");
+  console.log("- POST /api/preferences");
+  console.log("- GET  /api/preferences/user/:userId");
+  console.log("- DELETE /api/preferences/user/:userId");
 }
 
 const PORT = process.env.PORT || 3000;
