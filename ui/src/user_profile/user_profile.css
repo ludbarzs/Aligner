@@ -140,6 +140,14 @@
   overflow: visible;
 }
 
+#continue-section .projects-grid {
+  grid-template-columns: repeat(auto-fill, minmax(125px, 1fr)); /* Half the original size */
+}
+
+#continue-section .project-item {
+  padding-top: 50%; /* Half the original aspect ratio */
+}
+
 /* Responsive adjustments */
 @media screen and (max-width: 768px) {
   .container {
