@@ -114,18 +114,25 @@
   transform: translateY(-1px);
 }
 
-/* Maximized image container */
+/* Main content layout */
+.box {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 0; /* Allows content to shrink */
+}
+
+/* Image container styling */
 .image-container {
   width: 100%;
-  height: calc(100vh - 270px); /* Full height minus header space and controls */
-  min-height: 300px; /* Minimum height to ensure visibility */
-  max-height: none; /* Remove height restriction */
+  height: calc(100vh - 270px);
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
   position: relative;
-  flex-shrink: 0;
+  flex: 1;
+  min-height: 300px;
   padding: 20px;
   background: rgba(255, 255, 255, 0.02);
   border-radius: 12px;
@@ -133,22 +140,32 @@
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+.image-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
 #edge-image {
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 90%;
+  max-height: calc(90vh - 90px);
   width: auto;
   height: auto;
   object-fit: contain;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   opacity: 0;
   transition: opacity 0.3s ease;
-  border-radius: 8px;
 }
 
 #edge-image.loaded {
   opacity: 1;
-  transition:
-    transform 0.3s ease,
-    opacity 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 /* No image message styles */
