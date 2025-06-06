@@ -24,21 +24,12 @@ def contours_to_dxf(
 
     msp = doc.modelspace()
 
-    # Layers for different elemetns
+    # Layers for different elements
     doc.layers.add(name="CONTOURS", dxfattribs={"color": 2})
     doc.layers.add(name="DIMENSIONS", dxfattribs={"color": 1})
-    doc.layers.add(name="TEXT", dxfattribs={"color": 3})
-
-    msp.add_text(
-        f"Real-World Dimensions: {irl_width:.1f} mm (width) x {irl_length:.1f} mm (length)",
-        dxfattribs={
-            "layer": "TEXT",
-            "height": 5.0,
-        },
-    ).dxf.insert = (origin[0], origin[1] + 10)
 
     # Process each contour
-    for i, contour in enumerate(contours):
+    for contour in contours:
         # Convert to mm using ratios
         points_mm = []
         for point in contour:
@@ -50,22 +41,6 @@ def contours_to_dxf(
 
         polyline = msp.add_lwpolyline(points_mm, dxfattribs={"layer": "CONTOURS"})
         polyline.close(True)
-
-        M = cv.moments(contour)
-        # Find the centroid of the contour for labeling
-        if M["m00"] != 0:
-            cx = int(M["m10"] / M["m00"]) / x_ratio + origin[0]
-            cy = -int(M["m01"] / M["m00"]) / y_ratio + origin[1]
-
-            # Add contour number label
-            text = msp.add_text(
-                f"Contour {i + 1}",
-                dxfattribs={
-                    "layer": "TEXT",
-                    "height": 5.0,  # Text height in mm
-                },
-            )
-            text.dxf.insert = (cx, cy)
 
     try:
         doc.saveas(file_path)
