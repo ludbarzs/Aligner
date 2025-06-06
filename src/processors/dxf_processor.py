@@ -27,6 +27,7 @@ def contours_to_dxf(
     # Layers for different elements
     doc.layers.add(name="CONTOURS", dxfattribs={"color": 2})
     doc.layers.add(name="DIMENSIONS", dxfattribs={"color": 1})
+    doc.layers.add(name="BOUNDARIES", dxfattribs={"color": 3})  # Add new layer for boundaries
 
     # Process each contour
     for contour in contours:
@@ -41,6 +42,32 @@ def contours_to_dxf(
 
         polyline = msp.add_lwpolyline(points_mm, dxfattribs={"layer": "CONTOURS"})
         polyline.close(True)
+
+    # Add boundary lines
+    # Bottom line
+    msp.add_line(
+        start=(origin[0], origin[1]),
+        end=(origin[0] + irl_width, origin[1]),
+        dxfattribs={"layer": "BOUNDARIES"}
+    )
+    # Right line
+    msp.add_line(
+        start=(origin[0] + irl_width, origin[1]),
+        end=(origin[0] + irl_width, origin[1] + irl_length),
+        dxfattribs={"layer": "BOUNDARIES"}
+    )
+    # Top line
+    msp.add_line(
+        start=(origin[0] + irl_width, origin[1] + irl_length),
+        end=(origin[0], origin[1] + irl_length),
+        dxfattribs={"layer": "BOUNDARIES"}
+    )
+    # Left line
+    msp.add_line(
+        start=(origin[0], origin[1] + irl_length),
+        end=(origin[0], origin[1]),
+        dxfattribs={"layer": "BOUNDARIES"}
+    )
 
     try:
         doc.saveas(file_path)
