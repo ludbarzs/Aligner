@@ -44,6 +44,7 @@ def contours_to_dxf(
         polyline.close(True)
 
     # Add boundary lines
+    # Note: We need to flip the Y coordinates to match the contour coordinate system
     # Bottom line
     msp.add_line(
         start=(origin[0], origin[1]),
@@ -53,18 +54,18 @@ def contours_to_dxf(
     # Right line
     msp.add_line(
         start=(origin[0] + irl_width, origin[1]),
-        end=(origin[0] + irl_width, origin[1] + irl_length),
+        end=(origin[0] + irl_width, origin[1] - irl_length),  # Negative irl_length
         dxfattribs={"layer": "BOUNDARIES"}
     )
     # Top line
     msp.add_line(
-        start=(origin[0] + irl_width, origin[1] + irl_length),
-        end=(origin[0], origin[1] + irl_length),
+        start=(origin[0] + irl_width, origin[1] - irl_length),  # Negative irl_length
+        end=(origin[0], origin[1] - irl_length),  # Negative irl_length
         dxfattribs={"layer": "BOUNDARIES"}
     )
     # Left line
     msp.add_line(
-        start=(origin[0], origin[1] + irl_length),
+        start=(origin[0], origin[1] - irl_length),  # Negative irl_length
         end=(origin[0], origin[1]),
         dxfattribs={"layer": "BOUNDARIES"}
     )
