@@ -3,7 +3,10 @@ import { ImageController } from "../../scripts/controllers/image_controller.js";
 import { AppState } from "../../scripts/app_state.js";
 import { appwriteService } from "../../authentication/services/appwrite-service.js";
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  // Initialize auth controller
+  await authController.init();
+
   // Logout button handler
   const logoutBtn = document.getElementById("logoutBtn");
   logoutBtn.addEventListener("click", async () => {
