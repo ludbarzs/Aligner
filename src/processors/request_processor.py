@@ -22,6 +22,8 @@ class RequestProcessor:
         )
 
         image = ImageProcessor.decode_image(data["imageData"])
+        x_ratio = None
+        y_ratio = None
         
         # Handle coordinates if present (for initial processing)
         if "coordinates" in data:
@@ -41,8 +43,11 @@ class RequestProcessor:
         else:
             # For edge detection updates, use the image as is
             corrected_image = image
-            x_ratio = None
-            y_ratio = None
+            # Calculate ratios based on image size and real dimensions if available
+            if "realWidthMm" in data and "realHeightMm" in data:
+                height, width = image.shape[:2]
+                x_ratio = width / float(data["realWidthMm"])
+                y_ratio = height / float(data["realHeightMm"])
 
         # Extract edge detection settings if provided
         edge_settings = data.get("edgeDetectionSettings", {})
@@ -79,7 +84,7 @@ class RequestProcessor:
 
         # Generate DXF file if we have valid ratios and dimensions
         dxf_data = None
-        if x_ratio is not None and y_ratio is not None:
+        if x_ratio is not None and y_ratio is not None and "realWidthMm" in data and "realHeightMm" in data:
             # Create temporary file for DXF
             with tempfile.NamedTemporaryFile(suffix='.dxf', delete=False) as tmp_file:
                 dxf_path = contours_to_dxf(
@@ -101,15 +106,13 @@ class RequestProcessor:
             "contoured_image": edge_results["contoured_image"],
             "edge_image": ImageProcessor.encode_image(edge_results["edge_image"]),
             "transformations": transformations,
+            "x_ratio": x_ratio,
+            "y_ratio": y_ratio,
+            "dxf_data": dxf_data
         }
 
-        # Only include coordinates, ratios and DXF if they were processed
+        # Include coordinates if they were provided
         if "coordinates" in data:
-            result.update({
-                "coordinates": data["coordinates"],
-                "x_ratio": x_ratio,
-                "y_ratio": y_ratio,
-                "dxf_data": dxf_data
-            })
+            result["coordinates"] = data["coordinates"]
 
         return result
