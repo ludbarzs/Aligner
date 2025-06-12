@@ -12,8 +12,7 @@ const confirmPasswordInput = document.getElementById("confirm-password");
   try {
     const user = await appwriteService.getCurrentUser();
     if (user) {
-      // If there's an active session, log out first
-      await appwriteService.logout();
+       window.location.href = "../../image_upload/image_upload.html"; 
     }
   } catch (error) {
     console.error("Error checking session:", error);
@@ -46,7 +45,6 @@ const validateUsername = (username) => {
   if (username.length < 3) {
     return "Username must be at least 3 characters long";
   }
-  return "";
 };
 
 const validateEmail = (email) => {
@@ -57,7 +55,6 @@ const validateEmail = (email) => {
   if (!emailRegex.test(email)) {
     return "Please enter a valid email address";
   }
-  return "";
 };
 
 const validatePassword = (password) => {
@@ -73,7 +70,6 @@ const validatePassword = (password) => {
   if (!/\d/.test(password)) {
     return "Password must contain at least one number";
   }
-  return "";
 };
 
 const validateConfirmPassword = (password, confirmPassword) => {
@@ -83,14 +79,11 @@ const validateConfirmPassword = (password, confirmPassword) => {
   if (password !== confirmPassword) {
     return "Passwords do not match";
   }
-  return "";
 };
 
 // Register user in local database
 const registerInLocalDb = async (awId) => {
   try {
-    console.log("Attempting to register user with awId:", awId); // Debug log
-
     const response = await fetch("http://localhost:3000/api/users", {
       method: "POST",
       headers: {
@@ -99,18 +92,14 @@ const registerInLocalDb = async (awId) => {
       body: JSON.stringify({ awId }),
     });
 
-    console.log("Response status:", response.status); // Debug log
-
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("Server error:", errorData); // Debug log
       throw new Error(
         errorData.message || "Failed to register in local database",
       );
     }
 
     const result = await response.json();
-    console.log("Registration successful:", result); // Debug log
     return result;
   } catch (error) {
     console.error("Error registering in local database:", error);
@@ -136,13 +125,11 @@ registerForm.addEventListener("submit", async (e) => {
     confirmPassword,
   );
 
-  // Show error messages if any
   createErrorMessage(usernameInput, usernameError);
   createErrorMessage(emailInput, emailError);
   createErrorMessage(passwordInput, passwordError);
   createErrorMessage(confirmPasswordInput, confirmPasswordError);
 
-  // If there are no errors, attempt registration
   if (
     !usernameError &&
     !emailError &&

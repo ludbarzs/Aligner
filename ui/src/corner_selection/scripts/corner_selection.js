@@ -2,7 +2,7 @@ import { AppState } from "../../scripts/app_state.js";
 import { FrameSelector } from "./frame_selector.js";
 import { ApiService } from "../../scripts/api.js";
 import { authController } from "../../scripts/controllers/AuthController.js";
-// Get DOM elements
+
 const imageElement = document.getElementById("corner-image");
 const imageContainer = document.querySelector(".image-container");
 const noImageMessage = document.querySelector(".no-image-message");
@@ -11,13 +11,18 @@ const drawerWidthInput = document.getElementById("drawer-width");
 const drawerHeightInput = document.getElementById("drawer-height");
 let frameSelector = null;
 
-// Initialize AuthController
 document.addEventListener("DOMContentLoaded", async () => {
-  // Initialize auth controller
   await authController.init();
+
+  console.log("Current AppState:", AppState.getAllValues());
+  loadImageFromState();
+  loadDrawerDimensions();
+
+  drawerWidthInput.addEventListener("input", validateDrawerDimensions);
+  drawerHeightInput.addEventListener("input", validateDrawerDimensions);
 });
 
-// Function to validate drawer dimensions
+// Validate drawer dimensions
 function validateDrawerDimensions() {
   const width = drawerWidthInput.value;
   const height = drawerHeightInput.value;
@@ -34,7 +39,6 @@ function validateDrawerDimensions() {
   // Enable/disable continue button based on validation
   continueButton.disabled = !isValid;
 
-  // Add/remove visual feedback classes
   if (isValid) {
     continueButton.classList.remove("disabled");
   } else {
@@ -56,11 +60,10 @@ function loadDrawerDimensions() {
       drawerHeightInput.value = dimensions.height;
     }
   }
-  // Initial validation of the continue button
   validateDrawerDimensions();
 }
 
-// Function to load image from AppState
+// Load image from AppState
 function loadImageFromState() {
   const imageData = AppState.getCurrentImage();
 
@@ -142,7 +145,6 @@ function applyTransformations() {
     // Choose the appropriate scale based on rotation
     let scale;
     if (isSwapped) {
-      // Use the smaller scale factor to ensure image fits in both dimensions
       scale = Math.min(rotatedScaleX, rotatedScaleY);
     } else {
       scale = Math.min(normalScaleX, normalScaleY);
@@ -158,7 +160,7 @@ function applyTransformations() {
 
     // Apply transformations with centering translation
     const transforms = [
-      "translate(-50%, -50%)", // Center the image
+      "translate(-50%, -50%)",
       `rotate(${rotation}deg)`,
       mirrored ? "scaleX(-1)" : "scaleX(1)",
     ];
@@ -186,19 +188,6 @@ function initializeFrameSelector() {
   }
 }
 
-// Event Listeners
-document.addEventListener("DOMContentLoaded", () => {
-  // Print entire AppState to console
-  console.log("Current AppState:", AppState.getAllValues());
-
-  loadImageFromState();
-  loadDrawerDimensions();
-
-  // Add input validation listeners
-  drawerWidthInput.addEventListener("input", validateDrawerDimensions);
-  drawerHeightInput.addEventListener("input", validateDrawerDimensions);
-});
-
 // Add resize listener to handle responsive updates
 window.addEventListener("resize", () => {
   if (imageElement.style.display !== "none") {
@@ -220,6 +209,5 @@ continueButton.addEventListener("click", async () => {
   // Store drawer dimensions in AppState
   AppState.setDrawerDimensions(drawerWidth, drawerHeight);
 
-  // Send to API for processing
   await ApiService.sendToAPI();
 });

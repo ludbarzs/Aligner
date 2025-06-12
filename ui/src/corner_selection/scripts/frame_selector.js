@@ -7,7 +7,7 @@ export class FrameSelector {
     this.corners = [];
     this.lines = [];
     this.activeDragCorner = null;
-    this.cornerPositions = []; // Store positions as percentages
+    this.cornerPositions = []; 
     this.init();
   }
 
@@ -25,19 +25,17 @@ export class FrameSelector {
     this.container.style.left = "50%";
     this.container.style.transform = "translate(-50%, -50%)";
 
-    // Add container to the image's parent
     this.imageElement.parentElement.appendChild(this.container);
 
     // Check for saved coordinates in AppState
     const savedCoordinates = AppState.getCornerCoordinates();
     if (savedCoordinates && savedCoordinates.length === 4) {
-      // Convert saved absolute coordinates to percentages
+      // Convert saved coordinates to percentages
       this.cornerPositions = savedCoordinates.map(coord => ({
         x: (coord.x / this.imageElement.naturalWidth) * 100,
         y: (coord.y / this.imageElement.naturalHeight) * 100
       }));
     } else {
-      // Initialize cornerPositions with default percentage values only if no saved coordinates
       this.cornerPositions = [
         { x: 15, y: 15 },        // Top-left
         { x: 85, y: 15 },        // Top-right
@@ -51,7 +49,6 @@ export class FrameSelector {
     this.createLines();
     this.initializeCornerPositions();
 
-    // Update on window resize
     window.addEventListener("resize", () => {
       this.updateContainerSize();
       this.updateCornersFromPercentages();
@@ -80,8 +77,7 @@ export class FrameSelector {
       const corner = document.createElement("div");
       corner.className = "frame-corner";
       corner.dataset.index = i;
-      
-      // Set initial position to prevent NaN values
+
       corner.style.left = "0px";
       corner.style.top = "0px";
       
@@ -98,7 +94,7 @@ export class FrameSelector {
     for (let i = 0; i < 4; i++) {
       const line = document.createElement("div");
       line.className = "frame-line";
-      line.style.height = "2px"; // Set a default line thickness
+      line.style.height = "2px"; 
       this.lines.push(line);
       this.container.appendChild(line);
     }
@@ -127,7 +123,7 @@ export class FrameSelector {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    // Clamp to container bounds and convert to percentages
+    // Convert to percentages
     const clampedX = Math.max(0, Math.min(rect.width, x));
     const clampedY = Math.max(0, Math.min(rect.height, y));
     
@@ -189,7 +185,7 @@ export class FrameSelector {
     
     const rect = this.container.getBoundingClientRect();
     
-    // Convert absolute coordinates to percentages and update both stored and visual positions
+    // Convert absolute coordinates to percentages
     coordinates.forEach((coord, i) => {
       const percentX = (coord.x / this.imageElement.naturalWidth) * 100;
       const percentY = (coord.y / this.imageElement.naturalHeight) * 100;

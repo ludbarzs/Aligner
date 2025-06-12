@@ -8,11 +8,9 @@ const app = express();
 
 // Middleware
 app.use(cors());
-// Increase JSON payload limit for base64 images
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// Add basic route for testing
 app.get("/", (req, res) => {
   res.json({ message: "Server is running" });
 });
@@ -22,7 +20,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/images", imageRoutes);
 app.use("/api/preferences", preferenceRoutes);
 
-// Error handling middleware
+// Error handling
 app.use((err, req, res, next) => {
   console.error("Error:", err.stack);
   res.status(500).json({ message: "Something went wrong!" });

@@ -2,12 +2,12 @@ require('dotenv').config();
 const mysql = require('mysql2');
 
 const pool = mysql.createPool({
-    host: 'localhost',
-    user: 'webuser',
-    password: 'password',
-    database: 'aligner',
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     waitForConnections: true,
-    connectionLimit: 10,
+    connectionLimit: parseInt(process.env.DB_CONN_LIMIT || '10'),
     queueLimit: 0
 });
 
@@ -15,7 +15,7 @@ const pool = mysql.createPool({
 const promisePool = pool.promise();
 
 // Handle disconnects
-promisePool.on('error', function(err) {
+pool.on('error', function(err) {
     console.error('Database error:', err);
     if (err.code === 'PROTOCOL_CONNECTION_LOST') {
         console.error('Database connection was closed.');
@@ -28,12 +28,13 @@ promisePool.on('error', function(err) {
     }
 });
 
-promisePool.getConnection(err => {
-    if (err) {
+promisePool.getConnection()
+    .then(conn => {
+        console.log('Connected to MySQL database');
+        conn.release();
+    })
+    .catch(err => {
         console.error('Error connecting to MySQL:', err);
-        return;
-    }
-    console.log('Connected to MySQL database');
-});
+    });
 
-module.exports = promisePool; 
+module.exports = promisePool;

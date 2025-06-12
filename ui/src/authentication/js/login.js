@@ -21,7 +21,6 @@ if (urlParams.get('registration') === 'success') {
     );
 }
 
-// Form elements
 const loginForm = document.querySelector(".login-form");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
@@ -35,7 +34,7 @@ const createErrorMessage = (inputElement, message) => {
     existingError.remove();
   }
 
-  // Create and insert new error message if there is one
+  // Create and insert new error message
   if (message) {
     const errorDiv = document.createElement("div");
     errorDiv.className = "error-message";
@@ -44,7 +43,6 @@ const createErrorMessage = (inputElement, message) => {
   }
 };
 
-// Validation functions
 const validateEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!email) {
@@ -75,7 +73,6 @@ const validatePassword = (password) => {
 // Function to ensure user exists in local database
 async function ensureLocalUser(appwriteUserId) {
     try {
-        // First try to get the user
         let response = await fetch(`http://localhost:3000/api/users/appwrite/${appwriteUserId}`);
         
         if (response.status === 404) {
@@ -130,19 +127,15 @@ document.addEventListener('DOMContentLoaded', () => {
         createErrorMessage(passwordInput, "");
 
         try {
-            // First login with Appwrite
             await appwriteService.login(email, password);
             
-            // Get the current user
             const user = await appwriteService.getCurrentUser();
             if (!user) {
                 throw new Error('Failed to get user after login');
             }
 
-            // Ensure user exists in local database
             await ensureLocalUser(user.$id);
 
-            // Redirect to image upload page on success
             window.location.href = '../image_upload/image_upload.html';
         } catch (error) {
             console.error("Login failed:", error);
@@ -150,27 +143,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
-// Backend integration function (to be implemented)
-async function handleLogin(email, password) {
-  // This is a placeholder function that will be implemented when the backend is ready
-  // Example implementation:
-  /*
-    const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-    });
-
-    if (!response.ok) {
-        throw new Error('Login failed');
-    }
-
-    const data = await response.json();
-    // Handle successful login (e.g., store token, redirect)
-    localStorage.setItem('token', data.token);
-    window.location.href = '/dashboard';
-    */
-} 

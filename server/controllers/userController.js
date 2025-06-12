@@ -2,8 +2,6 @@ const pool = require('../config/database');
 
 /**
  * Add a new user to the database
- * @param {string} awId - Appwrite user ID
- * @returns {Promise<Object>} The created user object
  */
 const addUser = async (awId) => {
     try {
@@ -26,8 +24,6 @@ const addUser = async (awId) => {
 
 /**
  * Get a user by their Appwrite ID
- * @param {string} awId - Appwrite user ID
- * @returns {Promise<Object|null>} The user object or null if not found
  */
 const getUserByAppwriteId = async (awId) => {
     try {

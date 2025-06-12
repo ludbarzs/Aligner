@@ -22,16 +22,6 @@ class EdgeDetector:
     ) -> np.ndarray:
         """
         Prepares an image for contour detection by applying various filters
-
-        Args:
-            image: Input image as a NumPy array
-            blur_kernel_size: Size of the Gaussian blur kernel
-            canny_low: First threshold for Canny edge detector
-            canny_high: Second threshold for Canny edge detector
-            morph_kernel_size: Size of the morphological operations kernel
-
-        Returns:
-            Processed image with highlighted edges
         """
 
         # Convert to grayscale
@@ -40,7 +30,7 @@ class EdgeDetector:
         # Apply gaussian blur
         blurred_image = cv.GaussianBlur(gray_image, blur_kernel_size, 0)
 
-        # Detects edges using Canny EF
+        # Detects edges using Canny
         edges_image = cv.Canny(blurred_image, canny_low, canny_high)
 
         # Apply morhpological closing
@@ -53,13 +43,6 @@ class EdgeDetector:
     def find_contours(image: np.ndarray, min_area: float = 1000) -> List[np.ndarray]:
         """
         Finds contours in a binary image and filters by minimum area
-
-        Args:
-            image: Binary image (output from prepare_image)
-            min_area: Minimum contour area to keep
-
-        Returns:
-            List of filtered contours
         """
         contours, _ = cv.findContours(image, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
         filtered_contours = [cnt for cnt in contours if cv.contourArea(cnt) > min_area]
@@ -73,14 +56,6 @@ class EdgeDetector:
     ) -> np.ndarray:
         """
         Draws contours on the original image
-
-        Args:
-            image: Original image to draw on
-            contours: List of contours to draw
-            thickness: Line thickness
-
-        Returns:
-            Image with drawn contours
         """
         result = image.copy()
         cv.drawContours(result, contours, -1, (0, 255, 0), thickness)
@@ -97,24 +72,7 @@ class EdgeDetector:
         morph_kernel_size: Tuple[int, int] = (5, 5),
     ) -> dict:
         """
-        Complete edge detection workflow
-
-        Args:
-            image: Original input image
-            min_contour_area: Minimum contour area to keep
-            return_edges: Whether to include edge image in result
-            blur_kernel_size: Size of the Gaussian blur kernel
-            canny_low: First threshold for Canny edge detector
-            canny_high: Second threshold for Canny edge detector
-            morph_kernel_size: Size of the morphological operations kernel
-
-        Returns:
-            Dictionary with processed results:
-            {
-                'contoured_image': image with contours drawn,
-                'contours': list of contours (optional),
-                'edge_image': binary edge image (optional)
-            }
+        Complete edge detection, all in one
         """
         # Process the image to find edges
         edge_image = EdgeDetector.prepare_image(

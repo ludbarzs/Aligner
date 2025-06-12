@@ -15,9 +15,6 @@ class ImageProcessor:
                image: Input image as a NumPy array in OpenCV format (BGR)
                is_mirror: Whether to apply horizontal mirroring (left-right flip)
                rotation: Rotation angle in degrees (must be 0, 90, 180, or 270)
-
-           Returns:
-               np.ndarray: Transformed image as a NumPy array
         """
         processed_image = image.copy()
 

@@ -2,14 +2,12 @@ import { AppState } from "../../scripts/app_state.js";
 import { authController } from "../../scripts/controllers/AuthController.js";
 
 
-// Get DOM elements
 const imageElement = document.getElementById("edit-image");
 const editContainer = document.querySelector(".edit-container");
 const noImageMessage = document.querySelector(".no-image-message");
 const buttons = document.querySelectorAll(".control-button");
 let rotateButton, mirrorButton, reuploadButton;
 
-// Create hidden file input for reupload
 const fileInput = document.createElement('input');
 fileInput.type = 'file';
 fileInput.accept = '.jpg,.jpeg,.png';
@@ -17,12 +15,11 @@ fileInput.style.display = 'none';
 fileInput.id = 'reupload-input';
 document.body.appendChild(fileInput);
 
-// Initialize AuthController
 document.addEventListener("DOMContentLoaded", async () => {
-  // Initialize auth controller
   await authController.init();
+  loadImageFromState();
+  buttons.forEach((button) => button.style.display = "flex");
 });
-
 
 // Find the rotate, mirror, and reupload buttons by their text content
 buttons.forEach((button) => {
@@ -50,7 +47,6 @@ function handleReupload(file) {
   reader.onload = function(e) {
     // Save new image to app state
     AppState.setCurrentImage(e.target.result);
-    // Refresh the page to reset the UI
     window.location.reload();
   };
   
@@ -143,8 +139,8 @@ function applyTransformations() {
   const isSwapped = rotation % 180 !== 0;
   
   // Get container dimensions with some padding
-  const containerWidth = editContainer.clientWidth * 0.9; // 90% of container width
-  const containerHeight = editContainer.clientHeight * 0.9; // 90% of container height
+  const containerWidth = editContainer.clientWidth * 0.9;
+  const containerHeight = editContainer.clientHeight * 0.9;
   
   // Reset any existing transforms and dimensions to get natural size
   imageElement.style.transform = 'translate(-50%, -50%)';
@@ -165,7 +161,6 @@ function applyTransformations() {
     // Choose the appropriate scale based on rotation
     let scale;
     if (isSwapped) {
-      // Use the smaller scale factor to ensure image fits in both dimensions
       scale = Math.min(rotatedScaleX, rotatedScaleY);
     } else {
       scale = Math.min(normalScaleX, normalScaleY);
@@ -179,7 +174,7 @@ function applyTransformations() {
     imageElement.style.width = `${finalWidth}px`;
     imageElement.style.height = `${finalHeight}px`;
     
-    // Apply transformations with centering translation
+    // Apply transformations
     const transforms = [
       'translate(-50%, -50%)', // Center the image
       `rotate(${rotation}deg)`,
@@ -188,22 +183,11 @@ function applyTransformations() {
     
     imageElement.style.transform = transforms.join(' ');
     
-    // Add the loaded class to enable transitions after initial positioning
     requestAnimationFrame(() => {
       imageElement.classList.add('loaded');
     });
   }
 }
-
-// Event Listeners
-document.addEventListener("DOMContentLoaded", () => {
-  loadImageFromState();
-
-  // Make buttons visible
-  buttons.forEach((button) => {
-    button.style.display = "flex";
-  });
-});
 
 if (rotateButton) {
   rotateButton.addEventListener("click", rotateImage);
@@ -237,9 +221,5 @@ const continueButton = document.querySelector('.control-button.primary');
 
 // Add click event listener to continue button
 continueButton.addEventListener('click', () => {
-    // Save any necessary state if needed
-    // AppState.setSomeState(someValue);
-    
-    // Redirect to corner selection page
     window.location.href = '../corner_selection/corner_selection.html';
 });

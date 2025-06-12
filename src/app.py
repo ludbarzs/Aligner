@@ -9,14 +9,12 @@ from processors.image_processor import ImageProcessor
 from processors.request_processor import RequestProcessor
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+CORS(app) 
 
 
 @app.route("/process-image", methods=["POST"])
 def process_image():
     """
-    Endpoint to receive an image with coordinates
-
     Expected JSON format:
     {
         "imageData": "data:image/png;base64,iVBORw0KGgo...",
@@ -28,35 +26,37 @@ def process_image():
         ],
         "realWidthMm": 530,
         "realHeightMm": 330,
-        "transformations": {                    # Optional, defaults: {"mirrored": false, "rotation": 0}
-            "mirrored": true,
-            "rotation": 90
+        "transformations": {        
+            "mirrored": false,
+            "rotation": 0
         },
-        "edgeDetectionSettings": {              # Optional edge detection parameters
-            "blurKernelSize": [5, 5],          # Optional, defaults to [5, 5]. Must be odd numbers.
-            "cannyLow": 30,                     # Optional, defaults to 30
-            "cannyHigh": 130,                   # Optional, defaults to 130
-            "morphKernelSize": [5, 5]          # Optional, defaults to [5, 5]. Must be odd numbers.
+        "edgeDetectionSettings": {        
+            "blurKernelSize": [5, 5],     
+            "cannyLow": 30,               
+            "cannyHigh": 130,             
+            "morphKernelSize": [5, 5]     
         }
     }
 
     Returns:
     {
         "success": true,
-        "processedImage": "data:image/png;base64,...",  # Base64 encoded processed image
-        "edgeImage": "data:image/png;base64,...",       # Base64 encoded edge detection image
-        "contouredImage": "data:image/png;base64,...",  # Base64 encoded image with contours
-        "coordinates": [                                 # Processed/adjusted coordinates
-            {"x": float, "y": float},
-            ...
+        "processedImage": "data:image/png;base64,...", 
+        "edgeImage": "data:image/png;base64,...",      
+        "contouredImage": "data:image/png;base64,...", 
+        "coordinates": [
+            {"x": 100, "y": 200},
+            {"x": 300, "y": 200},
+            {"x": 300, "y": 400},
+            {"x": 100, "y": 400}
         ],
-        "xRatio": float,                                # Ratio for x-axis measurements
-        "yRatio": float,                                # Ratio for y-axis measurements
-        "transformations": {                            # Applied transformations
-            "mirrored": boolean,
-            "rotation": int
+        "xRatio": float,  
+        "yRatio": float,  
+        "transformations": {           
+            "mirrored": false,
+            "rotation": 0
         },
-        "dxf_data": string                             # Base64 encoded DXF file data (only when coordinates are provided)
+        "dxf_data": string 
     }
 
     Error Response:
@@ -78,13 +78,6 @@ def process_image():
         if image is None:
             return jsonify({"success": False, "error": "Invalid image data"}), 400
 
-        # TODO: Delete the following or transfrom before validation
-        # # Validate coordinates
-        # is_valid, error = ImageProcessor.validate_coordinates(
-        #     image, data["coordinates"]
-        # )
-        # if not is_valid:
-        #     return jsonify({"success": False, "error": error}), 400
 
         # Process request
         result = RequestProcessor.process_request(data)

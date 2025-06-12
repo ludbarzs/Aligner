@@ -1,22 +1,5 @@
 const pool = require("../config/database");
 
-/**
- * Add a new image with its associated data
- * @param {Object} imageData Object containing all image information
- * @param {string} imageData.base64Data Base64 encoded image data
- * @param {string} imageData.mimeType Image MIME type
- * @param {number} imageData.userId User ID who owns the image
- * @param {number} [imageData.realWidthMm] Real width in millimeters
- * @param {number} [imageData.realHeightMm] Real height in millimeters
- * @param {Object} [imageData.cornerCoordinates] Corner coordinates data
- * @param {Object} [imageData.transformations] Image transformation data
- * @param {number} [imageData.xRatio] X-axis scaling ratio
- * @param {number} [imageData.yRatio] Y-axis scaling ratio
- * @param {number} [imageData.gaussianBlur] Gaussian blur parameter
- * @param {number} [imageData.cannyThreshold1] First Canny threshold value
- * @param {number} [imageData.cannyThreshold2] Second Canny threshold value
- * @returns {Promise<Object>} The created image object with its ID
- */
 const addImage = async (imageData) => {
   const connection = await pool.getConnection();
 
@@ -82,8 +65,6 @@ const addImage = async (imageData) => {
 
 /**
  * Get an image by its ID
- * @param {number} imageId The ID of the image to retrieve
- * @returns {Promise<Object>} The image object with its data
  */
 const getImageById = async (imageId) => {
   try {
@@ -119,8 +100,6 @@ const getImageById = async (imageId) => {
 
 /**
  * Get all images for a user
- * @param {number} userId The ID of the user
- * @returns {Promise<Array>} Array of image objects
  */
 const getUserImages = async (userId) => {
   try {
@@ -153,9 +132,6 @@ const getUserImages = async (userId) => {
 
 /**
  * Delete an image and its associated data
- * @param {number} imageId The ID of the image to delete
- * @param {number} userId The ID of the user (for authorization)
- * @returns {Promise<boolean>} True if deletion was successful
  */
 const deleteImage = async (imageId, userId) => {
   const connection = await pool.getConnection();
@@ -190,9 +166,6 @@ const deleteImage = async (imageId, userId) => {
 
 /**
  * Update an existing image and its associated data
- * @param {number} imageId The ID of the image to update
- * @param {Object} imageData Updated image data
- * @returns {Promise<Object>} The updated image object
  */
 const updateImage = async (imageId, imageData) => {
   const connection = await pool.getConnection();

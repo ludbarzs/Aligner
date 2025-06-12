@@ -2,8 +2,6 @@ const pool = require("../config/database");
 
 /**
  * Get internal user_id from Appwrite ID
- * @param {string} appwriteId Appwrite user ID
- * @returns {Promise<number>} Internal user_id
  */
 async function getInternalUserId(appwriteId) {
     try {
@@ -24,13 +22,6 @@ async function getInternalUserId(appwriteId) {
 
 /**
  * Save or update user's edge detection preferences
- * @param {Object} preferences Object containing user preferences
- * @param {string} preferences.userId Appwrite user ID
- * @param {number} preferences.gaussianBlur Gaussian blur value
- * @param {number} preferences.cannyThreshold1 First Canny threshold
- * @param {number} preferences.cannyThreshold2 Second Canny threshold
- * @param {number} preferences.morphKernelSize Morphological operation kernel size
- * @returns {Promise<Object>} The saved preferences object
  */
 const savePreferences = async (preferences) => {
     const connection = await pool.getConnection();
@@ -110,8 +101,6 @@ const savePreferences = async (preferences) => {
 
 /**
  * Get user's edge detection preferences
- * @param {string} appwriteId Appwrite user ID
- * @returns {Promise<Object>} User's preferences object
  */
 const getUserPreferences = async (appwriteId) => {
     try {
@@ -141,8 +130,6 @@ const getUserPreferences = async (appwriteId) => {
 
 /**
  * Delete user's edge detection preferences
- * @param {string} appwriteId Appwrite user ID
- * @returns {Promise<boolean>} True if deletion was successful
  */
 const deletePreferences = async (appwriteId) => {
     try {
