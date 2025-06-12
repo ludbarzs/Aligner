@@ -186,8 +186,8 @@ export class AuthController {
    */
   async handleLogout() {
     try {
-      // Show loading state
-      const logoutButton = this.authButtons.querySelector(".logout-button");
+      // Show loading state if logout button exists
+      const logoutButton = this.authButtons?.querySelector(".logout-button");
       if (logoutButton) {
         logoutButton.textContent = "Logging out...";
         logoutButton.disabled = true;
@@ -208,8 +208,8 @@ export class AuthController {
       console.error("Logout failed:", error);
       this.showMessage("Logout failed. Please try again.", "error");
 
-      // Reset button state
-      const logoutButton = this.authButtons.querySelector(".logout-button");
+      // Reset button state if button exists
+      const logoutButton = this.authButtons?.querySelector(".logout-button");
       if (logoutButton) {
         logoutButton.textContent = "Logout";
         logoutButton.disabled = false;
