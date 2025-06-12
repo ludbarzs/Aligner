@@ -356,7 +356,7 @@ async function loadUserSettings() {
 
 // Add reset button functionality
 const resetButton = document.querySelector('.reset-settings-button');
-resetButton.addEventListener('click', () => {
+resetButton.addEventListener('click', async () => {
   // Reset blur setting
   const blurInput = document.getElementById('blur-setting');
   const blurValue = document.getElementById('blur-value');
@@ -375,6 +375,35 @@ resetButton.addEventListener('click', () => {
   closingInput.value = DEFAULT_SETTINGS.closing;
   closingValue.textContent = DEFAULT_SETTINGS.closing;
 
-  // Trigger edge detection with new settings
-  updateEdgeDetection();
+  // Update edge detection settings in AppState
+  const settings = {
+    blurKernelSize: [DEFAULT_SETTINGS.blur, DEFAULT_SETTINGS.blur],
+    cannyLow: Math.floor(DEFAULT_SETTINGS.sensitivity / 3),
+    cannyHigh: DEFAULT_SETTINGS.sensitivity,
+    morphKernelSize: [DEFAULT_SETTINGS.closing, DEFAULT_SETTINGS.closing],
+  };
+  AppState.setEdgeDetectionSettings(settings);
+
+  try {
+    // Show loading state
+    if (imageElement) {
+      imageElement.style.opacity = "0.5";
+    }
+
+    // Send to API for processing
+    await ApiService.sendToAPI();
+
+    // Update the image with the new contoured image
+    const contouredImage = AppState.getContouredImage();
+    if (contouredImage && imageElement) {
+      imageElement.src = contouredImage;
+      imageElement.style.opacity = "1";
+    }
+  } catch (error) {
+    console.error("Failed to update edge detection:", error);
+    // Reset opacity if there was an error
+    if (imageElement) {
+      imageElement.style.opacity = "1";
+    }
+  }
 });
