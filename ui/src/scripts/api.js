@@ -101,13 +101,9 @@ export const ApiService = {
         },
         realWidthMm: drawerWidth,
         realHeightMm: drawerHeight,
-        edgeDetectionSettings: edgeDetectionSettings
+        edgeDetectionSettings: edgeDetectionSettings,
+        coordinates: AppState.getCornerCoordinates()  // Always include coordinates
       };
-
-      // Only include coordinates if not in edge finding mode
-      if (!isEdgeFinding) {
-        requestBody.coordinates = AppState.getCornerCoordinates();
-      }
 
       // Log the request body for debugging (excluding image data)
       const debugBody = { ...requestBody, imageData: 'data:image/...[truncated]' };
