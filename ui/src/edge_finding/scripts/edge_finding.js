@@ -39,10 +39,20 @@ const DEFAULT_SETTINGS = {
 
 // Initialize AuthController
 document.addEventListener("DOMContentLoaded", async () => {
-  // Initialize auth controller
+  // Initialize auth controller first
   await authController.init();
+  
+  // Load image and local settings
+  loadImageFromState();
+  loadSavedSettings();
+  
   // Check visibility after auth is initialized
   updateSaveSettingsVisibility();
+  
+  // Load user settings if authenticated
+  if (authController.isAuthenticated()) {
+    await loadUserSettings();
+  }
 });
 
 // Listen for auth state changes
@@ -143,17 +153,6 @@ function handleNoImage(message) {
     window.location.href = "../image_upload/image_upload.html";
   }, 2000);
 }
-
-// Event Listeners
-document.addEventListener("DOMContentLoaded", async () => {
-  loadImageFromState();
-  loadSavedSettings();
-  
-  // Load user settings if authenticated
-  if (authController.isAuthenticated()) {
-    await loadUserSettings();
-  }
-});
 
 // Add edge detection settings change handlers
 [blurSetting, edgeSensitivity, edgeClosing].forEach((input) => {
@@ -289,6 +288,8 @@ async function saveUserSettings() {
       morphKernelSize: parseInt(document.getElementById("edge-closing").value)
     };
 
+    console.log('Saving user settings:', settings);
+
     const response = await fetch(`${API_BASE_URL}/api/preferences`, {
       method: 'POST',
       headers: {
@@ -318,18 +319,23 @@ async function loadUserSettings() {
   try {
     const currentUser = authController.getCurrentUser();
     if (!currentUser) {
+      console.log('No user logged in, skipping settings load');
       return;
     }
+
+    console.log('Loading settings for user:', currentUser.$id);
 
     const response = await fetch(`${API_BASE_URL}/api/preferences/user/${currentUser.$id}`);
     if (!response.ok) {
       if (response.status !== 404) { // 404 is expected when no settings exist
         throw new Error('Failed to load preferences');
       }
+      console.log('No saved settings found for user');
       return;
     }
 
     const settings = await response.json();
+    console.log('Loaded user settings:', settings);
     
     // Update the UI with loaded settings
     document.getElementById("blur-setting").value = settings.gaussian_blur;
@@ -338,8 +344,9 @@ async function loadUserSettings() {
     document.getElementById("edge-sensitivity").value = settings.canny_threshold_2;
     document.getElementById("sensitivity-value").textContent = settings.canny_threshold_2;
     
-    document.getElementById("edge-closing").value = settings.morph_kernel_size;
-    document.getElementById("closing-value").textContent = settings.morph_kernel_size;
+    const closingVal = findNearestStep(settings.morph_kernel_size, closingSteps);
+    document.getElementById("edge-closing").value = closingVal;
+    document.getElementById("closing-value").textContent = closingVal;
 
     // Check the save settings checkbox
     const checkbox = document.getElementById("save-settings-checkbox");
@@ -347,8 +354,39 @@ async function loadUserSettings() {
       checkbox.checked = true;
     }
 
-    // Update edge detection with loaded settings
-    await updateEdgeDetection();
+    // Update AppState with the loaded settings
+    const edgeSettings = {
+      blurKernelSize: [settings.gaussian_blur, settings.gaussian_blur],
+      cannyLow: Math.floor(settings.canny_threshold_2 / 3),
+      cannyHigh: settings.canny_threshold_2,
+      morphKernelSize: [closingVal, closingVal]
+    };
+    console.log('Updating AppState with settings:', edgeSettings);
+    AppState.setEdgeDetectionSettings(edgeSettings);
+
+    // Update the edge detection
+    try {
+      // Show loading state
+      if (imageElement) {
+        imageElement.style.opacity = "0.5";
+      }
+
+      // Send to API for processing
+      await ApiService.sendToAPI();
+
+      // Update the image with the new contoured image
+      const contouredImage = AppState.getContouredImage();
+      if (contouredImage && imageElement) {
+        imageElement.src = contouredImage;
+        imageElement.style.opacity = "1";
+      }
+    } catch (error) {
+      console.error("Failed to update edge detection:", error);
+      // Reset opacity if there was an error
+      if (imageElement) {
+        imageElement.style.opacity = "1";
+      }
+    }
   } catch (error) {
     console.error('Error loading settings:', error);
   }
