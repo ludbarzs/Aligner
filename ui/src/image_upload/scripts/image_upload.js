@@ -5,12 +5,18 @@ import { authController } from "../../scripts/controllers/AuthController.js";
 // Handle guidelines popup
 document.addEventListener("DOMContentLoaded", () => {
   const popup = document.getElementById("guidelines-popup");
+  const closeButton = document.querySelector(".close-button");
   
   // Close popup when clicking anywhere
   popup.addEventListener("click", (e) => {
     if (e.target === popup) {
       popup.style.display = "none";
     }
+  });
+
+  // Close popup when clicking the close button
+  closeButton.addEventListener("click", () => {
+    popup.style.display = "none";
   });
 });
 
