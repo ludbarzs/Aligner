@@ -2,6 +2,18 @@ import { AppState } from "../../scripts/app_state.js";
 import { initializeDragAndDrop } from "./drag_and_drop.js";
 import { authController } from "../../scripts/controllers/AuthController.js";
 
+// Handle guidelines popup
+document.addEventListener("DOMContentLoaded", () => {
+  const popup = document.getElementById("guidelines-popup");
+  
+  // Close popup when clicking anywhere
+  popup.addEventListener("click", (e) => {
+    if (e.target === popup) {
+      popup.style.display = "none";
+    }
+  });
+});
+
 // Get the file input element
 const fileInput = document.getElementById("image-upload");
 const uploadButton = document.querySelector(".upload-button");
