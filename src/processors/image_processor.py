@@ -7,6 +7,49 @@ import base64
 class ImageProcessor:
 
     @staticmethod
+    def transform_coordinates_for_rotation(
+        coordinates, image_width, image_height, rotation
+    ):
+        """
+        Transform coordinates to match the rotated image coordinate system
+
+        Args:
+            coordinates: List of coordinate dictionaries [{"x": int, "y": int}, ...]
+            image_width: Original image width
+            image_height: Original image height
+            rotation: Rotation angle (0, 90, 180, 270)
+
+        Returns:
+            List of transformed coordinates
+        """
+        transformed_coords = []
+
+        for coord in coordinates:
+            x, y = coord["x"], coord["y"]
+
+            if rotation == 0:
+                # No transformation needed
+                new_x, new_y = x, y
+            elif rotation == 90:
+                # 90° clockwise: (x,y) -> (y, width-1-x)
+                new_x = y
+                new_y = image_width - 1 - x
+            elif rotation == 180:
+                # 180°: (x,y) -> (width-1-x, height-1-y)
+                new_x = image_width - 1 - x
+                new_y = image_height - 1 - y
+            elif rotation == 270:
+                # 270° clockwise: (x,y) -> (height-1-y, x)
+                new_x = image_height - 1 - y
+                new_y = x
+            else:
+                raise ValueError(f"Unsupported rotation angle: {rotation}")
+
+            transformed_coords.append({"x": int(new_x), "y": int(new_y)})
+
+        return transformed_coords
+
+    @staticmethod
     def process_transformations(
         image: np.ndarray, is_mirror: bool, rotation: int
     ) -> np.ndarray:

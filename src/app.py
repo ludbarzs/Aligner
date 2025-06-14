@@ -9,62 +9,12 @@ from processors.image_processor import ImageProcessor
 from processors.request_processor import RequestProcessor
 
 app = Flask(__name__)
-CORS(app) 
+CORS(app)
 
 
 @app.route("/process-image", methods=["POST"])
+@app.route("/process-image", methods=["POST"])
 def process_image():
-    """
-    Expected JSON format:
-    {
-        "imageData": "data:image/png;base64,iVBORw0KGgo...",
-        "coordinates": [
-            {"x": 100, "y": 200},
-            {"x": 300, "y": 200},
-            {"x": 300, "y": 400},
-            {"x": 100, "y": 400}
-        ],
-        "realWidthMm": 530,
-        "realHeightMm": 330,
-        "transformations": {        
-            "mirrored": false,
-            "rotation": 0
-        },
-        "edgeDetectionSettings": {        
-            "blurKernelSize": [5, 5],     
-            "cannyLow": 30,               
-            "cannyHigh": 130,             
-            "morphKernelSize": [5, 5]     
-        }
-    }
-
-    Returns:
-    {
-        "success": true,
-        "processedImage": "data:image/png;base64,...", 
-        "edgeImage": "data:image/png;base64,...",      
-        "contouredImage": "data:image/png;base64,...", 
-        "coordinates": [
-            {"x": 100, "y": 200},
-            {"x": 300, "y": 200},
-            {"x": 300, "y": 400},
-            {"x": 100, "y": 400}
-        ],
-        "xRatio": float,  
-        "yRatio": float,  
-        "transformations": {           
-            "mirrored": false,
-            "rotation": 0
-        },
-        "dxf_data": string 
-    }
-
-    Error Response:
-    {
-        "success": false,
-        "error": "Error message description"
-    }
-    """
     try:
         data = request.json
 
@@ -78,6 +28,20 @@ def process_image():
         if image is None:
             return jsonify({"success": False, "error": "Invalid image data"}), 400
 
+        # Get original image dimensions
+        original_height, original_width = image.shape[:2]
+
+        # Transform coordinates if rotation is applied and coordinates exist
+        if "coordinates" in data and data["coordinates"]:
+            rotation = data.get("transformations", {}).get("rotation", 0)
+
+            # Transform coordinates to match the rotated image coordinate system
+            transformed_coordinates = ImageProcessor.transform_coordinates_for_rotation(
+                data["coordinates"], original_width, original_height, rotation
+            )
+
+            # Update the data with transformed coordinates
+            data["coordinates"] = transformed_coordinates
 
         # Process request
         result = RequestProcessor.process_request(data)
